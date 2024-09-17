@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Observations xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-Observations.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" imxVersion="12.0.0">
+	<DocumentReferences>
+<!--		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="0cf1e28c667cdd403ec284f71e6ac7379dd903ab5076bb24b96c3208e1853724"/>-->
+		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="xxxxx"/>
+	</DocumentReferences>
+	<Surveys>
+		<Survey puic="63e4ec4f-c204-4c2d-b576-62593a975ba4" surveyTime="2023-02-24T00:00:00+02:00" dataAcquisitionMethod="Photogrammetry"/>
+	</Surveys>
+	<ObservedLocations>
+		<ObservedLocation surveyRef="63e4ec4f-c204-4c2d-b576-62593a975ba4" objectRef="65ccaade-e1c7-43e8-975b-e377951ba621" azimuth="10.0">
+			<gml:Point srsName="EPSG:28992">
+				<gml:coordinates>141500,497000</gml:coordinates>
+			</gml:Point>			
+			<RailConnectionInfo railConnectionRef="7d90c208-cf69-46e6-a4fb-80d6a0c1141d" atMeasure="123" direction="None"/>
+		</ObservedLocation>
+	</ObservedLocations>
+</Observations>

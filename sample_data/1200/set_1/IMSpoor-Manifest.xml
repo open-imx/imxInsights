@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Manifest xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd" imxVersion="12.0.0" nidRbc="6" coreFileName="IMSpoor-SignalingDesign-toBuild.xml">
+	<ImSpoorDataList>		
+		<ImSpoorData fileName="IMSpoor-SignalingDesign.xml" hash="23cffa0ca158d2f4172e830b6779ee3277cc56b324465604208b3ef02b639d8d"/>
+		<ImSpoorData fileName="IMSpoor-ManagementAreas.xml" hash="33a37610bd3cccfbdd7e15e49e345d3f3ea16d58fea0b1de57f29004879a20b6"/>
+		<ImSpoorData fileName="IMSpoor-TrainControl.xml" hash="881a3fba8e168a217bb0881f64c2126bec2df711ee1a45f8a2ed37a9b2efa3c7"/>
+	</ImSpoorDataList>
+	<MediaList>
+		<!-- hashes zijn bepaald op basis van bestandsnaam, er zijn geen echte bestanden -->
+		<Media fileName="plaatje1.jpg" mediaType="image/jpg" hash="cfe7c196f3f4ed41343477a9007706160859b0a86a2d8f85c5cc7ba52a54916b"/>
+		<Media fileName="plaatje2.jpg" mediaType="image/jpg" hash="be6fa97477fa5d53da507af632e52bcc10362a1abf158204ec4fa13f720ac4b3"/>
+		<Media fileName="contract.pdf" mediaType="application/pdf" hash="7256e89c2fd7352d9422bcc4b87368f800a292e45afaed8908500de51bc26406"/>
+	</MediaList>
+</Manifest>

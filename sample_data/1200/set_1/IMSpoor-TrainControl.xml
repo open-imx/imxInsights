@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TrainControl xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-TrainControl.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" imxVersion="12.0.0">
+	<DocumentReferences>
+		<PreviousVersion documentName="vorigeversie.xml" hashcode="5df7a4f9ed769a5f5e7cf9d19654b891867d02efc578841032a93fba6fe219a2"/>
+		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="0cf1e28c667cdd403ec284f71e6ac7379dd903ab5076bb24b96c3208e1853724"/>
+		<BaseReference parentDocumentName="IMSpoor-ManagementAreas.xml" parentHashcode="9ffe0342e34a49a83926f5ce510944616479948ee8dfcf32ab7d1663eeea51b3"/>
+		<BoundaryReference documentName="buurblad1.xml"/>
+		<BoundaryReference documentName="buurblad2.xml"/>
+	</DocumentReferences>
+	<Routes>
+		<SingularRoute puic="62afb2ec-2212-4284-b95b-bf2ab8c763bc" startObjectRef="65ccaade-e1c7-43e8-975b-e377951ba621" endObjectRef="2e417aff-a9f1-49be-90c6-6f5d6ec41e28" isUnsuitedForElectricTraction="False" hasAutomaticControlOption="True" hasExtraControlOption="False" functionalRouteRef="929b7d38-691c-4495-ace2-3857e1eb036f" hasCargoCriteriumOption="True" hasDriveOnSightOption="True" hasNormalOption="True">
+			<TrackFragments>
+				<TrackFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="364.27" toMeasure="724.359"/>
+			</TrackFragments>
+			<OrderedSwitchPosition index="0" switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left"/>
+			<SingularRoutePart startObjectRef="65ccaade-e1c7-43e8-975b-e377951ba621" endObjectRef="196cd6ec-3135-4cc3-b6ff-3bb6233a9354"/>
+			<SingularRoutePart startObjectRef="196cd6ec-3135-4cc3-b6ff-3bb6233a9354" endObjectRef="2e417aff-a9f1-49be-90c6-6f5d6ec41e28"/>
+		</SingularRoute>
+		<CompositeRoute puic="406e399c-8b01-49fa-b596-fb899546b522">
+			<RouteRefs>046a8497-b4d8-475d-9325-4298bece5ca2 62afb2ec-2212-4284-b95b-bf2ab8c763bc</RouteRefs>
+		</CompositeRoute>
+	</Routes>
+	<MovementPlans>
+		<MovementPlan puic="daa56027-7e59-4220-91de-f16b85907dc3" ppcRef="c5d001c1-0dd7-4a75-8e6b-4fcfc9b8abce">
+			<TrainMovement puic="6f5feecc-0b49-4ea6-a68e-2a97fc1b1291" fromSignalRef="9d2fb1f1-951c-42ba-a75c-6451f93b5a48" toSignalRef="371961c2-64fc-45c5-b11c-a06ab6f22a23" fromPpcTrackRef="d256edda-3037-4a0f-8992-1de3a7de260a" toPpcTrackRef="d256edda-3037-4a0f-8992-1de3a7de260a">
+				<PrioritizedRoute routeRef="406e399c-8b01-49fa-b596-fb899546b522" priority="1"/>
+			</TrainMovement>
+		</MovementPlan>
+	</MovementPlans>
+	<FictitiousSignals>
+		<FictitiousSignal puic="196cd6ec-3135-4cc3-b6ff-3bb6233a9354" physicalObjectRef="8df39b81-dd83-4600-a9b4-e62c379eeec8" rollOnBlockDemarcationRef="173a89aa-1b5e-4dc4-bf65-0974bde9318d">
+			<Location>
+				<GeographicLocation dataAcquisitionMethod="Sketch">
+					<gml:Point srsName="EPSG:28992">
+						<gml:coordinates>141000,497502</gml:coordinates>
+					</gml:Point>
+				</GeographicLocation>
+			</Location>
+			<RailConnectionInfo railConnectionRef="8d197f85-7940-440c-b3ba-70fec0eca0a3" atMeasure="3682.1" direction="Upstream"/>
+		</FictitiousSignal>
+	</FictitiousSignals>
+	<PpcAuthorities>
+		<PpcAuthority ppcRef="c5d001c1-0dd7-4a75-8e6b-4fcfc9b8abce">
+			<WorkzoneRefs>e1ce0553-3490-4a4f-ba90-9291455f3e55</WorkzoneRefs>
+			<PpcControlledBridge bridgeRef="cdc88402-e3ec-4c47-872a-4de179c3deca" bridgeNumber="1234"/>
+		</PpcAuthority>
+	</PpcAuthorities>
+	<TrafficControlAreas>
+		<TrafficControlArea puic="b8db2e8c-adf9-4d80-aeaf-1873c7984c7e" name="KFH" description="Kijfhoek">
+			<PpcRefs>a276d546-bc98-454b-ba1d-3b0a017f28b9</PpcRefs>
+			<UncontrolledOperationalPointRefs/>
+			<OpenLineRefs/>
+		</TrafficControlArea>
+	</TrafficControlAreas>
+	<TrafficControlSystems>
+		<TrafficControlSystem puic="5588bdaa-e048-4753-b0f2-46affd9275c3" name="TCS1">
+			<Location>
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:Point>
+						<gml:coordinates>80502.232,431958.462</gml:coordinates>
+					</gml:Point>
+				</GeographicLocation>
+			</Location>
+			<CentralSafetySystemRefs>c914ab9c-97c2-41cd-8ba8-cc1708fdc904</CentralSafetySystemRefs>
+		</TrafficControlSystem>
+	</TrafficControlSystems>
+</TrainControl>

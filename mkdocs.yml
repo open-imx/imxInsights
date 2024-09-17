@@ -1,0 +1,122 @@
+site_name: Imx:Insights
+site_description: Python library for extracting information from IMX files.
+
+repo_url: https://github.com/open-imx/ImxInsights
+repo_name: ImxInsights
+
+theme:
+    favicon: assets/icon.svg
+    logo: assets/logo.svg
+
+    features:
+      - navigation.tabs
+      - navigation.tabs.sticky
+      - navigation.expand
+      # - toc.integrate
+      - search.suggest
+    name: material
+    icon:
+        logo: material/library
+    palette:
+        # Palette toggle for automatic mode
+        - media: "(prefers-color-scheme)"
+          toggle:
+            icon: material/brightness-auto
+            name: Switch to light mode
+
+        # Palette toggle for light mode
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: deep purple
+          accent: deep orange
+          toggle:
+            icon: material/brightness-7
+            name: Switch to dark mode
+
+        # Palette toggle for dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: deep purple
+          accent: deep orange
+          toggle:
+            icon: material/brightness-4
+            name: Switch to light mode
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+markdown_extensions:
+    - toc:
+        permalink: true
+    - pymdownx.highlight:
+        anchor_linenums: true
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.details
+    - admonition
+    - pymdownx.tabbed:
+        alternate_style: true
+
+plugins:
+    - search
+    - mkdocstrings:
+        handlers:
+            python:
+                import:
+                    - https://docs.python.org/3.12/objects.inv
+                    - https://shapely.readthedocs.io/en/latest/objects.inv
+                    - https://lxml.de/apidoc/objects.inv
+                options:
+                    docstring_style: google
+                    members_order: source
+                    inherited_members: true
+                    show_source: false
+                    show_symbol_type_heading: true
+                    show_symbol_type_toc: true
+                    show_root_toc_entry: false
+#                    show_root_heading: false
+#                    show_root_members_full_path: false
+
+watch:
+    - docs
+    - imxInsights
+
+nav:
+    - About: index.md
+    - Getting started:
+        - Installation: context/installation.md
+        - Basic use: examples/basic_use.md
+#        - Way of working: context/way_of_working.md
+    - Reference:
+        - Imx:
+          - SingleFileImx: reference/single_file_imx.md
+          - ContainerizedImx: reference/containerized_imx.md
+          - Domain objects:
+              - ImxObject: reference/imx_object.md
+#              - TrackAsset: reference/todo.md
+#              - RailConnection: reference/todo.md
+#              - Groupings: reference/todo.md
+          - ImxFile: reference/imx_file.md
+        - ImxRepo:
+            - ImxRepo: reference/repo/imx_repo.md
+            - RepoConfig: reference/repo/config.md
+            - RepoBuilders: reference/repo/repo_builders.md
+            - BuildExceptions: reference/repo/repo_exceptions.md
+            - ImxMultiRepo: reference/repo/imx_multi_repo.md
+        - ImxCompair:
+            - CompairRepo: reference/compair/imx_compair_multirepo.md
+            - CustomOperators: reference/compair/imx_compair_operator.md
+
+        - Exceptions:
+           - Custom Exceptions: reference/exceptions/exceptions.md
+           - Exception Handler: reference/exceptions/exceptions_handler.md
+           - ImxExceptions: reference/exceptions/exceptions_imx.md
+    - Contributing: contribution.md
+    - Code of conduct: code_of_conduct.md
+    - License: license.md

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SchemaLayout xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-SchemaLayout.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" imxVersion="12.0.0">
+	<DocumentReferences>
+		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="0cf1e28c667cdd403ec284f71e6ac7379dd903ab5076bb24b96c3208e1853724"/>
+	</DocumentReferences>
+	<Design puic="bfea7113-fc83-497a-bafe-c79fafeb08b3">
+		<Location>
+			<GeographicLocation dataAcquisitionMethod="Design">
+				<gml:Polygon>
+					<gml:outerBoundaryIs>
+						<gml:LinearRing>
+							<gml:coordinates>202922.9,437108 203018.2,437082.7 202984.8,437475.7 202945.4,437490.1 202922.9,437108</gml:coordinates>
+						</gml:LinearRing>
+					</gml:outerBoundaryIs>
+				</gml:Polygon>
+			</GeographicLocation>
+		</Location>
+		<RailConnectionLayouts>
+			<RailConnectionLayout railConnectionRef="909b5544-029b-4220-a817-7196e2b1239b">
+				<SchemaLocation dataAcquisitionMethod="Design">
+					<gml:LineString>
+						<gml:coordinates>290.0,-10.0 326.25,-10.0</gml:coordinates>
+					</gml:LineString>
+				</SchemaLocation>
+			</RailConnectionLayout>
+		</RailConnectionLayouts>
+		<ObjectLayouts>
+			<ObjectLayout objectRef="ceb38f3e-87a4-43f4-97a9-a6e1c9f9338f">
+				<SchemaLocation dataAcquisitionMethod="Design">
+					<gml:Point>
+						<gml:coordinates>290.0,-10.0</gml:coordinates>
+					</gml:Point>
+				</SchemaLocation>
+			</ObjectLayout>
+		</ObjectLayouts>
+	</Design>
+</SchemaLayout>

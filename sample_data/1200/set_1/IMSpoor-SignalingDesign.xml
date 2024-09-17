@@ -1,0 +1,3362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SignalingDesign xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-SignalingDesign.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" referenceDate="2023-10-01T00:00:00+02:00" imxVersion="12.0.0">
+	<RailInfrastructure>
+		<RailTopology>
+			<MicroNodes>
+				<MicroNode junctionRef="a9e6a356-da92-4f80-af84-b8ddf7630319">
+					<Jumpers>
+						<Jumper fromIndex="0" toIndex="1" isTraversible="Unknown" isTwoWay="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 3d004472-e699-4da4-bbfb-1da6e54fe70d</PassageRefs>
+						</Jumper>
+						<Jumper fromIndex="0" toIndex="2" isTwoWay="False" isTraversible="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 8d90241d-7b40-4e50-a917-6d05fa25f7d9</PassageRefs>
+						</Jumper>
+					</Jumpers>
+				</MicroNode>
+				<MicroNode junctionRef="087e22ef-407c-432e-b1ff-7f80c91b6621">
+					<Jumpers>
+						<Jumper fromIndex="0" toIndex="1" isTraversible="Unknown" isTwoWay="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 8d90241d-7b40-4e50-a917-6d05fa25f7d9</PassageRefs>
+						</Jumper>
+						<Jumper fromIndex="0" toIndex="2" isTraversible="Unknown" isTwoWay="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 8d90241d-7b40-4e50-a917-6d05fa25f7d9</PassageRefs>
+						</Jumper>
+					</Jumpers>
+				</MicroNode>
+				<MicroNode junctionRef="520ae762-6dfe-4881-b565-4c4159cedcd4"/>
+				<MicroNode junctionRef="cc5e5be7-2b22-4c5a-954c-94c9c3210859">
+					<Jumpers>
+						<Jumper fromIndex="0" toIndex="1" isTraversible="Unknown" isTwoWay="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 8d90241d-7b40-4e50-a917-6d05fa25f7d9</PassageRefs>
+						</Jumper>
+						<Jumper fromIndex="0" toIndex="2" isTraversible="Unknown" isTwoWay="Unknown">
+							<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6 8d90241d-7b40-4e50-a917-6d05fa25f7d9</PassageRefs>
+						</Jumper>
+					</Jumpers>
+				</MicroNode>
+			</MicroNodes>
+			<MicroLinks>
+				<MicroLink implementationObjectRef="4c61f54d-bfe3-4c09-a362-d8125428af84">
+					<FromMicroNode nodeRef="a9e6a356-da92-4f80-af84-b8ddf7630319" portIndex="2"/>
+					<ToMicroNode nodeRef="087e22ef-407c-432e-b1ff-7f80c91b6621" portIndex="0"/>
+				</MicroLink>
+				<MicroLink implementationObjectRef="6244d378-9652-4af3-8ab7-bb1e141f6755">
+					<FromMicroNode nodeRef="087e22ef-407c-432e-b1ff-7f80c91b6621" portIndex="1"/>
+					<ToMicroNode nodeRef="cc5e5be7-2b22-4c5a-954c-94c9c3210859" portIndex="0"/>
+				</MicroLink>
+				<MicroLink implementationObjectRef="04a152db-f5f2-4d24-99e4-a8e844f5d79b">
+					<FromMicroNode nodeRef="087e22ef-407c-432e-b1ff-7f80c91b6621" portIndex="2"/>
+					<ToMicroNode nodeRef="520ae762-6dfe-4881-b565-4c4159cedcd4" portIndex="0"/>
+				</MicroLink>
+				<MicroLink implementationObjectRef="0fd0059b-58d1-4799-9001-881a3f9445e5">
+					<FromMicroNode nodeRef="a9e6a356-da92-4f80-af84-b8ddf7630319" portIndex="1"/>
+					<ToMicroNode nodeRef="cc5e5be7-2b22-4c5a-954c-94c9c3210859" portIndex="2"/>
+				</MicroLink>
+			</MicroLinks>
+		</RailTopology>
+		<RailImplementation>
+			<Junctions>
+				<!--138009,497035 lighthouse Marken  -->
+				<SingleSwitch puic="a9e6a356-da92-4f80-af84-b8ddf7630319" name="GC3W02" angleRatio="1:34,7" switchPointHeatingCabinetRef="f4e502d4-f876-4a86-a775-5d372cecfdc5" genericDesignDocumentId="12378" isReadRedundantly="Unknown">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>140000,497500</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+						<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+					</Location>
+					<MathematicalPoint dataAcquisitionMethod="DGPS">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>140000,497500</gml:coordinates>
+						</gml:Point>
+					</MathematicalPoint>
+					<VCrossing puic="c58e0011-250e-4ab7-940c-dad99bcdabb5" isMovable="False" hasSwitchChecker="False" maintenanceSwitchAmount="1">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</VCrossing>
+					<Joint puic="46e10f56-945c-4e3d-b2e4-60784a5cb73d">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</Joint>
+					<SwitchBlades puic="bc18150a-4f10-45e0-b63b-351969fb2b8b" switchCheckerAmount="0" maintenanceSwitchAmount="1">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</SwitchBlades>
+					<FoulingPoint puic="e85adfeb-cd1d-4718-ad0f-304eee37c16a">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingPoint>
+					<FoulingPoint puic="b9dec6c1-3014-4d22-9197-30d79d66e19e">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingPoint>
+					<SwitchMechanism puic="9339e31a-babb-4083-b8cd-16c08870be41" fixType="Locked" normalPosition="Right" switchConnectionCabinetRef="2961d10c-8cec-42b6-bfda-2cf87fbbc7c2" preferredPosition="Right" interconnectedSwitchMechanismRef="087e22ef-407c-432e-b1ff-7f80c91b6621" isSpringSwitch="False" operatingType="Central">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+							<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+						</Location>
+						<Lock puic="1317923c-a4d9-4cd9-984e-8b968129ab3c" lockType="SafetyLock">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point>
+										<gml:coordinates>140000,497500</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</Lock>
+						<FlankProtectionConfiguration position="Left">
+							<MandatoryFlankProtection switchMechanismRef="b37828c1-9615-4317-b64c-ec8ae4813d15" switchPosition="Left"/>
+							<OptionalFlankProtection switchMechanismRef="b37828c1-9615-4317-b64c-ec8ae4813d15" switchPosition="Right"/>
+						</FlankProtectionConfiguration>
+					</SwitchMechanism>
+					<SwitchMechanism puic="6cf5ad62-a779-40e9-9d79-1ca3364cecd5" fixType="None" normalPosition="Left" preferredPosition="Right" interconnectedSwitchMechanismRef="a9e6a356-da92-4f80-af84-b8ddf7630319" isSpringSwitch="False" operatingType="Central">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+							<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+						</Location>
+					</SwitchMechanism>
+					<Passage puic="03c6e0e3-edec-447f-9e3d-27afbbec89e6" passageSpeed="40" sideTag="S" unrestricted="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:LineString>
+									<gml:coordinates>152698.335,453090.288 152699.835,453090.305 152726.682,453092.459</gml:coordinates>
+								</gml:LineString>
+							</GeographicLocation>
+						</Location>
+					</Passage>
+					<DivergingPassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</DivergingPassageRefs>
+					<GroupedControl groupedPowerDown="False"/>
+				</SingleSwitch>
+				<SingleSwitch name="GC3W03" angleRatio="1:9" puic="087e22ef-407c-432e-b1ff-7f80c91b6621" isReadRedundantly="Not Applicable">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497500</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<!-- <SwitchMechanism puic="6cf5ad62-a779-40e9-9d79-1ca3364cecd5" fixType="Spiked" normalPosition="Left" preferredPosition="Right" interconnectedSwitchMechanismRef="a9e6a356-da92-4f80-af84-b8ddf7630319" isSpringSwitch="False" operatingType="Central"> -->
+					<SwitchMechanism puic="0a49774e-c8bb-4c7a-9f2c-8f857416ba16" fixType="Spiked" normalPosition="Left" preferredPosition="Right" interconnectedSwitchMechanismRef="a9e6a356-da92-4f80-af84-b8ddf7630319" isSpringSwitch="False" operatingType="Central">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+							<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+						</Location>
+					</SwitchMechanism>
+					<DivergingPassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</DivergingPassageRefs>
+				</SingleSwitch>
+				<BufferStop puic="32bce6ff-42ab-437c-b562-c75422ece536" name="GC3W04" signRef="c7d6ee28-4587-4a1d-844e-a6590b1e6011" locationSpecificDesignDocumentId="8459364">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141500,497000</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+				</BufferStop>
+				<TerraIncognita puic="cc5e5be7-2b22-4c5a-954c-94c9c3210859" name="GC3W04">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141500,497000</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+				</TerraIncognita>
+				<TrackEnd puic="ed59d18d-9d22-400d-90ae-f94917ef900a" name="GC3W04">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141500,497000</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+				</TrackEnd>
+				<DoubleDiamondCrossing puic="8703218d-29c6-45f0-920e-7de4aec3a6b4" angleRatio="1:9" name="103_405" isReadRedundantly="Unknown">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141500,497000</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<SwitchMechanism puic="ceb38f3e-87a4-43f4-97a9-a6e1c9f9338f" operatingType="Central" fixType="None" normalPosition="Right" preferredPosition="Right" isSpringSwitch="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+							<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+						</Location>
+					</SwitchMechanism>
+					<DivergingPassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</DivergingPassageRefs>
+				</DoubleDiamondCrossing>
+				<SingleDiamondCrossing puic="f0b998d4-a1db-4ad7-983f-2eee99709eab" angleRatio="1:9" name="103_405" isReadRedundantly="Unknown">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141500.567,497000.000</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<DivergingPassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</DivergingPassageRefs>
+					<KCrossing puic="8b796952-ac0c-4a5d-b2fe-7a759a1540e8" isMovable="False" maintenanceSwitchAmount="0">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>141500.579,497000.001</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</KCrossing>
+				</SingleDiamondCrossing>
+				<SingleSwitch puic="a8f59a6a-1bfe-410a-94ae-15ac3faf3750" name="GC4W05" angleRatio="1:9" isReadRedundantly="Unknown">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>142000,497500</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<FoulingMark puic="171dcc8c-4f58-4ccc-b16e-7d6ae7b0ba78">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingMark>
+					<FoulingPoint puic="11dc6029-ac18-4c6d-8b77-22682bb4bcb8">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>140002,497501</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingPoint>
+					<SwitchMechanism puic="9e7b0714-899d-4356-8acd-ad64f17f2026" operatingType="Central" fixType="Spiked" normalPosition="Right" preferredPosition="Right" isSpringSwitch="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+							<KmRibbonLocation kmRibbonRef="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" value="33.5"/>
+						</Location>
+					</SwitchMechanism>
+					<DivergingPassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</DivergingPassageRefs>
+				</SingleSwitch>
+				<Crossing angleRatio="1:9" puic="520ae762-6dfe-4881-b565-4c4159cedcd4" name="KW_101AR-103AL">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>207796.291,474690.426</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<Passage puic="e168f72d-997c-46af-b212-eb7d884d65a8" passageSpeed="40" sideTag="S" unrestricted="True">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:LineString>
+									<gml:coordinates>152698.335,453090.288 152699.835,453090.305 152726.682,453092.459</gml:coordinates>
+								</gml:LineString>
+							</GeographicLocation>
+						</Location>
+					</Passage>
+					<FoulingMark puic="fde53e2a-a7d7-4c90-b9c5-0fdd1f727ed9">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>140000,497500</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingMark>
+					<FoulingPoint puic="3c3241cc-a016-4934-8f07-513c2d6a0c29">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>140002,497501</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</FoulingPoint>
+					<CrossingFlankProtectionConfiguration>
+						<PassageRefs>e168f72d-997c-46af-b212-eb7d884d65a8</PassageRefs>
+						<MandatoryFlankProtection switchMechanismRef="b37828c1-9615-4317-b64c-ec8ae4813d15" switchPosition="Left"/>
+						<OptionalFlankProtection switchMechanismRef="b37828c1-9615-4317-b64c-ec8ae4813d15" switchPosition="Right"/>
+					</CrossingFlankProtectionConfiguration>
+					<MovableOverheadLineControl>
+						<SwitchMechanism puic="4610d2f1-4a9c-4194-8cab-7b42b6cb4a4c" fixType="None" operatingType="Central" normalPosition="Left" preferredPosition="Left" isSpringSwitch="False">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point>
+										<gml:coordinates>207796.291,474690.426</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</SwitchMechanism>
+					</MovableOverheadLineControl>
+				</Crossing>
+			</Junctions>
+			<Tracks>
+				<Track puic="eeb7675e-609f-4999-9a60-b328d7d6acca" name="127L-137R">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Design">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>135000,496000 135809.016994797,496587.785251712 135809.016995002,496587.785250001 135811.901189945,496589.880786956 135827.169474765,496600.98544497 135839.026022082,496609.640787049 135849.244465122,496617.139426804 135858.439705745,496623.929400059 135866.910908939,496630.228684234 135874.830708292,496636.16306811 135882.309679426,496641.813126038 135889.423839095,496647.234252353 135889.423840001,496647.234255001 135896.030527433,496652.313233752 135902.615995165,496657.4196962 135909.180128866,496662.55355369 135915.722814576,496667.714717093 135922.243938707,496672.903096806 135928.743388044,496678.118602753 135928.743384998,496678.1186 135935.695456537,496683.746084307 135942.956362412,496689.673765953 135950.597927593,496695.962375924 135958.724626889,496702.700255652 135967.499563277,496710.025327549 135977.20537796,496718.176605834 135988.423016115,496727.645357335 136002.828449024,496739.848531253 136005.547566842,496742.154231558 136005.547570001,496742.154235002 136014.870854385,496750.057507337 136026.232184799,496759.665316914 136035.669552693,496767.607639803 136044.042708427,496774.611256638 136051.714736172,496780.98312407 136058.879662597,496786.887272098 136065.655864065,496792.423771492 136072.122023125,496797.659134415 136078.333677851,496802.64030702 136084.331813996,496807.40193423 136090.147732958,496811.970475632 136095.805999181,496816.366697513 136101.326320632,496820.607262787 136106.724800453,496824.705789262 136112.014799748,496828.673579124 136117.207550079,496832.520136816 136122.31259933,496836.253546032 136122.312600002,496836.253545001 136127.380403444,496839.911377846 136132.470969212,496843.537465683 136137.584098456,496847.13166687 136142.719591447,496850.693841007 136147.877247579,496854.22384895 136153.056865381,496857.721552806 136158.258242526,496861.186815947 136163.481175836,496864.619503012 136168.72546129,496868.019479912 136173.990894034,496871.386613835 136179.277268388,496874.720773254 136184.584377854,496878.021827928 136189.912015123,496881.289648911 136195.259972085,496884.524108553 136200.628039836,496887.725080509 136206.016008687,496890.892439741 136211.423668171,496894.026062525 136216.850807052,496897.125826453 136222.297213333,496900.191610442 136227.762674264,496903.223294736 136233.246976351,496906.220760908 136238.749905366,496909.183891871 136244.271246349,496912.112571879 136249.810783625,496915.006686529 136255.368300807,496917.866122772 136260.943580803,496920.69076891 136266.536405831,496923.480514606 136272.146557422,496926.235250886 136277.773816429,496928.954870144 136283.417963039,496931.639266145 136289.078776778,496934.288334029 136294.756036521,496936.901970319 136300.449520501,496939.480072919 136306.159006316,496942.022541122 136311.884270942,496944.529275614 136317.625090735,496947.000178475 136323.381241445,496949.435153187 136329.152498223,496951.834104632 136334.938635631,496954.196939104 136340.739427649,496956.523564303 136346.554647682,496958.813889346 136352.384068576,496961.067824768 136358.227462619,496963.285282525 136364.084601554,496965.466175997 136369.955256588,496967.610419993 136375.839198399,496969.717930755 136381.736197146,496971.788625958 136387.646022478,496973.822424715 136393.568443544,496975.819247582 136399.503229,496977.779016558 136405.450147018,496979.70165509 136411.408965299,496981.587088074 136417.379451077,496983.435241862 136423.361371129,496985.246044261 136429.35449179,496987.019424535 136435.358578951,496988.755313413 136441.373398081,496990.453643086 136447.398714226,496992.114347214 136453.434292022,496993.737360926 136459.479895706,496995.322620823 136465.535289122,496996.870064981 136471.600235732,496998.379632953 136477.674498625,496999.851265772 136483.757840525,497001.284905952 136489.850023803,497002.680497492 136495.950810484,497004.037985877 136502.059962257,497005.35731808 136508.177240483,497006.638442565 136514.302406208,497007.881309288 136520.435220167,497009.0858697 136526.575442799,497010.252076748 136532.722834251,497011.379884877 136538.877154392,497012.469250031 136545.03816282,497013.520129659 136551.205618872,497014.53248271 136557.379281631,497015.506269639 136563.558909939,497016.441452408 136569.744262407,497017.337994486 136575.935097418,497018.195860852 136582.131173145,497019.015017996 136582.131170001,497019.015020002 136588.406210635,497019.804790387 136594.82269716,497020.572490039 136601.3931216,497021.318795341 136608.132175581,497022.044505393 136615.057333338,497022.750573955 136622.189652601,497023.438153339 136629.55490275,497024.108656254 136637.185201429,497024.76384552 136645.121473385,497025.405968865 136653.417304403,497026.037970178 136662.145306513,497026.663838398 136671.4083529,497027.289223288 136681.36121736,497027.922621517 136692.257589446,497028.577954307 136704.572204939,497029.281268539 136719.429150553,497030.094288014 136731.634002946,497030.74768176 136731.634004999,497030.747680001 137031.207676167,497046.735661207</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<AlignmentData>
+						<HorizontalStraightPath puic="623fa890-2e96-4c1a-b360-9036bf78b65a" length="1000" startX="135000" startY="496000" endX="135809.01699479696" endY="496587.78525171161" angle="0.62831853">
+							<VerticalAlignment>
+								<VerticalStraightPath length="100" startM="0" endM="99.996915765762267" angle="0.00785398" horizontalLength="99.9969157657623" startZ="10" endZ="10.785389925478725"/>
+								<VerticalCurve length="100" startM="99.9969157657623" endM="199.99501884126039" startAngle="0.00785398" endAngle="6.2710392871795868" horizontalLength="99.9981030754981" startZ="10.78539009" endZ="10.570791831401039" radius="5000"/>
+								<VerticalStraightPath length="428.29755" startM="199.99501884126039" endM="628.26097677457733" angle="6.27103929" horizontalLength="428.265957933317" startZ="10.57079199" endZ="5.3688104962824283"/>
+								<VerticalCurve length="60.73009" startM="628.26097677457733" endM="688.98957357718223" startAngle="6.27103929" endAngle="8.2041395899068448E-10" horizontalLength="60.7285968026049" startZ="5.36880999" endZ="5.000000190794708" radius="-5000"/>
+								<VerticalStraightPath length="311.01042643" startM="688.98957357718223" endM="1000.0000000071823" angle="2.8204141244714265E-09" horizontalLength="311.01042643" startZ="5.00000012" endZ="5.0000009971782"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="1000" startValue="0" endValue="0"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="1000" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalStraightPath>
+						<HorizontalTransitionCurve puic="9707665d-9d8d-4fd9-b4a2-98aa514f5b02" length="100" startX="135809.01699500158" startY="496587.78525000066" endX="135889.42383909484" endY="496647.23425235256" startAngle="0.62831853" endAngle="0.65331853000000006" startRadius="0" endRadius="-2000">
+							<VerticalAlignment>
+								<VerticalStraightPath length="100" startM="0" endM="100" angle="2.8204141244714265E-09" horizontalLength="100" startZ="5.00000001" endZ="5.0000002920414124"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="100" startValue="0" endValue="80"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="100" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalTransitionCurve>
+						<HorizontalCurve puic="9c5a4f16-f4bc-4095-8344-2485cb4fdb93" length="50" startX="135889.42384000123" startY="496647.23425500095" endX="135928.74338804395" endY="496678.11860275338" startAngle="0.65331853" endAngle="0.67831853000000031" radius="-2000">
+							<VerticalAlignment>
+								<VerticalStraightPath length="50" startM="0" endM="50" angle="2.8204141244714265E-09" horizontalLength="50" startZ="4.99999997" endZ="5.0000001110207064"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="50" startValue="80" endValue="80"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="50" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalCurve>
+						<HorizontalTransitionCurve puic="cfc5e6e0-15d4-4400-8927-1e3e9a00c34e" length="100" startX="135928.74338499829" startY="496678.1185999997" endX="136005.54756684185" endY="496742.15423155756" startAngle="0.67831853" endAngle="0.70331853" startRadius="-2000" endRadius="0">
+							<VerticalAlignment>
+								<VerticalStraightPath length="100" startM="0" endM="100" angle="2.8204141244714265E-09" horizontalLength="100" startZ="4.99999995" endZ="5.0000002320414128"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="100" startValue="80" endValue="0"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="100" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalTransitionCurve>
+						<HorizontalTransitionCurve puic="b283d298-7fc1-4721-896a-bbdd8e446ae6" length="150" startX="136005.54757000133" startY="496742.15423500165" endX="136122.31259932986" endY="496836.25354603177" startAngle="0.70331853" endAngle="0.62831853" startRadius="0" endRadius="1000">
+							<VerticalAlignment>
+								<VerticalStraightPath length="150" startM="0" endM="150" angle="2.8204141244714265E-09" horizontalLength="150" startZ="4.99999992" endZ="5.0000003430621183"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="150" startValue="0" endValue="120"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="150" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalTransitionCurve>
+						<HorizontalCurve puic="e45aa8c7-40da-4795-a8c2-eac45f4e3306" length="500" startX="136122.31260000169" startY="496836.25354500115" endX="136582.13117314535" endY="497019.01501799643" startAngle="0.62831853" endAngle="0.1283185299999996" radius="1000">
+							<VerticalAlignment>
+								<VerticalStraightPath length="500" startM="0" endM="500" angle="2.8204141244714265E-09" horizontalLength="500" startZ="4.99999986" endZ="5.0000012702070622"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="500" startValue="120" endValue="120"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="500" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalCurve>
+						<HorizontalTransitionCurve puic="67398cd9-a538-4591-a36d-ae6d5ec6c18d" length="150" startX="136582.13117000088" startY="497019.01502000168" endX="136731.63400294568" endY="497030.74768175959" startAngle="0.12831853" endAngle="0.053318529999999989" startRadius="1000" endRadius="0">
+							<VerticalAlignment>
+								<VerticalStraightPath length="150" startM="0" endM="150" angle="2.8204141244714265E-09" horizontalLength="150" startZ="4.99999968" endZ="5.0000001030621188"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="150" startValue="120" endValue="0"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="150" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalTransitionCurve>
+						<HorizontalStraightPath puic="3f07b4d5-bbde-4d14-960b-ced610e4bd2d" length="300" startX="136731.63400499895" startY="497030.74768000096" endX="137031.20767616673" endY="497046.73566120735" angle="0.05331853">
+							<VerticalAlignment>
+								<VerticalStraightPath length="300" startM="0" endM="300" angle="2.8204141244714265E-09" horizontalLength="300" startZ="4.99999962" endZ="5.000000466124237"/>
+							</VerticalAlignment>
+							<CantValues>
+								<CantValue startM="0" endM="300" startValue="0" endValue="0"/>
+							</CantValues>
+							<DesignSpeedValues>
+								<DesignSpeedValue startM="0" endM="300" value="130"/>
+							</DesignSpeedValues>
+						</HorizontalStraightPath>
+					</AlignmentData>
+				</Track>
+				<Track puic="6244d378-9652-4af3-8ab7-bb1e141f6755" name="ST3Z01">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>139500,497500 42000,497500</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+				</Track>
+				<Track puic="04a152db-f5f2-4d24-99e4-a8e844f5d79b" name="ST5A35">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>141000,497500 141500,497000</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+				</Track>
+				<Track puic="0fd0059b-58d1-4799-9001-881a3f9445e5" name="ST654R">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>140000,497500 140500,498000 141500,498000 142000,497500</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+				</Track>
+			</Tracks>
+			<RailConnections>
+				<RailConnection puic="7d90c208-cf69-46e6-a4fb-80d6a0c1141d" functionalBegin="0" functionalEnd="125.6" trackRef="4c61f54d-bfe3-4c09-a362-d8125428af84" hasInterlocking="Yes" isElectrified="Yes" voltageClass="V1500" isSafetyTrack="False" transportType="Both" length="115.6">
+					<PassageRefs>03c6e0e3-edec-447f-9e3d-27afbbec89e6</PassageRefs>
+				</RailConnection>
+			</RailConnections>
+		</RailImplementation>
+		<TrackAssets>
+			<Signals>
+				<Signal puic="65ccaade-e1c7-43e8-975b-e377951ba621" signalType="AutomaticPermissive" name="DS123" hasDangerSign="False" hasShuntingIndicator="False" hasSpreaderLens="True" isOutOfService="Unknown" hasArrowMarker="False" hasDirectionIndicator="None" rollOnBlockDemarcationRef="edfb89fd-ccbe-4dd5-a420-7f4f3c0eac63" signalPosition="High" hasHardwareInput="False" isDimmable="False" hasWhitebarEtcsIndicator="True">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="102" direction="Upstream"/>
+					<IlluminatedSign puic="8815d2e9-10d9-40dd-a39f-d49413f75242" illuminatedSignType="Speed" text="Melden bij treindienstleider" isIntegrated="False" isDimmable="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Laser">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</IlluminatedSign>
+					<ReflectorPost puic="70125202-731d-49a4-9945-467f1b032724" reflectorType="Straight">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ReflectorPost>
+					<!-- <ReflectorPost puic="70125202-731d-49a4-9945-467f1b032724" reflectorType="DistantSignalCountdownMarker"> -->
+					<ReflectorPost puic="b6127d1b-97a9-49f6-b92e-67b4afc76441" reflectorType="DistantSignalCountdownMarker">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ReflectorPost>
+					<AtpType>ETCS_L1_L2_L3</AtpType>
+					<AtpType>PZB</AtpType>
+					<LongRangeApproach blockDemarcationRef="9f075e73-eadf-4a78-9734-a07ed71c0d1b" distance="1200">
+						<Path>
+							<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+						</Path>
+					</LongRangeApproach>
+					<LampProvingSignalRefs>b374e918-14c1-4e62-854c-55fe1b4bd876</LampProvingSignalRefs>
+				</Signal>
+			</Signals>
+			<DepartureSignals>
+				<DepartureSignal puic="389c790e-59e9-4774-9377-2be27666766e" departureSignalType="DepartureSingle" hasArrowMarker="True" isDimmable="True" isOutOfService="False" signalPosition="High" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621" controlAuthority="CSS">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+					<DepartureCondition>
+						<SwitchPosition switchMechanismRef="6cf5ad62-a779-40e9-9d79-1ca3364cecd5" switchPosition="Left"/>
+						<SwitchPosition switchMechanismRef="a9e6a356-da92-4f80-af84-b8ddf7630319" switchPosition="Left"/>
+					</DepartureCondition>
+				</DepartureSignal>
+			</DepartureSignals>
+			<CountdownSignals>
+				<!-- <CountdownSignal puic="389c790e-59e9-4774-9377-2be27666766e" departureSignalRef="389c790e-59e9-4774-9377-2be27666766e"> -->
+				<CountdownSignal puic="1f21c61c-8d7f-4e9d-945f-648d5dda2153" departureSignalRef="389c790e-59e9-4774-9377-2be27666766e">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</CountdownSignal>
+			</CountdownSignals>
+			<Signs>
+				<Sign puic="c7d6ee28-4587-4a1d-844e-a6590b1e6011" signType="DecelerateLevelCrossing" signText="Na toestemming Terreinbeheerder , stel HBLI in werking. Oprijden als witte lamp constant brandt. Na passeren handmatig uitschakelen." hasArrowMarker="False" hasLamp="False">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</Sign>
+				<Sign puic="3024c1be-9386-4937-a70d-7badc5bc63af" signType="LanternSafe" hasArrowMarker="False" hasLamp="False">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</Sign>
+				<SpeedSign puic="62d1dc25-1753-4957-819b-44e0734ae7d2" speedSignType="AccelerateToSpeed" speed="100" cargoSpeed="80" hasArrowMarker="False">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>141000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</SpeedSign>
+			</Signs>
+			<StopMarkerBoards>
+				<StopMarkerBoard puic="1d5031ee-4c64-400d-b734-644c6616bb13" hasL1ActiveIndicator="False" hasShuntingActiveIndicator="Both" isMountedOnGantry="False" driveBySightInOppositeDirectionIsAllowed="False" stopMarkerBoardPosition="High">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="564.5"/>
+				</StopMarkerBoard>
+				<StopMarkerBoard puic="f5365670-343b-41ab-8287-9379c7fefda3" hasL1ActiveIndicator="False" hasShuntingActiveIndicator="Both" isMountedOnGantry="False" driveBySightInOppositeDirectionIsAllowed="False" stopMarkerBoardPosition="High">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="161.9"/>
+				</StopMarkerBoard>
+				<StopMarkerBoard puic="8b7244d1-205e-4a6c-a9ea-939af6e025b7" name="126" hasL1ActiveIndicator="False" driveBySightInOppositeDirectionIsAllowed="False" hasShuntingActiveIndicator="Unknown" stopMarkerBoardPosition="Unknown" isMountedOnGantry="Unknown">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Sketch">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>145000,497502</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="125" direction="Upstream"/>
+				</StopMarkerBoard>
+			</StopMarkerBoards>
+			<BaliseGroups>
+				<BaliseGroup puic="f4e95840-e5ee-4128-9605-d811161c4186" name="425_00153">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77231.26,433552.97</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="112.9"/>
+					<Balise puic="3abcebf6-ef9c-41bc-abcf-ea66ea21c150" isSwitchable="False" name="425_00153_0">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77231.26,433552.97</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="112.9"/>
+					</Balise>
+					<LinesideElectronicUnit puic="9121ea58-d42f-4f92-bf1c-0c15287a878e">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77231.26,433552.97</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</LinesideElectronicUnit>
+				</BaliseGroup>
+			</BaliseGroups>
+			<LevelCrossings>
+				<LevelCrossing puic="3c98ebe0-38b7-4e5b-ac30-e55d70a35296" name="101.3" isConnectedToTrafficControlInstallation="True" grossAnnouncementTime="5" netAnnouncementTime="4" isLowLoaderSensitive="False" levelCrossingCharacter="PublicLevelCrossing" locationIndication="Spoorstraat" levelCrossingType="VKL" levelCrossingBarrierType="ZigzagFence" isEmergencyAccess="False" roadRailAccessPointLength="30.1" minimumOpenTime="30">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<Flooring puic="d28b1709-9dd3-4861-bbe7-f9a143355f92">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+<!--											<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70,77229.40, 433555.81 77230.57,433556.06</gml:coordinates>-->
+											<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" fromMeasure="112.9" toMeasure="142.9"/>
+					</Flooring>
+					<PoleInstallation puic="51388110-b363-4a6e-8533-a9e64d691710" poleInstallationType="AHOB">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</PoleInstallation>
+					<LevelCrossingBattery puic="a6872d9d-4380-4e7e-a80b-25bada8b3bac" installationCabinetRef="5e4b18a9-46f5-46ca-b79c-3f2eb225d042">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</LevelCrossingBattery>
+					<ChargeRectifier puic="8791ee1f-5d9d-48f8-8331-3a5d844b05c8" installationCabinetRef="5e4b18a9-46f5-46ca-b79c-3f2eb225d042">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ChargeRectifier>
+					<LxSupport puic="31a5fa1e-a66c-4f03-ad6a-ad50648c53d2">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<LxSupportGirder puic="3d4e7012-fc23-42d9-a468-248af89054a7">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:LineString>
+										<gml:coordinates>77230.57,433556.06 77231.26,433552.97</gml:coordinates>
+									</gml:LineString>
+								</GeographicLocation>
+							</Location>
+						</LxSupportGirder>
+						<LxSupportPole puic="753cb4ef-edce-4cbd-bf33-1408f1b8b5fe">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77230.57,433556.06</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</LxSupportPole>
+						<LxSupportPole puic="0382a8bd-32bd-4e40-ac19-3e4142f3c44b">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77231.26,433552.97</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</LxSupportPole>
+					</LxSupport>
+					<EvacuationInstallation puic="08170c87-f6d2-49f6-b647-622a82237f4a">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77231.26,433552.97</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</EvacuationInstallation>
+					<BarrierDrive puic="c026d6c4-c47e-487e-a6b9-07487dc6f175" poleInstallationRef="51388110-b363-4a6e-8533-a9e64d691710">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BarrierDrive>
+					<Crossbuck puic="ef1e5c50-f3aa-47ae-bef9-e45a72dd3c08" crossbuckType="Multiple" poleInstallationRef="51388110-b363-4a6e-8533-a9e64d691710">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</Crossbuck>
+				</LevelCrossing>
+			</LevelCrossings>
+			<Platforms>
+				<Platform puic="85282f44-558a-4323-8164-07ef6dee7673" name="3" height="76.0">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Polygon>
+								<gml:outerBoundaryIs>
+									<gml:LinearRing>
+										<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,474897.467 252335.919,474895.952 252334.404,474894.708 252332.675,474893.784 252330.799,474893.215 252328.848,474893.023 252326.897,474893.215 252325.021,474893.784 252323.292,474894.708 252321.777,474895.952 252320.533,474897.467 252319.609,474899.196 252319.04,474901.072 252318.848,474903.023 252319.04,474904.974 252319.609,474906.85 252320.533,474908.579 252321.777,474910.094 252323.292,474911.338 252325.021,474912.262 252326.897,474912.831 252328.848,474913.023 252330.799,474912.831 252332.675,474912.262 252334.404,474911.338 252335.919,474910.094 252337.163,474908.579 252338.087,474906.85 252338.656,474904.974 252338.848,474903.023</gml:coordinates>
+									</gml:LinearRing>
+								</gml:outerBoundaryIs>
+							</gml:Polygon>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="10" toMeasure="210.3" direction="None"/>
+					<PlatformWallRefs>165c8504-4964-4ccc-abf6-7d1ee39b3a9f</PlatformWallRefs>
+				</Platform>
+			</Platforms>
+			<PlatformWalls>
+				<PlatformWall puic="165c8504-4964-4ccc-abf6-7d1ee39b3a9f" length="200.2">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="ManuallyDigitized">
+							<gml:LineString>
+<!--								<gml:coordinates>130840.07,460826.83 130660.21,461000.43 130645.94, 461014.40</gml:coordinates>-->
+								<gml:coordinates>130840.07,460826.83 130660.21,461000.43 130645.94,461014.40</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="10" toMeasure="210.3" direction="None"/>
+					<PhysicalLength direction="Upstream" length="121.5"/>
+					<PlatformClearancePoint puic="77f56a7c-6428-442a-80a2-623e3c7d008b">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Estimate">
+								<gml:Point>
+									<gml:coordinates>142000.01,497500.22</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="220.3" direction="Downstream"/>
+					</PlatformClearancePoint>
+				</PlatformWall>
+			</PlatformWalls>
+			<InsulatedJoints>
+				<InsulatedJoint puic="edfb89fd-ccbe-4dd5-a420-7f4f3c0eac63" rail="LeftRail">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>142000.01,497500.22</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="3.1" direction="Upstream"/>
+					<FoulingJunction foulingJunctionRef="a9e6a356-da92-4f80-af84-b8ddf7630319">
+						<SwitchPositionException switchMechanismRef="a9e6a356-da92-4f80-af84-b8ddf7630319" switchPosition="Left"/>
+					</FoulingJunction>
+					<Announcement announcementType="Normal" installationRef="5d1d93f9-0af4-4743-b3fb-6da11730a1f9" delayTime="5.1">
+						<Path>
+							<OrderedSwitchPosition index="0" switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left"/>
+						</Path>
+					</Announcement>
+				</InsulatedJoint>
+			</InsulatedJoints>
+			<AudioFrequencyJoints>
+				<AudioFrequencyJoint puic="8745d8ee-0b92-4f66-8761-455eccd10230" rail="LeftRail">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Terrestrial">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None"/>
+				</AudioFrequencyJoint>
+			</AudioFrequencyJoints>
+			<AxleCounterDetectionPoints>
+				<AxleCounterDetectionPoint puic="eecbef37-210d-4f8d-b89a-4db9779c1e07" name="25389" electronicsConnectionCabinetRef="1464bd26-1c22-4745-8ae8-f0259438795f" rail="LeftRail" countDirection="Upstream">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="2334.6" direction="Downstream"/>
+				</AxleCounterDetectionPoint>
+				<AxleCounterDetectionPoint puic="dcfb222b-2c9e-4daf-96f5-b71a34fd4723" name="25390" electronicsConnectionCabinetRef="1464bd26-1c22-4745-8ae8-f0259438795f" rail="RightRail" countDirection="Downstream">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.57,433556.06</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="1334.6" direction="Upstream"/>
+				</AxleCounterDetectionPoint>
+			</AxleCounterDetectionPoints>
+			<AtbVvInstallations>
+				<AtbVvInstallation puic="0d14cefc-ccb5-4a23-a71d-1a8e6a96803b" signalRef="9088cb8b-e508-4e74-81a3-3a0871139a9f" atbVvConnectionCabinetRef="72cf7dd2-3294-40b9-a336-cd537f80f956">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>130645.94,461014.40</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<AtbVvBeacon puic="9088cb8b-e508-4e74-81a3-3a0871139a9f">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="GPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>130645.94,461014.40</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="347.1" direction="Downstream"/>
+					</AtbVvBeacon>
+					<AtbVvLoop puic="f836ba12-9fb3-4143-9a0d-7245c8172a37">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="GPS">
+								<gml:MultiLineString>
+									<gml:lineStringMember>
+										<gml:LineString srsName="EPSG:28992">
+											<gml:coordinates>130645.94,461014.40 130645.94,461014.90</gml:coordinates>
+										</gml:LineString>
+									</gml:lineStringMember>
+								</gml:MultiLineString>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="347.1" direction="Downstream"/>
+					</AtbVvLoop>
+				</AtbVvInstallation>
+			</AtbVvInstallations>
+			<AtbNgBeacons>
+				<AtbNgBeacon puic="9c0a9546-44a6-4183-a4cf-4eeedd44356a" isPermanentSpeedRestriction="False" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="GPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>130645.94,461014.40</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="347.1" direction="Downstream"/>
+				</AtbNgBeacon>
+			</AtbNgBeacons>
+			<AtbNgLoops>
+				<AtbNgLoop puic="18cebdb2-a0a1-46b7-90a7-b5383c1560c3" intersectionCount="3">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="GPS">
+							<gml:MultiLineString>
+								<gml:lineStringMember>
+									<gml:LineString srsName="EPSG:28992">
+										<gml:coordinates>130645.94,461014.40 130840.07,60826.83</gml:coordinates>
+									</gml:LineString>
+								</gml:lineStringMember>
+							</gml:MultiLineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="347.1" direction="Downstream"/>
+				</AtbNgLoop>
+			</AtbNgLoops>
+			<Detectors>
+				<Detector puic="41b279c6-de2c-4afb-abcd-725a2c05d1c3" detectorType="Radar" rail="LeftRail">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>130840.07,60826.83</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="30.6"/>
+				</Detector>
+			</Detectors>
+			<Pedals>
+				<Pedal puic="1a011d50-3fa1-4efb-8bcd-24571be058bc" rail="LeftRail" blockDemarcationRef="edfb89fd-ccbe-4dd5-a420-7f4f3c0eac63" levelCrossingRef="3c98ebe0-38b7-4e5b-ac30-e55d70a35296">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>130840.071,60826.832</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="30.6"/>
+				</Pedal>
+			</Pedals>
+			<OverlayTrackCircuits>
+				<OverlayTrackCircuit puic="663e08eb-f629-4aa5-902b-2233630cb393" switchRef="a9e6a356-da92-4f80-af84-b8ddf7630319">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>130645.94,461014.40 130840.07,60826.83</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="30.6"/>
+				</OverlayTrackCircuit>
+			</OverlayTrackCircuits>
+			<MassDetectionLoops>
+				<MassDetectionLoop puic="faa601b6-8211-444a-a66e-0afd39a6f778" levelCrossingRef="3c98ebe0-38b7-4e5b-ac30-e55d70a35296">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="GPS">
+							<gml:LineString srsName="EPSG:28992">
+								<gml:coordinates>130645.94,461014.40 130840.07,60826.83</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="30.6"/>
+				</MassDetectionLoop>
+			</MassDetectionLoops>
+			<PermanentWarningSystems>
+				<PermanentWarningSystem puic="2455f7f7-e64a-4034-beba-460610b67e3b" name="101.7">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>130645.94,461014.40</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<PermanentWarningDevice puic="9ce5aa02-be55-4e75-a30c-9978d4b53ecf">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>130645.94,461014.40</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="10.9" direction="Downstream"/>
+					</PermanentWarningDevice>
+					<PermanentWarningDevice puic="b32b186f-c53f-4932-b153-067eb7fd54c5">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>130645.94,461000.40</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="40.9" direction="Downstream"/>
+					</PermanentWarningDevice>
+				</PermanentWarningSystem>
+			</PermanentWarningSystems>
+			<FlankProtectionSystems>
+				<FlankProtectionSystem puic="73b8722a-ae28-40de-8eae-f35a546a21e3" flankProtectionObjectType="DerailingBlock" divergingDirection="Left" hasSwitchChecker="False" maintenanceSwitchAmount="0">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="467.8"/>
+					<SwitchMechanism puic="3c6a845c-5d7e-442b-ba39-de5e505aabe4" operatingType="Central" fixType="Spiked" normalPosition="Left" switchConnectionCabinetRef="2961d10c-8cec-42b6-bfda-2cf87fbbc7c2" preferredPosition="Right" isSpringSwitch="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>77230.03,433552.70</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</SwitchMechanism>
+				</FlankProtectionSystem>
+			</FlankProtectionSystems>
+			<SofisBalises>
+				<SofisBalise puic="0b21e58e-f0fd-4b6c-a5b6-ffc518fb996d" name="425_00153_0">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77231.26,433552.97</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="112.9"/>
+				</SofisBalise>
+			</SofisBalises>
+			<GuardRails>
+				<GuardRail puic="b8e1c0c6-4afe-4c83-8312-d890a4e8c0e7">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString>
+								<gml:coordinates>77230.03,433552.70 77230.03,433562.70</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" fromMeasure="256" toMeasure="260"/>
+				</GuardRail>
+			</GuardRails>
+			<ExpansionInstallations>
+				<ExpansionInstallation rail="LeftRail" puic="01988d30-8116-42b3-8407-4c3d39177b8e" genericDesignDocumentId="12346">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString>
+								<gml:coordinates>252338.848,474903.023 252338.656,474901.072</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="256"/>
+				</ExpansionInstallation>
+				<ExpansionInstallation puic="11a4d963-1353-4486-ad05-fdce771f2256" rail="Both">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:LineString>
+								<gml:coordinates>252338.848,474903.023 252338.656,474901.072</gml:coordinates>
+							</gml:LineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" fromMeasure="256" toMeasure="260"/>
+				</ExpansionInstallation>
+			</ExpansionInstallations>
+			<FloodBarriers>
+				<FloodBarrier puic="a4f01983-30b1-49b1-ae0f-d32316a4134a">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="256"/>
+				</FloodBarrier>
+			</FloodBarriers>
+			<LubricationNozzles>
+				<LubricationNozzle puic="91487d0f-f766-481d-b31e-452f8443929c" lubricationSystemCabinetRef="77d05877-b4ec-486a-bdf6-29abb1a8be97">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+				</LubricationNozzle>
+			</LubricationNozzles>
+			<BridgeTransitions>
+				<BridgeTransition puic="866a6b91-2081-4d8e-baaa-af951a8cfd7c" rail="Both" locationSpecificDesignDocumentId="12345" bridgeRef="cdc88402-e3ec-4c47-872a-4de179c3deca">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+				</BridgeTransition>
+			</BridgeTransitions>
+			<MonitoringLocations>
+				<MonitoringLocation puic="c08ce324-f82a-4f6b-8635-072b1de8bf38">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+					<TagReader puic="3a3f1942-4bf2-4fb1-9ba1-dc0bb110bc49">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.03,433552.70</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+					</TagReader>
+					<QuoVadis puic="49f53cbb-b263-4785-a836-960c83ac7389" hasActiveSignaling="False" monitoringSystemCabinetRef="77982f90-c7db-4134-8106-f2814e562338">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.03,433552.70</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						<QuoVadisSensor puic="bd6ffbaa-3e56-4462-bbdb-7315569d4f22">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77230.03,433552.70</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+							<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						</QuoVadisSensor>
+					</QuoVadis>
+					<HotboxDetector puic="f090065f-fd01-4959-811d-e159d7653da0" hasActiveSignaling="False" monitoringSystemCabinetRef="77982f90-c7db-4134-8106-f2814e562338">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.03,433552.70</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						<Scanner puic="089c8cd0-360a-4196-9b5a-a43152f7ad97">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77230.03,433552.70</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+							<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						</Scanner>
+						<RailContact puic="97bee364-174d-407f-b828-c11145f130fd">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77230.03,433552.70</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+							<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						</RailContact>
+						<RailContact puic="5267b8e8-28a3-464c-9f69-18830f2c2c9b">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>77230.03,433552.70</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+							<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="1237.8"/>
+						</RailContact>
+					</HotboxDetector>
+				</MonitoringLocation>
+			</MonitoringLocations>
+			<Crocodiles>
+				<Crocodile puic="62287bda-36d5-4b1e-9f3a-962f525c631b" protectedObjectRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None"/>
+				</Crocodile>
+			</Crocodiles>
+			<Indusis>
+				<Indusi puic="b84deb0e-b017-48c2-8de0-26db7ebfd3a6" isSwitchable="False" frequency="Hz1000" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</Indusi>
+			</Indusis>
+			<CompressedAirConnections>
+				<CompressedAirConnection puic="57c65410-ef89-473e-bb13-5aeca36456f7" brakeTestingInstallationRef="69215dc4-69ae-41b1-adec-a50ba97aefe5">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="15.1"/>
+				</CompressedAirConnection>
+			</CompressedAirConnections>
+			<OverheadLineEnds>
+				<OverheadLineEnd puic="b782b483-121b-42d6-b16d-1696511a53a6">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="317"/>
+				</OverheadLineEnd>
+			</OverheadLineEnds>
+			<RailCoils>
+				<RailCoil puic="43a72ffa-3a80-4604-b488-3620b9862c44" insulatedJointRef="a24aa7da-2982-4e88-8a11-126ab63d77f2">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>77230.03,433552.70</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="None" atMeasure="317"/>
+				</RailCoil>
+			</RailCoils>
+			<BridgeWarningSystems>
+				<BridgeWarningSystem puic="5df89150-69f5-4d88-b8d1-f27511ecbbed" bridgeRef="cdc88402-e3ec-4c47-872a-4de179c3deca" hasBell="True">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Photogrammetry">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream"/>
+				</BridgeWarningSystem>
+			</BridgeWarningSystems>
+			<LevelCrossingWarningSystems>
+				<LevelCrossingWarningSystem puic="3aefec99-bf23-4d1c-ab71-a137ab1f028e" levelCrossingWarningInstallationType="WIDO_WFLS">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="RTK">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</LevelCrossingWarningSystem>
+			</LevelCrossingWarningSystems>
+			<SightRestrictingObjectWarningSystems>
+				<SightRestrictingObjectWarningSystem puic="5340601e-6b67-4809-b1b6-5dca064e3ef8">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="Constructed">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream"/>
+				</SightRestrictingObjectWarningSystem>
+			</SightRestrictingObjectWarningSystems>
+			<TunnelWarningSystems>
+				<TunnelWarningSystem puic="991270c1-f189-4215-be66-fa59b03e5077" tunnelTubeRef="eb71a8d7-48bd-4edd-8635-a2777cec0a00">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="PanoramicPhotogrammetry">
+							<gml:Point srsName="EPSG:28992">
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="2465" direction="Upstream"/>
+				</TunnelWarningSystem>
+			</TunnelWarningSystems>
+			<AtbEgLoops>
+				<AtbEgLoop puic="cec3dd01-0de0-4d0e-86cd-0a66827428e9">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="GPS">
+							<gml:MultiLineString>
+								<gml:lineStringMember>
+									<gml:LineString srsName="EPSG:28992">
+										<gml:coordinates>130645.94,461014.40 130645.94,461014.90</gml:coordinates>
+									</gml:LineString>
+								</gml:lineStringMember>
+							</gml:MultiLineString>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="2465" direction="Upstream"/>
+				</AtbEgLoop>
+			</AtbEgLoops>
+			<LoadingGauges>
+				<LoadingGauge puic="f36e7d16-c204-41f6-bc75-e3ec727a76d1">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point>
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="2465" direction="Upstream"/>
+				</LoadingGauge>
+			</LoadingGauges>
+			<Blockings>
+				<Blocking puic="b2720e2e-bdf6-4bfb-bb65-751520cdb363">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Point>
+								<gml:coordinates>203047.324,437044.828</gml:coordinates>
+							</gml:Point>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="2465" direction="Upstream"/>
+				</Blocking>
+			</Blockings>
+			<RoadRailAccessPoints>
+				<RoadRailAccessPoint puic="1c94dea2-9344-4bf4-b05d-09b51cb2809d" length="30.1">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Polygon srsName="EPSG:28992">
+								<gml:outerBoundaryIs>
+									<gml:LinearRing>
+<!--										<gml:coordinates>77230.57,433556.06 77231.26, 433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>-->
+										<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+									</gml:LinearRing>
+								</gml:outerBoundaryIs>
+							</gml:Polygon>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" direction="None" fromMeasure="593.837" toMeasure="523.937"/>
+				</RoadRailAccessPoint>
+			</RoadRailAccessPoints>
+			<FuelFacilities>
+				<FuelFacility puic="8ab02165-9e51-48a6-a9c9-f5791972683e" isSuitedForMobileRefueling="False" length="30.1">
+					<Location>
+						<GeographicLocation dataAcquisitionMethod="DGPS">
+							<gml:Polygon srsName="EPSG:28992">
+								<gml:outerBoundaryIs>
+									<gml:LinearRing>
+<!--										<gml:coordinates>77230.57,433556.06 77231.26, 433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>-->
+										<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+
+									</gml:LinearRing>
+								</gml:outerBoundaryIs>
+							</gml:Polygon>
+						</GeographicLocation>
+					</Location>
+					<RailConnectionInfo railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" direction="None" fromMeasure="593.837" toMeasure="523.937"/>
+				</FuelFacility>
+			</FuelFacilities>
+			<LocalControls>
+				<ControlBooths>
+					<ControlBooth puic="35f8716a-1b2e-46d5-b669-904cf93d360f" name="Post 1">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ControlBooth>
+				</ControlBooths>
+				<ControlConsoles>
+					<ControlConsole puic="c9eb77eb-8cf5-46b1-9e8c-a4bf267a4ec2" name="Ovw">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ControlConsole>
+				</ControlConsoles>
+				<BridgeEmergencyStops>
+					<BridgeEmergencyStop puic="84b09ebb-8902-4f02-87cf-dafb09ad67c1" controlType="Button" authority="Employee" bridgeControlSystemRef="a727c53b-474b-4f99-81be-1695dae89e4c">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BridgeEmergencyStop>
+				</BridgeEmergencyStops>
+				<ContactCheckers>
+					<ContactChecker puic="6cb9e975-f626-445c-8e3a-b174d962e922" bridgeControlSystemRef="a727c53b-474b-4f99-81be-1695dae89e4c">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ContactChecker>
+				</ContactCheckers>
+				<BridgePosts>
+					<BridgePost puic="50c376d3-c629-41e6-9b79-62760c67a6b2" name="Brp" bridgeControlSystemRef="a727c53b-474b-4f99-81be-1695dae89e4c">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BridgePost>
+				</BridgePosts>
+				<LevelCrossingControls>
+					<LevelCrossingControl puic="1460079e-eba3-4257-81bb-2f46ca97c972" controlType="Switch" authority="MainConductor" levelCrossingRef="3c98ebe0-38b7-4e5b-ac30-e55d70a35296">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</LevelCrossingControl>
+				</LevelCrossingControls>
+				<SwitchControls>
+					<SwitchControl puic="1da15451-fccb-4add-bfa5-dafe948d3764" controlType="Button" authority="Employee" switchMechanismRef="9339e31a-babb-4083-b8cd-16c08870be41">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</SwitchControl>
+				</SwitchControls>
+				<WorkzoneSwitchCabinets>
+					<WorkzoneSwitchCabinet puic="42dff12f-306d-43ce-a397-a341a3502521">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Design">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<WorkzoneSwitchRefs>98bce077-56a9-4261-bbe5-f615d0fd0e16</WorkzoneSwitchRefs>
+					</WorkzoneSwitchCabinet>
+				</WorkzoneSwitchCabinets>
+				<WorkzoneSwitches>
+					<WorkzoneSwitch workzoneSwitchType="BridgeAccessA" puic="98bce077-56a9-4261-bbe5-f615d0fd0e16" workzoneSystemRef="0287b027-eac6-4f0e-8ff5-66227cb26b18">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</WorkzoneSwitch>
+				</WorkzoneSwitches>
+				<ControllerCabinets>
+					<ControllerCabinet puic="4c51f393-6a98-4b04-9ab6-a5b896844ec4" controlType="Button" authority="MainConductor">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ControllerCabinet>
+				</ControllerCabinets>
+				<KeyLocks>
+					<KeyLock puic="f9a54924-1472-431b-b8d8-4c47b64a0031" controlType="Button" authority="Employee" firstKeyType="KeyAbsent" secondKeyType="DoesNotApply">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</KeyLock>
+				</KeyLocks>
+				<KeyLockControls>
+					<KeyLockControl puic="0aa088b7-45cf-4d20-9c8a-fa103d6ca38b" keyType="KeyPresent" lockRef="1317923c-a4d9-4cd9-984e-8b968129ab3c">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</KeyLockControl>
+				</KeyLockControls>
+				<BellTestControls>
+					<BellTestControl puic="37a5a58e-fb16-41e5-a717-22956d36dc90" controlType="Switch" authority="Employee" bridgeWarningSystemRef="5df89150-69f5-4d88-b8d1-f27511ecbbed">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="GPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BellTestControl>
+				</BellTestControls>
+				<BellControls>
+					<!-- <BellControl puic="37a5a58e-fb16-41e5-a717-22956d36dc90" controlType="Switch" authority="Employee" bridgeWarningSystemRef="5df89150-69f5-4d88-b8d1-f27511ecbbed"> -->
+					<BellControl puic="59334412-a3d3-4d30-9a50-cad483a73ac5" controlType="Switch" authority="Employee" bridgeWarningSystemRef="5df89150-69f5-4d88-b8d1-f27511ecbbed">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="GPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BellControl>
+				</BellControls>
+				<TemporaryShuntingReleases>
+					<TemporaryShuntingRelease puic="d1977e60-57ec-4133-adbc-92c75b18c566" controlType="Switch" authority="Employee" temporaryShuntingAreaRef="9339e31a-babb-4083-b8cd-16c08870be41">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</TemporaryShuntingRelease>
+				</TemporaryShuntingReleases>
+			</LocalControls>
+			<TrackSideEquipment>
+				<ElectronicsConnectionCabinets>
+					<ElectronicsConnectionCabinet puic="1464bd26-1c22-4745-8ae8-f0259438795f">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.57,433556.06</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</ElectronicsConnectionCabinet>
+				</ElectronicsConnectionCabinets>
+				<AtbVvConnectionCabinets>
+					<AtbVvConnectionCabinet puic="72cf7dd2-3294-40b9-a336-cd537f80f956">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>130645.94,461014.40</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</AtbVvConnectionCabinet>
+				</AtbVvConnectionCabinets>
+				<BrakeTestingInstallations>
+					<BrakeTestingInstallation puic="69215dc4-69ae-41b1-adec-a50ba97aefe5">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>77230.03,433552.70</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</BrakeTestingInstallation>
+				</BrakeTestingInstallations>
+				<AfTuningUnits>
+					<AfTuningUnit puic="16a1d1d8-0dc6-4cec-82dd-08f3795ea60a">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<Transmitter frequency="1500" blockDemarcationRef="e3f780a2-ea80-4525-98b0-16749ce06250"/>
+					</AfTuningUnit>
+					<AfTuningUnit puic="6b41853c-4c20-4730-b879-d53d4fde423b">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<Receiver blockDemarcationRef="e3f780a2-ea80-4525-98b0-16749ce06250"/>
+					</AfTuningUnit>
+					<AfTuningUnit puic="9f861b9f-e1e1-401a-9c01-7dea76459972">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<Receiver blockDemarcationRef="e3f780a2-ea80-4525-98b0-16749ce06250"/>
+					</AfTuningUnit>
+				</AfTuningUnits>
+				<MonitoringSystemCabinets>
+					<MonitoringSystemCabinet puic="77982f90-c7db-4134-8106-f2814e562338">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="GPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</MonitoringSystemCabinet>
+				</MonitoringSystemCabinets>
+				<LubricationSystemCabinets>
+					<LubricationSystemCabinet puic="77d05877-b4ec-486a-bdf6-29abb1a8be97">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Constructed">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</LubricationSystemCabinet>
+				</LubricationSystemCabinets>
+				<HighVoltageDetectionCabinets>
+					<HighVoltageDetectionCabinet puic="8e0745f6-41a7-47bf-9410-0c456f8d8a40">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</HighVoltageDetectionCabinet>
+				</HighVoltageDetectionCabinets>
+				<SwitchConnectionCabinets>
+					<SwitchConnectionCabinet puic="2961d10c-8cec-42b6-bfda-2cf87fbbc7c2">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</SwitchConnectionCabinet>
+				</SwitchConnectionCabinets>
+				<AxleCounterUnits>
+					<AxleCounterUnit puic="d0afdf11-26dd-43aa-8051-d8b6e081c8a2" countingReferenceDirection="East" housingRef="5e4b18a9-46f5-46ca-b79c-3f2eb225d042">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>203378.501,436899.774</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<ElectronicsConnectionCabinetRefs>72cf7dd2-3294-40b9-a336-cd537f80f956</ElectronicsConnectionCabinetRefs>
+					</AxleCounterUnit>
+				</AxleCounterUnits>
+				<AntiIcingInstallations>
+					<AntiIcingInstallation puic="47c3b916-7ac0-4283-a80e-567f16c8a315">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+<!--											<gml:coordinates>77230.57,433556.06 77231.26, 433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>-->
+											<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+					</AntiIcingInstallation>
+				</AntiIcingInstallations>
+				<WorkPits>
+					<WorkPit puic="39cf98f7-1313-4456-ab31-ff192a560563">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+<!--											<gml:coordinates>77230.57,433556.06 77231.26, 433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>-->
+											<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+					</WorkPit>
+				</WorkPits>
+				<TrainWashFacilities>
+					<TrainWashFacility puic="89dbec8b-c5b4-413c-9421-4852ea801aa7">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+<!--											<gml:coordinates>77230.57,433556.06 77231.26, 433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>-->
+											<gml:coordinates>77230.57,433556.06 77231.26,433552.97 77230.03,433552.70 77229.40,433555.81 77230.57,433556.06</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+					</TrainWashFacility>
+				</TrainWashFacilities>
+				<InstallationCabinets>
+					<InstallationCabinet puic="5e4b18a9-46f5-46ca-b79c-3f2eb225d042" installationCabinetType="Type42" installationCabinetFunction="HS">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="PanoramicPhotogrammetry" azimuth="0.0" accuracy="25">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>252338.848,474903.023</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</InstallationCabinet>
+				</InstallationCabinets>
+				<Tunnels>
+					<Tunnel puic="ee552d77-9d4a-4eef-97cc-02bc612555a9" abbreviation="Btlk" name="Botlek Tunnel">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Sketch" azimuth="0.0" accuracy="25">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+											<gml:coordinates>202327.242,437310.599 202323.628,437321.756 202321.494,437327.683 202319.03,437333.523 202316.586,437336.911 202307.775,437344.182 202301.052,437343.353 202301.411,437337.614 202303.69,437331.974 202310.043,437316.491 202320.319,437311.678 202327.242,437310.599</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+						<TunnelTube puic="eb71a8d7-48bd-4edd-8635-a2777cec0a00">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="AutomaticallyDigitized">
+									<gml:Polygon srsName="EPSG:28992">
+										<gml:outerBoundaryIs>
+											<gml:LinearRing>
+												<gml:coordinates>202327.242,437310.599 202323.628,437321.756 202321.494,437327.683 202319.03,437333.523 202316.586,437336.911 202307.775,437344.182 202301.052,437343.353 202301.411,437337.614 202303.69,437331.974 202310.043,437316.491 202320.319,437311.678 202327.242,437310.599</gml:coordinates>
+											</gml:LinearRing>
+										</gml:outerBoundaryIs>
+									</gml:Polygon>
+								</GeographicLocation>
+							</Location>
+							<TunnelTrackFragment railConnectionRef="a7b8bcac-c181-423c-8556-bf183cd726c7" fromMeasure="3.15" toMeasure="2017.4" tunnelCivilSpeed="80" tunnelFloorSpeed="100"/>
+						</TunnelTube>
+						<TunnelTube puic="a447d708-4952-4705-b3d3-b43a26e38121">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="AutomaticallyDigitized">
+									<gml:Polygon srsName="EPSG:28992">
+										<gml:outerBoundaryIs>
+											<gml:LinearRing>
+												<gml:coordinates>202327.242,437310.599 202323.628,437321.756 202321.494,437327.683 202319.03,437333.523 202316.586,437336.911 202307.775,437344.182 202301.052,437343.353 202301.411,437337.614 202303.69,437331.974 202310.043,437316.491 202320.319,437311.678 202327.242,437310.599</gml:coordinates>
+											</gml:LinearRing>
+										</gml:outerBoundaryIs>
+									</gml:Polygon>
+								</GeographicLocation>
+							</Location>
+						</TunnelTube>
+					</Tunnel>
+				</Tunnels>
+				<TunnelTechnicalInstallations>
+					<TunnelTechnicalInstallation name="12345" puic="4c0303fc-adb8-4cb4-9298-f92d2a8d8792" hasStallDetection="False">
+						<TunnelTubeRefs>eb71a8d7-48bd-4edd-8635-a2777cec0a00</TunnelTubeRefs>
+					</TunnelTechnicalInstallation>
+				</TunnelTechnicalInstallations>
+				<Gantries>
+					<Gantry puic="e317f692-0f63-4bbf-b3a1-d886046f15ce" hasBridge="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS" azimuth="0.0" accuracy="25">
+								<gml:LineString>
+									<gml:coordinates>252332.848,474903.023 252338.848,474903.023</gml:coordinates>
+								</gml:LineString>
+							</GeographicLocation>
+						</Location>
+						<Girder puic="b60136cf-0037-4f42-afb2-95216fce320b">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:LineString>
+										<gml:coordinates>252332.848,474903.023 252338.848,474903.023</gml:coordinates>
+									</gml:LineString>
+								</GeographicLocation>
+							</Location>
+						</Girder>
+						<Pole puic="b2765b53-cfef-4a4b-9770-cb4319a230e3">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>252332.848,474903.023</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</Pole>
+						<Pole puic="5e4b2c5b-2cac-411d-8ec2-d5dcb9082bed">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>252338.848,474903.023</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</Pole>
+					</Gantry>
+				</Gantries>
+				<CivilConstructions>
+					<CivilConstruction puic="5d1d93f9-0af4-4743-b3fb-6da11730a1f9" abbreviation="KGS" carriesTrack="True" civilConstructionType="RoadViaduct" material="Steel" wildlifeCrossing="None" roadName="N123">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS" azimuth="0.0" accuracy="25">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+											<gml:coordinates>80502.232,431958.462 80503.401,431958.787 80504.445,431955.624 80498.675,431954.004 80497.574,431957.166 80502.232,431958.462</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+					</CivilConstruction>
+				</CivilConstructions>
+				<Bridges>
+					<Bridge puic="cdc88402-e3ec-4c47-872a-4de179c3deca" name="Harinxmakanaalbrug" abbreviation="HRMK" isMoveable="True" carriesTrack="True" material="Steel" wildlifeCrossing="None" waterWayName="Harinxmakanaal" hasBridgeWatcherFunction="False" isShippingPriority="False">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Polygon>
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+											<gml:coordinates>80502.232,431958.462 80503.401,431958.787 80504.445,431955.624 80498.675,431954.004 80497.574,431957.166 80502.232,431958.462</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" direction="None" fromMeasure="593.837" toMeasure="523.937"/>
+						<BridgeConstructionPart partType="Column" puic="48fe1478-2d7f-41a7-90cc-72b9e1a6caca">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS" azimuth="0.0" accuracy="25">
+									<gml:Polygon srsName="EPSG:28992">
+										<gml:outerBoundaryIs>
+											<gml:LinearRing>
+												<gml:coordinates>80502.232,431958.462 80503.401,431958.787 80504.445,431955.624 80498.675,431954.004 80497.574,431957.166 80502.232,431958.462</gml:coordinates>
+											</gml:LinearRing>
+										</gml:outerBoundaryIs>
+									</gml:Polygon>
+								</GeographicLocation>
+							</Location>
+						</BridgeConstructionPart>
+						<BridgeSignalRefs>f2de66a0-6376-41ff-838e-d72ce25bae44</BridgeSignalRefs>
+						<BridgeSectionRefs>8286272c-0eaa-420b-bc64-9ab6ad3aada5</BridgeSectionRefs>
+						<SignRefs>3024c1be-9386-4937-a70d-7badc5bc63af</SignRefs>
+					</Bridge>
+					<BridgeControlSystem puic="a727c53b-474b-4f99-81be-1695dae89e4c" bridgeRef="cdc88402-e3ec-4c47-872a-4de179c3deca">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<Lock puic="929e167c-2e40-48c7-a3e9-bf55ecf8b518" lockType="ElectricLock">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point>
+										<gml:coordinates>80502.232,431958.462</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</Lock>
+					</BridgeControlSystem>
+				</Bridges>
+				<SwitchPointHeatingInstallations>
+					<SwitchPointHeatingInstallation puic="ccf93a36-838c-4e01-8714-e5d43539d450" type="CentralPipeCityHeating">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS" azimuth="0.0" accuracy="25">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>252338.848,474903.023</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<SwitchPointHeatingCabinet puic="f4e502d4-f876-4a86-a775-5d372cecfdc5" switchPointHeatingCabinetType="EmergencyShutOff">
+							<Location>
+								<GeographicLocation dataAcquisitionMethod="DGPS">
+									<gml:Point srsName="EPSG:28992">
+										<gml:coordinates>252338.848,474903.023</gml:coordinates>
+									</gml:Point>
+								</GeographicLocation>
+							</Location>
+						</SwitchPointHeatingCabinet>
+					</SwitchPointHeatingInstallation>
+				</SwitchPointHeatingInstallations>
+				<EquipmentRooms>
+					<EquipmentRoom puic="5f3e6780-5cae-411a-8adc-a546eb78928d" equipmentRoomType="RH">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS">
+								<gml:Point>
+									<gml:coordinates>80502.232,431958.462</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</EquipmentRoom>
+				</EquipmentRooms>
+				<EscapeDoors>
+					<EscapeDoor puic="346eab9c-50d0-4263-8cdc-4a38b6050a5b">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Constructed" azimuth="0.0" accuracy="25">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>252338.848,474903.023</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+					</EscapeDoor>
+				</EscapeDoors>
+				<RailTrenches>
+					<RailTrench puic="179fb17b-38ab-4cb5-ae3d-0c566b4b3449" tunnelRef="ee552d77-9d4a-4eef-97cc-02bc612555a9" abbreviation="Btlk">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="DGPS" azimuth="0.0" accuracy="25">
+								<gml:Polygon srsName="EPSG:28992">
+									<gml:outerBoundaryIs>
+										<gml:LinearRing>
+											<gml:coordinates>80502.232,431958.462 80503.401,431958.787 80504.445,431955.624 80498.675,431954.004 80497.574,431957.166 80502.232,431958.462</gml:coordinates>
+										</gml:LinearRing>
+									</gml:outerBoundaryIs>
+								</gml:Polygon>
+							</GeographicLocation>
+						</Location>
+					</RailTrench>
+				</RailTrenches>
+			</TrackSideEquipment>
+		</TrackAssets>
+	</RailInfrastructure>
+	<Groupings>
+		<TrackAggregations>
+			<PpcTracks>
+				<PpcTrack puic="d256edda-3037-4a0f-8992-1de3a7de260a" name="904" description="Mariënberg">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="364.27" toMeasure="724.359"/>
+					</TrackFragments>
+					<DemarcationObject objectRef="5722777e-3363-4fca-8be9-158497de3419" direction="Upstream"/>
+					<DemarcationObject objectRef="fa88bc0c-4626-4dbd-b294-791618d7edd2" direction="Downstream"/>
+					<KeyLockRefs>f9a54924-1472-431b-b8d8-4c47b64a0031</KeyLockRefs>
+					<StopConnectionRefs>244c8748-0228-46a2-84f9-fe7845f47f30</StopConnectionRefs>
+				</PpcTrack>
+			</PpcTracks>
+			<FunctionalRoutes>
+				<FunctionalRoute puic="929b7d38-691c-4495-ace2-3857e1eb036f" startObjectRef="65ccaade-e1c7-43e8-975b-e377951ba621" endObjectRef="2e417aff-a9f1-49be-90c6-6f5d6ec41e28" tunnelTubeRef="eb71a8d7-48bd-4edd-8635-a2777cec0a00" isReleasedAutomatically="False" hasOverheadLineSwitchMechanism="False" routeTimerValue="15" hasCargoCriteriumOption="False" hasNormalOption="True" hasDriveOnSightOption="False">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="364.27" toMeasure="724.359"/>
+					</TrackFragments>
+					<OrderedSwitchPosition index="0" switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left"/>
+					<StopSignalPassageDetection signalRef="f2de66a0-6376-41ff-838e-d72ce25bae44"/>
+					<TrainlengthDependentDepartureSignalActivation platformClearancePointRef="77f56a7c-6428-442a-80a2-623e3c7d008b"/>
+					<SectionOccupationDetectionRefs>8286272c-0eaa-420b-bc64-9ab6ad3aada5</SectionOccupationDetectionRefs>
+					<WarningSystemRefs>3aefec99-bf23-4d1c-ab71-a137ab1f028e</WarningSystemRefs>
+					<TunnelEntryRoute tunnelTubeRef="eb71a8d7-48bd-4edd-8635-a2777cec0a00" ttiTimer="15">
+						<AdjoiningTunnelTubeRefs>a447d708-4952-4705-b3d3-b43a26e38121</AdjoiningTunnelTubeRefs>
+						<RouteReportingElement>
+							<SwitchPosition switchMechanismRef="9339e31a-babb-4083-b8cd-16c08870be41" switchPosition="None"/>
+						</RouteReportingElement>
+					</TunnelEntryRoute>
+					<ConditionalRouteRefs>18705164-95e4-4c54-8fb0-38cd9192c248</ConditionalRouteRefs>
+				</FunctionalRoute>
+				<FunctionalRoute puic="18705164-95e4-4c54-8fb0-38cd9192c248" startObjectRef="65ccaade-e1c7-43e8-975b-e377951ba621" endObjectRef="2e417aff-a9f1-49be-90c6-6f5d6ec41e28" isReleasedAutomatically="False" hasOverheadLineSwitchMechanism="False" hasCargoCriteriumOption="False" hasNormalOption="True" hasDriveOnSightOption="False">
+				</FunctionalRoute>
+			</FunctionalRoutes>
+		</TrackAggregations>
+		<Demarcations>
+			<TrainVacancyDetection>
+				<TrackCircuit name="1T" puic="39c50683-f8de-4e0f-abad-7413a3a1e5da" isLampSection="False" highVoltageDetectionCabinetRef="8e0745f6-41a7-47bf-9410-0c456f8d8a40" trackCircuitType="HighVoltage" isTrapSectionSituation="False">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="888.067" toMeasure="1047.789"/>
+					</TrackFragments>
+					<ReleaseMethod releasePrinciple="Passive" direction="Downstream"/>
+					<DemarcationObject objectRef="a24aa7da-2982-4e88-8a11-126ab63d77f2" direction="Downstream"/>
+					<ReferenceDirection sectionDirection="A_minus">
+						<EntryBlockDemarcationRefs>a24aa7da-2982-4e88-8a11-126ab63d77f2</EntryBlockDemarcationRefs>
+					</ReferenceDirection>
+				</TrackCircuit>
+				<AfSection puic="76bda407-86e4-416b-9897-22266c577e98" name="5104BT" description="" afSectionType="JADE1" isTrapSectionSituation="False" audioFrequencyTransmitterRef="16a1d1d8-0dc6-4cec-82dd-08f3795ea60a" isLampSection="False">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="a46c3e0b-e7c5-414a-a224-5bbd84937c81" fromMeasure="888.067" toMeasure="1047.789"/>
+					</TrackFragments>
+					<ReleaseMethod releasePrinciple="Active" direction="Downstream"/>
+					<DemarcationObject objectRef="e3f780a2-ea80-4525-98b0-16749ce06250" direction="Upstream"/>
+					<DemarcationObject objectRef="a24aa7da-2982-4e88-8a11-126ab63d77f2" direction="Downstream"/>
+					<ReferenceDirection sectionDirection="A_minus">
+						<EntryBlockDemarcationRefs>e3f780a2-ea80-4525-98b0-16749ce06250</EntryBlockDemarcationRefs>
+					</ReferenceDirection>
+					<ReferenceDirection sectionDirection="A_plus">
+						<EntryBlockDemarcationRefs>a24aa7da-2982-4e88-8a11-126ab63d77f2</EntryBlockDemarcationRefs>
+					</ReferenceDirection>
+				</AfSection>
+				<AxleCounterSection name="50T" puic="f6255214-ebd9-445c-8cc0-22d69effb8cd" axleCounterType="AZ_L90" axleCounterUnitRef="d0afdf11-26dd-43aa-8051-d8b6e081c8a2" axleCounterSectionFunction="BlockDetection" isTrapSectionSituation="False" baliseGroupRef="f4e95840-e5ee-4128-9605-d811161c4186" isLampSection="False" cssPickUpDelayTime="1.1">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="888.067" toMeasure="1047.789"/>
+					</TrackFragments>
+					<ReleaseMethod releasePrinciple="Passive" direction="Downstream"/>
+					<DemarcationObject objectRef="eecbef37-210d-4f8d-b89a-4db9779c1e07" direction="Upstream"/>
+					<DemarcationObject objectRef="dcfb222b-2c9e-4daf-96f5-b71a34fd4723" direction="Downstream"/>
+					<ReferenceDirection sectionDirection="A_minus">
+						<EntryBlockDemarcationRefs>eecbef37-210d-4f8d-b89a-4db9779c1e07</EntryBlockDemarcationRefs>
+					</ReferenceDirection>
+					<ReferenceDirection sectionDirection="A_plus">
+						<EntryBlockDemarcationRefs>dcfb222b-2c9e-4daf-96f5-b71a34fd4723</EntryBlockDemarcationRefs>
+					</ReferenceDirection>
+				</AxleCounterSection>
+				<SweepCorridor puic="a4f9969f-67ff-41f7-9c40-252ea69fe247" name="1T-5104BT" axleCounterSectionRef="f6255214-ebd9-445c-8cc0-22d69effb8cd">
+					<SweepMovement boundarySection1Ref="39c50683-f8de-4e0f-abad-7413a3a1e5da" boundarySection2Ref="76bda407-86e4-416b-9897-22266c577e98"/>
+				</SweepCorridor>
+				<PowerOffRelay puic="b3c12a8e-0c80-4986-be53-ef1a7a02723f" porType="ERTMS" housingRef="5e4b18a9-46f5-46ca-b79c-3f2eb225d042">
+					<SectionRefs>76bda407-86e4-416b-9897-22266c577e98</SectionRefs>
+					<SignalRefs>f2de66a0-6376-41ff-838e-d72ce25bae44</SignalRefs>
+				</PowerOffRelay>
+			</TrainVacancyDetection>
+			<NonStoppingAreas>
+				<NonStoppingArea puic="4e5ead8c-95a7-4068-a87a-33c0fe651004">
+					<TrackFragments/>
+					<DemarcationMarkers/>
+				</NonStoppingArea>
+			</NonStoppingAreas>
+			<NonCentrallyOperatedAreas>
+				<NonCentrallyOperatedArea puic="ec330517-61f6-4a99-9768-4837a6047527" description="NCBG1" cardinalDirection="North">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" fromMeasure="30" toMeasure="40"/>
+					</TrackFragments>
+					<DemarcationObject objectRef="d9b43723-b96b-4b4c-9306-525829fca3c2" direction="Downstream"/>
+					<DemarcationObject objectRef="58de6cc0-a5d3-4efa-a1d9-505d193081b3" direction="Upstream"/>
+				</NonCentrallyOperatedArea>
+			</NonCentrallyOperatedAreas>
+			<TemporaryShuntingAreas>
+				<TemporaryShuntingArea puic="1c1cd82b-2430-4169-b486-6ed55922600c" name="Kfh" description="Kijfhoek">
+					<TrackFragments>
+						<TrackFragment railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" fromMeasure="30" toMeasure="40"/>
+					</TrackFragments>
+					<DemarcationObject objectRef="8cb7f4a7-6097-4bc8-bffd-1bf6b430558c" direction="Downstream"/>
+					<LockRefs>1317923c-a4d9-4cd9-984e-8b968129ab3c</LockRefs>
+					<DetectableElementCondition reportDurationType="Temporary" state="Energized" detectableAndLockableType="DetectableAndLockableElement" objectRef="3d28b7ca-91c8-4876-b6cc-3a64a19d46c1">
+						<RailConnectionPosition railConnectionRef="e58f9956-ac7d-4f6c-b8c4-c25dcf110aea" direction="Upstream" atMeasure="123.5"/>
+						<ReportingElement>
+							<LevelCrossingRef>3c98ebe0-38b7-4e5b-ac30-e55d70a35296</LevelCrossingRef>
+						</ReportingElement>
+					</DetectableElementCondition>
+					<PassableDemarcationRefs/>
+					<MandatoryFlankProtection switchMechanismRef="3c6a845c-5d7e-442b-ba39-de5e505aabe4" switchPosition="Left"/>
+					<BridgeFloodBarrierRefs>cdc88402-e3ec-4c47-872a-4de179c3deca</BridgeFloodBarrierRefs>
+					<ConditionalSectionRefs>8286272c-0eaa-420b-bc64-9ab6ad3aada5</ConditionalSectionRefs>
+					<LevelCrossingRefs>3c98ebe0-38b7-4e5b-ac30-e55d70a35296</LevelCrossingRefs>
+					<WarningSystemRefs>5340601e-6b67-4809-b1b6-5dca064e3ef8</WarningSystemRefs>
+				</TemporaryShuntingArea>
+			</TemporaryShuntingAreas>
+			<Workzones>
+				<Workzone puic="e1ce0553-3490-4a4f-ba90-9291455f3e55" workzoneSystemRef="fb9d77f4-ad40-46be-8a55-4e47ce8b3ac3">
+					<SectionRefs>efcbafee-16a7-491e-8c1c-81cee1bd7399 914697bd-c28d-4540-a25f-7a4799c35a24</SectionRefs>
+				</Workzone>
+			</Workzones>
+			<WorkzoneSystems>
+				<WorkzoneSystem puic="fb9d77f4-ad40-46be-8a55-4e47ce8b3ac3" workzoneSystemControlType="WorkzoneSwitch" controlDelay="15">
+					<MandatoryFlankProtection switchMechanismRef="3c6a845c-5d7e-442b-ba39-de5e505aabe4" switchPosition="Left"/>
+					<LockRefs>1317923c-a4d9-4cd9-984e-8b968129ab3c</LockRefs>
+					<DetectableElementCondition reportDurationType="Temporary" state="Energized" detectableAndLockableType="DetectableElement" objectRef="3d28b7ca-91c8-4876-b6cc-3a64a19d46c1">
+						<ReportingElement>
+							<LevelCrossingRef>3c98ebe0-38b7-4e5b-ac30-e55d70a35296</LevelCrossingRef>
+						</ReportingElement>
+					</DetectableElementCondition>
+				</WorkzoneSystem>
+			</WorkzoneSystems>
+			<SlopeRegimeAreas>
+				<SlopeRegimeArea puic="e7f4ce1a-8e94-4435-820f-30e84875e39f" lengthCriteriumExtraSection="150">
+					<EntrySignalRefs>65ccaade-e1c7-43e8-975b-e377951ba621</EntrySignalRefs>
+					<FirstEndSignalRefs>8815d2e9-10d9-40dd-a39f-d49413f75242</FirstEndSignalRefs>
+					<LastBeginSignalRefs>8815d2e9-10d9-40dd-a39f-d49413f75242</LastBeginSignalRefs>
+					<ExitSignalRefs> 389c790e-59e9-4774-9377-2be27666766e</ExitSignalRefs>
+				</SlopeRegimeArea>
+			</SlopeRegimeAreas>
+			<TunnelRegimeAreas>
+				<TunnelRegimeArea puic="833db438-80ae-4cea-b493-e27569f62868">
+					<EntrySignalRefs>65ccaade-e1c7-43e8-975b-e377951ba621</EntrySignalRefs>
+					<FirstEndSignalRefs>8815d2e9-10d9-40dd-a39f-d49413f75242</FirstEndSignalRefs>
+					<LastBeginSignalRefs>8815d2e9-10d9-40dd-a39f-d49413f75242</LastBeginSignalRefs>
+					<ExitSignalRefs> 389c790e-59e9-4774-9377-2be27666766e</ExitSignalRefs>
+				</TunnelRegimeArea>
+			</TunnelRegimeAreas>
+			<SectionBreakProjections>
+				<SectionBreakProjection puic="8a254b76-e257-4162-a21b-e6447fee2f83" sectionBreakType="Open">
+					<DemarcationMarkers>
+						<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="10"/>
+						<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="120"/>
+					</DemarcationMarkers>
+					<SlopingWiresProjection>
+						<DemarcationMarkers>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="10"/>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="40"/>
+						</DemarcationMarkers>
+					</SlopingWiresProjection>
+					<SlopingWiresProjection>
+						<DemarcationMarkers>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="80"/>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="120"/>
+						</DemarcationMarkers>
+					</SlopingWiresProjection>
+					<ParallelWiresProjection>
+						<DemarcationMarkers>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="40"/>
+							<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="80"/>
+						</DemarcationMarkers>
+					</ParallelWiresProjection>
+				</SectionBreakProjection>
+			</SectionBreakProjections>
+		</Demarcations>
+		<KilometerRibbons>
+			<KilometerRibbon puic="2c1cc13b-93a9-451f-89cb-0bebf9b42f37" name="Asd-Zvg" kmFrom="1.458" kmTo="111.03" description="Amsterdam Centraal - Zevenaar Grens">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Sketch">
+						<gml:LineString srsName="EPSG:28992">
+							<gml:coordinates>122998.007,484386.612 123011.966,484348.978 123046.189,484255.314 123075.3,484161.5 123094.2,484062.7 123122.4,483964.5 123152.2,483868.5 123186.4,483774.3 123221.1,483681.8 123261.9,483590.2</gml:coordinates>
+						</gml:LineString>
+					</GeographicLocation>
+				</Location>
+				<Measures>1.458 1.5 1.6 1.7 1.8 1.9 2 2.1 2.2 2.3</Measures>
+				<MeasuringLine labelValue="100.0">
+					<GeographicLocation dataAcquisitionMethod="Design">
+						<gml:MultiLineString>
+							<gml:lineStringMember>
+								<gml:LineString>
+									<gml:coordinates>122998.007,484386.612 123011.966,484348.978</gml:coordinates>
+								</gml:LineString>
+							</gml:lineStringMember>
+							<gml:lineStringMember>
+								<gml:LineString>
+									<gml:coordinates>122998.500,484386.612 123011.966,484348.200</gml:coordinates>
+								</gml:LineString>
+							</gml:lineStringMember>
+						</gml:MultiLineString>
+					</GeographicLocation>
+				</MeasuringLine>
+			</KilometerRibbon>
+		</KilometerRibbons>
+		<SignalAspectRelations>
+			<SignalAspect puic="9d2ab1ab-3818-47b7-9319-e2fd1d67b996" aspectProducerRef="65ccaade-e1c7-43e8-975b-e377951ba621" targetSpeed="0" initialAtbCode="Code96">
+				<Aspect>
+					<AspectColor color="Red" isFlashing="False"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspect puic="c3c8a709-fc64-4ac9-8f87-c2beb92974d5" aspectProducerRef="5f8fc65f-40b5-4f5b-a58e-57592f8c00ce" targetSpeed="40" initialAtbCode="Code96">
+				<Aspect>
+					<AspectColor color="Green" isFlashing="False"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspect puic="b956a930-eff2-4d57-9bc2-5627185757da" aspectProducerRef="3521f8a8-26f4-41e5-830f-5e69d27a6498" targetSpeed="40" initialAtbCode="Code180">
+				<Aspect>
+					<AspectColor color="Yellow" isFlashing="False"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspect puic="a761ba8b-e79d-4c9a-9766-b57ff7f45496" aspectProducerRef="d7bd3159-16aa-4618-a67f-ae0cc5d13921" targetSpeed="100" initialAtbCode="Code180">
+				<Aspect>
+					<AspectColor color="Green" isFlashing="False"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspect puic="2217d5dd-c694-497e-b026-e6e93a24b400" aspectProducerRef="d7bd3159-16aa-4618-a67f-ae0cc5d13921" targetSpeed="80" initialAtbCode="Code120">
+				<Aspect>
+					<AspectColor color="Green" isFlashing="False"/>
+					<SpeedIndicator speed="70" isFlashing="True"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspect puic="ccedfd1c-7079-4535-a2be-36444144f30f" aspectProducerRef="bc1dbccd-eefc-42eb-9c55-0a59d56e096e" targetSpeed="140" initialAtbCode="Code96">
+				<Aspect>
+					<AspectColor color="Green" isFlashing="False"/>
+					<CargoRegime>None</CargoRegime>
+					<TunnelRegime>None</TunnelRegime>
+				</Aspect>
+			</SignalAspect>
+			<SignalAspectRelationAtbEg puic="ebd69cdb-4aee-40a4-97b0-623e4c59565b" signalAspectRef="9d2ab1ab-3818-47b7-9319-e2fd1d67b996" previousSignalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da"/>
+			<SignalAspectRelationAtbEg puic="5caaeb31-679d-4f5b-960c-4118390cf3ce" signalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da" previousSignalAspectRef="a761ba8b-e79d-4c9a-9766-b57ff7f45496">
+				<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+			</SignalAspectRelationAtbEg>
+			<SignalAspectRelationAtbEg puic="9a8ed9bc-9699-4fe2-811f-e4246d883087" signalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da" previousSignalAspectRef="2217d5dd-c694-497e-b026-e6e93a24b400">
+				<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+			</SignalAspectRelationAtbEg>
+			<SignalAspectRelationAtbEg puic="b7c760ae-4cae-40ce-ad46-34651cc6c3ba" signalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da" previousSignalAspectRef="c3c8a709-fc64-4ac9-8f87-c2beb92974d5">
+				<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Right" index="0"/>
+			</SignalAspectRelationAtbEg>
+			<SignalAspectRelationAtbEg puic="096668f1-3c6b-43d8-aa7b-b002821a7679" signalAspectRef="2217d5dd-c694-497e-b026-e6e93a24b400" previousSignalAspectRef="ccedfd1c-7079-4535-a2be-36444144f30f">
+				<EgSpeedChange atbCode="Code180" insulatedJointRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9"/>
+			</SignalAspectRelationAtbEg>
+				
+			<!-- <SignalAspectRelationAtbNg puic="b7c760ae-4cae-40ce-ad46-34651cc6c3ba" signalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da" previousSignalAspectRef="c3c8a709-fc64-4ac9-8f87-c2beb92974d5"> -->
+			<SignalAspectRelationAtbNg puic="9ba2e6a0-a164-4132-9f9a-0b790ed53f58" signalAspectRef="b956a930-eff2-4d57-9bc2-5627185757da" previousSignalAspectRef="c3c8a709-fc64-4ac9-8f87-c2beb92974d5">
+				<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Right" index="0"/>
+				<NgSpeedChange passingSpeed="120" objectRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9"/>
+			</SignalAspectRelationAtbNg>
+		</SignalAspectRelations>
+		<DimmableSignalGroups>
+			<DimmableSignalGroup puic="bde45329-ad43-4d23-968a-bec2383a12be" signalDimmingPolicy="RegularDimming">
+				<DimmableSignalRefs>65ccaade-e1c7-43e8-975b-e377951ba621 8815d2e9-10d9-40dd-a39f-d49413f75242 389c790e-59e9-4774-9377-2be27666766e</DimmableSignalRefs>
+			</DimmableSignalGroup>
+		</DimmableSignalGroups>
+		<StopConnectionConfigurations>
+			<StopConnection puic="244c8748-0228-46a2-84f9-fe7845f47f30" stopConnectionControlCode="Automatic" levelCrossingRef="d1db3f18-3166-477f-8614-d2f9ca945e96" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+				<FunctionalRouteRefs>929b7d38-691c-4495-ace2-3857e1eb036f</FunctionalRouteRefs>
+				<Automatic blockDemarcationRef="24c1de91-7752-4013-a153-dbfa9dfa37d0" activationType="FirstAxle" stopConnectionControlTime="60"/>
+			</StopConnection>
+			<StopConnection puic="6f3e0b93-5ecb-4851-afcc-0aea057ae78e" stopConnectionControlCode="Button" levelCrossingRef="d1db3f18-3166-477f-8614-d2f9ca945e96" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+				<FunctionalRouteRefs>929b7d38-691c-4495-ace2-3857e1eb036f</FunctionalRouteRefs>
+				<Manual controllerCabinetRef="4c51f393-6a98-4b04-9ab6-a5b896844ec4" trainDetectionSectionRef="76bda407-86e4-416b-9897-22266c577e98"/>
+			</StopConnection>
+			<OpenLineStopConnection puic="06f45c95-8217-4162-951c-d5db946f8654" stopConnectionControlCode="Button" levelCrossingRef="d1db3f18-3166-477f-8614-d2f9ca945e96" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621">
+				<FunctionalRouteRefs>929b7d38-691c-4495-ace2-3857e1eb036f</FunctionalRouteRefs>
+				<Automatic blockDemarcationRef="24c1de91-7752-4013-a153-dbfa9dfa37d0" activationType="FirstAxle" stopConnectionControlTime="60"/>
+			</OpenLineStopConnection>
+			<OpenLineStopConnection puic="cba45b37-70bf-4a24-8dd1-331ade158606" stopConnectionControlCode="Button" levelCrossingRef="d1db3f18-3166-477f-8614-d2f9ca945e96" signalRef="65ccaade-e1c7-43e8-975b-e377951ba621" openLineDelayTimer="120">
+				<FunctionalRouteRefs>929b7d38-691c-4495-ace2-3857e1eb036f</FunctionalRouteRefs>
+				<Manual controllerCabinetRef="4c51f393-6a98-4b04-9ab6-a5b896844ec4" trainDetectionSectionRef="76bda407-86e4-416b-9897-22266c577e98"/>
+			</OpenLineStopConnection>
+		</StopConnectionConfigurations>
+	</Groupings>
+	<ReturnCurrents>
+		<ReturnCurrentTrackCircuits>
+			<ReturnCurrentTrackCircuit>
+				<InsulatedRail polarity="Positive">
+					<RailFragments>
+						<RailFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="50" toMeasure="150" rail="RightRail"/>
+						<PassageSide passageRef="03c6e0e3-edec-447f-9e3d-27afbbec89e6" rail="LeftRail"/>
+					</RailFragments>
+					<InsulatedRailBoundary jointRef="bebae5c4-5b99-411d-a678-4cca44cf8268" direction="Downstream"/>
+					<InsulatedRailBoundary jointRef="0696b137-fc2a-4a72-b4e9-bd18c8830b9f" direction="Upstream"/>
+				</InsulatedRail>
+			</ReturnCurrentTrackCircuit>
+		</ReturnCurrentTrackCircuits>
+		<PowerConnectionCables>
+			<PowerConnectionCable puic="10ebb43b-1052-4b82-9e45-2c523d123e5b" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<InsulatedJointConnection insulatedJointRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9" direction="Downstream" rail="Both"/>
+				<PowerConnectionCableFunction>ATP</PowerConnectionCableFunction>
+			</PowerConnectionCable>
+			<!-- <PowerConnectionCable puic="10ebb43b-1052-4b82-9e45-2c523d123e5b" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35"> -->
+			<PowerConnectionCable puic="d8621d39-25cb-459b-8471-775140d058f1" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<InsulatedJointConnection insulatedJointRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9" direction="Downstream" rail="Both"/>
+				<PowerConnectionCableFunction>ATP</PowerConnectionCableFunction>
+				<PowerConnectionCableFunction>TVD</PowerConnectionCableFunction>
+			</PowerConnectionCable>
+		</PowerConnectionCables>
+		<RelayConnectionCables>
+			<!-- <RelayConnectionCable puic="10ebb43b-1052-4b82-9e45-2c523d123e5b" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35"> -->
+			<RelayConnectionCable puic="2a3d37d3-ffc1-4795-bc4e-0179b238ed8d" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<InsulatedJointConnection insulatedJointRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9" direction="Downstream" rail="Both"/>
+				<RelayConnectionCableFunction>TVD</RelayConnectionCableFunction>
+				<RelayConnectionCableFunction>ATP</RelayConnectionCableFunction>
+			</RelayConnectionCable>
+			<!-- <RelayConnectionCable puic="10ebb43b-1052-4b82-9e45-2c523d123e5b" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35"> -->
+			<RelayConnectionCable puic="f7f705b7-813c-4c16-9335-812c610ee3f2" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<InsulatedJointConnection insulatedJointRef="21626b5c-d3cc-4241-892f-ece80ff0d0a9" direction="Downstream" rail="Both"/>
+				<RelayConnectionCableFunction>BRD</RelayConnectionCableFunction>
+			</RelayConnectionCable>
+		</RelayConnectionCables>
+		<CathodicProtectionCables>
+			<!-- <CathodicProtectionCable puic="10ebb43b-1052-4b82-9e45-2c523d123e5b" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35"> -->
+			<CathodicProtectionCable puic="6068a135-78c7-47be-bba7-50c04b22dc53" cableType="Mm6x2" numberOfCables="4" housingRef="885a5b9e-813d-419b-a81b-d56a465c1b35">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<RailCableConnection railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" rail="LeftRail"/>
+			</CathodicProtectionCable>
+		</CathodicProtectionCables>
+		<ReturnCurrentCables>
+			<ReturnCurrentCable puic="df4f3bd2-1c2f-455e-9e0c-1610830a8641" cableType="Mm6x2" numberOfCables="6" hasExactLocation="False" railCoilConnectionRef="43a72ffa-3a80-4604-b488-3620b9862c44">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<RailCableConnection railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" rail="LeftRail"/>
+			</ReturnCurrentCable>
+		</ReturnCurrentCables>
+		<SerialCables>
+			<SerialCable puic="1e95aae2-6914-4c56-8b73-11a1596b9836" cableType="Mm6x2" numberOfCables="2">
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<RailCableConnection railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" rail="LeftRail"/>
+				<RailCableConnection railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" rail="LeftRail"/>
+				<ParallelCableFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="20" toMeasure="120" rail="LeftRail"/>
+				<ParallelCableFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="120" toMeasure="20" rail="LeftRail"/>
+			</SerialCable>
+		</SerialCables>
+		<AtbEgLoopCableConnections>
+			<AtbEgLoopCableConnection puic="ac16b890-f9e5-447b-9745-1dac71149c7c" cableType="Mm6x2" numberOfCables="1" hasExactLocation="True" atbEgLoopRef="cec3dd01-0de0-4d0e-86cd-0a66827428e9" housingRef="5f3e6780-5cae-411a-8adc-a546eb78928d">
+				<GeographicLocation dataAcquisitionMethod="Design">
+					<gml:LineString>
+						<gml:coordinates>252338.848,474903.023 252338.656,474901.072 252338.087,474899.196 252337.163,47</gml:coordinates>
+					</gml:LineString>
+				</GeographicLocation>
+				<ParallelCableFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="20" toMeasure="120" rail="LeftRail"/>
+				<ParallelCableFragment railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" fromMeasure="120" toMeasure="20" rail="LeftRail"/>
+			</AtbEgLoopCableConnection>
+		</AtbEgLoopCableConnections>
+		<BridgeSwitches>
+			<BridgeSwitch puic="58e57f90-2f7e-415e-9a65-9edd16f91a27" bridgeTransitionRef="60aade58-4dde-49f6-95c1-f680b75c0ac2">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:LineString>
+							<gml:coordinates>252338.848,474903.023 252338.656,474901.072</gml:coordinates>
+						</gml:LineString>
+					</GeographicLocation>
+				</Location>
+			</BridgeSwitch>
+		</BridgeSwitches>
+		<PowerSupplyIsolators>
+			<PowerSupplyIsolator insulatedJointRef="ee8d0402-f3e7-4f6e-bd62-15e54c9e6fc1" isSwitchable="True"/>
+		</PowerSupplyIsolators>
+	</ReturnCurrents>
+	<Ertms>
+		<TrackConditionMarkers>
+			<TC68 puic="544c2e3c-1bfe-47a0-bc72-4b5355764698" name="Track Condition 68">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<M_TRACKCOND>0000</M_TRACKCOND>
+			</TC68>
+			<TC69_StationPlatform puic="957c804e-0901-433d-9d5b-dd5bbf175aed" name="Track Condition 69" platformWallRef="165c8504-4964-4ccc-abf6-7d1ee39b3a9f">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<M_PLATFORM>15</M_PLATFORM>
+				<Q_PLATFORM>00</Q_PLATFORM>
+			</TC69_StationPlatform>
+			<TC40_ChangeOfAllowedCurrentConsumption puic="71cff808-4a0b-4f70-a421-f07b0d3dd92f" name="Track Condition 40">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<M_CURRENT>100</M_CURRENT>
+			</TC40_ChangeOfAllowedCurrentConsumption>
+			<TC39_ChangeOfTractionSystem puic="938cbe97-7209-411a-b2d6-c1112815aa7d" name="Track Condition 39">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<M_VOLTAGE>4</M_VOLTAGE>
+			</TC39_ChangeOfTractionSystem>
+			<TC67_BigMetalMass puic="2d015928-b369-435d-b78c-1cefe5f1dabb" name="Track Condition 67">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+			</TC67_BigMetalMass>
+		</TrackConditionMarkers>
+		<TransitionMarkers>
+			<TransitionMarker puic="ccd5d1c4-2e80-4c7b-8361-8151eb19eb3c" name="Level transitie">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<LevelTransition conditional="False" osmaLengthL2="110.0">
+					<PriorityList>
+						<OrderedErtmsLevel index="0">
+							<M_LEVELTR>3</M_LEVELTR>
+							<AcknowledgementArea>
+								<L_ACKLEVELTR>10</L_ACKLEVELTR>
+								<Path>
+									<OrderedSwitchPosition index="0" switchMechanismRef="45b379ef-0faf-4fd2-ac60-534e57bae347" switchPosition="Left"/>
+								</Path>
+							</AcknowledgementArea>
+						</OrderedErtmsLevel>
+						<OrderedErtmsLevel index="1">
+							<M_LEVELTR>2</M_LEVELTR>
+							<AcknowledgementArea>
+								<L_ACKLEVELTR>10</L_ACKLEVELTR>
+								<Path>
+									<OrderedSwitchPosition index="0" switchMechanismRef="45b379ef-0faf-4fd2-ac60-534e57bae347" switchPosition="Left"/>
+								</Path>
+							</AcknowledgementArea>
+						</OrderedErtmsLevel>
+					</PriorityList>
+				</LevelTransition>
+			</TransitionMarker>
+			<TransitionMarker puic="9198e1c2-65e4-4f8d-b283-d37548c89819" name="Wisselstand-afhankelijke level transitie">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<SwitchCondition switchMechanismRef="45b379ef-0faf-4fd2-ac60-534e57bae347" switchPosition="Left"/>
+				<LevelTransition conditional="False">
+					<PriorityList>
+						<OrderedErtmsLevel index="0">
+							<M_LEVELTR>3</M_LEVELTR>
+							<AcknowledgementArea>
+								<L_ACKLEVELTR>10</L_ACKLEVELTR>
+								<Path>
+									<OrderedSwitchPosition index="0" switchMechanismRef="45b379ef-0faf-4fd2-ac60-534e57bae347" switchPosition="Left"/>
+								</Path>
+							</AcknowledgementArea>
+						</OrderedErtmsLevel>
+					</PriorityList>
+				</LevelTransition>
+			</TransitionMarker>
+			<TransitionMarker puic="00166215-25bc-4255-b2f4-460b14ef17de" name="Mode transitie">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<ModeTransition acknowledgementTime="30">
+					<M_MAMODE>01</M_MAMODE>
+					<Q_MAMODE>0</Q_MAMODE>
+					<V_MAMODE>40</V_MAMODE>
+					<L_MAMODE>1</L_MAMODE>
+					<AcknowledgementArea>
+						<L_ACKMAMODE>1</L_ACKMAMODE>
+						<Path>
+							<OrderedSwitchPosition index="0" switchMechanismRef="45b379ef-0faf-4fd2-ac60-534e57bae347" switchPosition="Left"/>
+						</Path>
+					</AcknowledgementArea>
+				</ModeTransition>
+			</TransitionMarker>
+			<TransitionMarker puic="35ad3f7f-eaad-4f16-982b-0acf6e4f7e5e" name="TSI-CCS transitie">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<TsiCcsTransition>
+					<M_VERSION>32</M_VERSION>
+				</TsiCcsTransition>
+			</TransitionMarker>
+			<TransitionMarker puic="5de31ab8-a777-4203-9b39-7d26ec823928" name="RBC-RBC transitie">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<RbcRbcTransition entryRadioBlockCenterAreaRef="3e5e3898-42e7-4c6d-a2ab-cf105864506c" exitRadioBlockCenterAreaRef="1625f5a2-59a3-431c-ac20-62d9f0f0f878" lifeSignTimer="10"/>
+			</TransitionMarker>
+		</TransitionMarkers>
+		<SpeedChangeMarkers>
+			<SpeedChangeMarker puic="c08f2964-5e59-4861-beb0-9bb91d8e48bd" name="Onconditionele speed change" basicSpeed="80">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<Q_FRONT>1</Q_FRONT>
+				<Q_DIFF>3</Q_DIFF>
+				<TrainCategorySpeed speed="80">
+					<NC_DIFF>2</NC_DIFF>
+				</TrainCategorySpeed>
+				<TrainCategorySpeed speed="80">
+					<NC_DIFF>3</NC_DIFF>
+				</TrainCategorySpeed>
+				<CantDeficiencySpeed speed="80">
+					<NC_CDDIFF>0</NC_CDDIFF>
+				</CantDeficiencySpeed>
+				<CantDeficiencySpeed speed="80">
+					<NC_CDDIFF>3</NC_CDDIFF>
+				</CantDeficiencySpeed>
+			</SpeedChangeMarker>
+			<SpeedChangeMarker puic="39e698c7-2768-4255-a500-bcc83e172375" name="Conditionele speed change" basicSpeed="80">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<Q_FRONT>1</Q_FRONT>
+				<Q_DIFF>3</Q_DIFF>
+				<SpeedChangeConditions>
+					<SwitchCondition switchPosition="Left" switchMechanismRef="c60978a5-c0ae-416e-a5d4-8811aaea31b4"/>
+					<SignalCondition signalAspectRef="a761ba8b-e79d-4c9a-9766-b57ff7f45496"/>
+					<WorkzoneCondition workzoneSystemRef="6c9e5c45-02b3-4507-955e-57061fd793c4"/>
+					<OtherCondition state="Energized" objectRef="3d28b7ca-91c8-4876-b6cc-3a64a19d46c1"/>
+				</SpeedChangeConditions>
+			</SpeedChangeMarker>
+		</SpeedChangeMarkers>
+		<AxleLoadSpeedMarkers>
+			<AxleLoadSpeedMarker puic="17cab08f-7440-425b-b8aa-beeb3ddf4b93">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Design">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<Q_FRONT>1</Q_FRONT>
+				<AxleLoadSpeed>
+					<M_AXLELOADCAT>1</M_AXLELOADCAT>
+					<V_AXLELOAD>6</V_AXLELOAD>
+				</AxleLoadSpeed>
+			</AxleLoadSpeedMarker>
+		</AxleLoadSpeedMarkers>
+		<GradientMarkers>
+			<GradientMarker puic="3468ecf9-ae8b-4248-b7c9-bd86b93ba7a0">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<Q_GDIR>0</Q_GDIR>
+				<G_A>0</G_A>
+			</GradientMarker>
+		</GradientMarkers>
+		<TextMessageMarkers>
+			<TextMessageMarker puic="ebf63211-781d-4277-a378-a137b2e8c461">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<Path>
+					<OrderedSwitchPosition switchMechanismRef="a1615d1c-28c3-40fe-9fdd-9eb268325f6d" switchPosition="Left" index="0"/>
+					<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="1"/>
+				</Path>
+				<Q_TEXTCLASS>01</Q_TEXTCLASS>
+				<Q_TEXTDISPLAY>0</Q_TEXTDISPLAY>
+				<StartConditions>
+					<D_TEXTDISPLAY>818</D_TEXTDISPLAY>
+					<M_MODETEXTDISPLAY>0</M_MODETEXTDISPLAY>
+					<LevelCondition>
+						<M_LEVELTEXTDISPLAY>3</M_LEVELTEXTDISPLAY>
+					</LevelCondition>
+				</StartConditions>
+				<EndConditions>
+					<L_TEXTDISPLAY>60</L_TEXTDISPLAY>
+					<T_TEXTDISPLAY>5</T_TEXTDISPLAY>
+					<M_MODETEXTDISPLAY>0</M_MODETEXTDISPLAY>
+					<LevelCondition>
+						<M_LEVELTEXTDISPLAY>1</M_LEVELTEXTDISPLAY>
+						<NID_NTC>0</NID_NTC>
+					</LevelCondition>
+				</EndConditions>
+				<Q_TEXTCONFIRM>00</Q_TEXTCONFIRM>
+				<X_TEXT>Dit is een testbericht</X_TEXT>
+			</TextMessageMarker>
+		</TextMessageMarkers>
+		<NationalValueSets>
+			<NationalValueSet puic="d3a91527-3eb1-4e53-887b-3f36b87bc9c0" setNumber="1">
+				<NID_C>86</NID_C>
+				<Variable name="NID_C">86</Variable>
+				<Variable name="V_NVSHUNT">40</Variable>
+				<VariableSet name="Q_NVKINTSET" index="0">
+					<Variable name="A_NVP12">0.05</Variable>
+				</VariableSet>
+				<VariableSet name="Q_NVKINTSET" index="1">
+					<Variable name="A_NVP12">0.08</Variable>
+				</VariableSet>
+			</NationalValueSet>
+		</NationalValueSets>
+		<NationalValueSetMarkers>
+			<NationalValueSetMarker puic="c4076293-59f4-477e-bc1a-e1ce1e535688" name="Nederland" nationalValueSetRef="d3a91527-3eb1-4e53-887b-3f36b87bc9c0">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Constructed">
+						<gml:Point srsName="EPSG:28992">
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+			</NationalValueSetMarker>
+		</NationalValueSetMarkers>
+		<GeoPosMarkers>
+			<GeoPosMarker puic="9a1a119d-9adf-4139-95ee-190908800df0">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Design">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041"/>
+				<GeoPosMessage geoPosKilometerValue="12">
+					<Q_MPOSITION>0</Q_MPOSITION>
+				</GeoPosMessage>
+			</GeoPosMarker>
+		</GeoPosMarkers>
+		<ErtmsLevelCrossings>
+			<ErtmsLevelCrossing levelCrossingRef="aff87d52-56e6-43e7-8ff3-a07110984cda" speedRestriction="10">
+				<LevelCrossingMalfunction>
+					<SpeedRestrictedArea>
+						<TrackFragment railConnectionRef="fbc31d77-4668-4001-b504-c515bb26f5a2" fromMeasure="0" toMeasure="10"/>
+					</SpeedRestrictedArea>
+					<StoppingArea>
+						<TrackFragment railConnectionRef="fbc31d77-4668-4001-b504-c515bb26f5a2" fromMeasure="0" toMeasure="10"/>
+					</StoppingArea>
+				</LevelCrossingMalfunction>
+				<StopZone>
+					<TrackFragment railConnectionRef="fbc31d77-4668-4001-b504-c515bb26f5a2" fromMeasure="0" toMeasure="10"/>
+				</StopZone>
+				<DepartureDetectionPoint railConnectionRef="6c9e5c45-02b3-4507-955e-57061fd793c4" direction="Downstream" atMeasure="818.041" s_lx10="120">
+					<Path>
+						<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+					</Path>
+				</DepartureDetectionPoint>
+				<AnnouncementMethod railConnectionRef="fbc31d77-4668-4001-b504-c515bb26f5a2" direction="Downstream" activationMethod="TvpBased"/>
+			</ErtmsLevelCrossing>
+		</ErtmsLevelCrossings>
+		<ErtmsWarningSystems>
+			<ErtmsWarningSystem warningSystemRef="5340601e-6b67-4809-b1b6-5dca064e3ef8">
+				<AnnouncementMethod railConnectionRef="fbc31d77-4668-4001-b504-c515bb26f5a2" direction="Downstream" activationMethod="TvpBased"/>
+			</ErtmsWarningSystem>
+		</ErtmsWarningSystems>
+		<ErtmsSignals>
+			<ErtmsSignal signalRef="1e61d292-0509-4a4d-a96f-aa25056e9f3d" reportSignalDarkToTcs="False">
+				<EndOfAuthority>
+					<DangerPoint>
+						<DangerPointLocation railConnectionRef="e2e0ba2b-597e-4fc5-8aff-a9dfea84c0ef" direction="Downstream" atMeasure="10"/>
+						<DangerPointTrainCategorySpeed speed="10">
+							<NC_DIFF>2</NC_DIFF>
+							<V_RELEASEDP>4</V_RELEASEDP>
+						</DangerPointTrainCategorySpeed>
+					</DangerPoint>
+					<Overlap>
+						<OverlapTrainCategorySpeed speed="10">
+							<NC_DIFF>2</NC_DIFF>
+							<D_OL>100</D_OL>
+							<T_OL>10</T_OL>
+							<V_RELEASEOL>15</V_RELEASEOL>
+							<D_STARTOL>20</D_STARTOL>
+						</OverlapTrainCategorySpeed>
+					</Overlap>
+					<PermittedSpeedAtEoA>10</PermittedSpeedAtEoA>
+					<OsModeProfileLocation railConnectionRef="e2e0ba2b-597e-4fc5-8aff-a9dfea84c0ef" direction="None" atMeasure="123.4"/>
+				</EndOfAuthority>
+				<Taa forcedPointRef="78c9789f-3912-44c1-ab75-aa696b97e4fa">
+					<Path>
+						<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+					</Path>
+				</Taa>
+				<CSspApproachDs cSspApproachDistance="520" cSspApproachSpeed="40">
+					<Path>
+						<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+					</Path>
+				</CSspApproachDs>
+				<SrApproach distance="350">
+					<Path>
+						<OrderedSwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left" index="0"/>
+					</Path>
+				</SrApproach>
+				<BaliseGroupRefs>95957fae-f1e0-49ed-859b-5104b63e4643</BaliseGroupRefs>
+				<TransitionSignal slopeLocationType="HLocation">
+					<L2ExitTransition puic="382695ab-1733-4fc2-ac29-cc78e2c83cfb" authorisationCode="1" atbCode="Code180">
+						<Aspect>
+							<AspectColor color="Green" isFlashing="False"/>
+							<SpeedIndicator speed="8" isFlashing="False"/>
+							<CargoRegime>None</CargoRegime>
+							<TunnelRegime>None</TunnelRegime>
+						</Aspect>
+						<MovementAuthority>
+							<Packet_5 index="0">
+								<NID_PACKET>0</NID_PACKET>
+								<Q_DIR>0</Q_DIR>
+								<L_PACKET>0</L_PACKET>
+								<Q_SCALE>1</Q_SCALE>
+								<D_LINK>250</D_LINK>
+								<Q_NEWCOUNTRY>0</Q_NEWCOUNTRY>
+								<NID_BG>2564</NID_BG>
+								<Q_LINKORIENTATION>0</Q_LINKORIENTATION>
+								<Q_LINKREACTION>00</Q_LINKREACTION>
+								<Q_LOCACC>1</Q_LOCACC>
+								<N_ITER>0</N_ITER>
+							</Packet_5>
+							<Packet_15 index="1">
+								<NID_PACKET>0</NID_PACKET>
+								<Q_DIR>0</Q_DIR>
+								<L_PACKET>0</L_PACKET>
+								<Q_SCALE>1</Q_SCALE>
+								<V_EMA>16</V_EMA>
+								<T_EMA>10</T_EMA>
+								<N_ITER>0</N_ITER>
+								<L_ENDSECTION>250</L_ENDSECTION>
+								<Q_SECTIONTIMER>0</Q_SECTIONTIMER>
+								<Q_ENDTIMER>0</Q_ENDTIMER>
+								<Q_DANGERPOINT>0</Q_DANGERPOINT>
+								<Q_OVERLAP>0</Q_OVERLAP>
+							</Packet_15>
+							<Packet_21 index="2">
+								<NID_PACKET>0</NID_PACKET>
+								<Q_DIR>0</Q_DIR>
+								<L_PACKET>0</L_PACKET>
+								<Q_SCALE>1</Q_SCALE>
+								<D_GRADIENT>100</D_GRADIENT>
+								<Q_GDIR>0</Q_GDIR>
+								<G_A>5</G_A>
+								<N_ITER>0</N_ITER>
+							</Packet_21>
+							<Packet_27 index="3">
+								<NID_PACKET>0</NID_PACKET>
+								<Q_DIR>0</Q_DIR>
+								<L_PACKET>0</L_PACKET>
+								<Q_SCALE>1</Q_SCALE>
+								<D_STATIC>100</D_STATIC>
+								<V_STATIC>16</V_STATIC>
+								<Q_FRONT>0</Q_FRONT>
+								<N_ITER>0</N_ITER>
+								<N_ITER>0</N_ITER>
+							</Packet_27>
+							<Packet_80 index="4">
+								<NID_PACKET>0</NID_PACKET>
+								<Q_DIR>0</Q_DIR>
+								<L_PACKET>0</L_PACKET>
+								<Q_SCALE>1</Q_SCALE>
+								<D_MAMODE>100</D_MAMODE>
+								<M_MAMODE>0</M_MAMODE>
+								<V_MAMODE>16</V_MAMODE>
+								<L_MAMODE>250</L_MAMODE>
+								<L_ACKMAMODE>100</L_ACKMAMODE>
+								<Q_MAMODE>0</Q_MAMODE>
+								<N_ITER>0</N_ITER>
+							</Packet_80>
+						</MovementAuthority>
+					</L2ExitTransition>
+				</TransitionSignal>
+			</ErtmsSignal>
+		</ErtmsSignals>
+		<DepartureTracks>
+			<CbgDepartureTracks>
+				<CbgDepartureTrack puic="c7b4a655-a302-4ab9-8162-fedd5badac1a" signalRef="8f435126-0841-4957-a287-e29ee9c9f8bd" isReverseTrack="False" driveBySightPossible="True">
+					<DemarcationMarkers>
+						<DemarcationMarker railConnectionRef="7d75f22b-f616-4434-9bd9-d3e44c42f7f5" direction="Upstream" atMeasure="123"/>
+						<DemarcationMarker railConnectionRef="9f3e7adf-0120-47b8-8240-cae88d7f3f6d" direction="Upstream" atMeasure="512"/>
+					</DemarcationMarkers>
+					<SectionRefs>06138f9e-b7c7-4a78-9c47-aa39cec50d0e 1106e9e5-b4e2-4707-af73-4b6ca7399ed6</SectionRefs>
+					<DepartureTrackExtension timerValue="40">
+						<TrackFragments>
+							<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="512" toMeasure="600"/>
+						</TrackFragments>
+						<SectionRef>8c7baa23-c2f6-4c38-8c9a-ba159be79aa7</SectionRef>
+					</DepartureTrackExtension>
+					<UsefulLength direction="Upstream" length="150"/>
+				</CbgDepartureTrack>
+			</CbgDepartureTracks>
+			<NcbgDepartureTracks>
+				<NcbgDepartureTrack puic="b64ee8a9-7645-4236-ad32-16e8479d0061" signalRef="7d0b882e-804a-4bf2-8d7c-74ac2c98b958" staffResponsibleSpeedLimit="100" nonCentrallyOperatedAreaRef="ec330517-61f6-4a99-9768-4837a6047527">
+					<DemarcationMarkers>
+						<DemarcationMarker railConnectionRef="c33f12bf-ce51-4627-b981-278610f195c5" direction="Upstream" atMeasure="123"/>
+						<DemarcationMarker railConnectionRef="f042b94f-668b-4a8c-9693-a6509de8f9b7" direction="Upstream" atMeasure="512"/>
+					</DemarcationMarkers>
+					<SwitchPosition switchMechanismRef="b12d959a-6172-4ac0-a21e-d4fe38a0e465" switchPosition="Left"/>
+					<SwitchPosition switchMechanismRef="a1615d1c-28c3-40fe-9fdd-9eb268325f6d" switchPosition="Right"/>
+					<BaliseGroup8mRefs>16c61540-a70b-4262-bb12-d7b0d8103f44</BaliseGroup8mRefs>
+					<DetectableElementCondition reportDurationType="Temporary" state="Energized" detectableAndLockableType="DetectableElement" objectRef="3d28b7ca-91c8-4876-b6cc-3a64a19d46c1">
+						<ReportingElement>
+							<LevelCrossingRef>3c98ebe0-38b7-4e5b-ac30-e55d70a35296</LevelCrossingRef>
+						</ReportingElement>
+					</DetectableElementCondition>
+				</NcbgDepartureTrack>
+			</NcbgDepartureTracks>
+			<WorkzoneDepartureTracks>
+				<WorkzoneDepartureTrack puic="aaa1e0b9-d912-403b-ae7e-005c8a64792d" signalRef="bd7c7ee9-b2bf-47d5-8e6f-76a566be64f3" speedLimit="100" workzoneRef="e1ce0553-3490-4a4f-ba90-9291455f3e55">
+					<DemarcationMarkers>
+						<DemarcationMarker railConnectionRef="fae17e64-f4ca-4c54-b75d-09a813e2a6e6" direction="Upstream" atMeasure="123"/>
+						<DemarcationMarker railConnectionRef="988cb76c-8071-4771-9b67-9955972d7c1c" direction="Upstream" atMeasure="512"/>
+					</DemarcationMarkers>
+				</WorkzoneDepartureTrack>
+			</WorkzoneDepartureTracks>
+			<TemporaryShuntingAreaDepartureTracks>
+				<TemporaryShuntingAreaDepartureTrack puic="0bddf85e-ae0c-413c-85e4-af339dff0cc7" signalRef="af9a6cef-3c51-4ffc-b9f7-5ce0d5fd9fda" standStillTimer="120" temporaryShuntingAreaRef="1c1cd82b-2430-4169-b486-6ed55922600c">
+					<DemarcationMarkers>
+						<DemarcationMarker railConnectionRef="dd90bc9d-0471-4e6f-8492-cd2f0d5b499e" direction="Upstream" atMeasure="123"/>
+						<DemarcationMarker railConnectionRef="3dddc0f6-7ea7-4d74-80d5-d3b6d901db16" direction="Upstream" atMeasure="512"/>
+					</DemarcationMarkers>
+				</TemporaryShuntingAreaDepartureTrack>
+			</TemporaryShuntingAreaDepartureTracks>
+		</DepartureTracks>
+		<CombiningTracks>
+			<CombiningTrack puic="683f45ef-964d-4349-8331-b716055e9223" usefulLength="510">
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<OrderedSwitchPosition index="0" switchMechanismRef="91f3b5f3-8811-44b0-8ed6-b9e70357f8d6" switchPosition="Right"/>
+				<SectionRefs>345f34a3-4603-4ee2-8fa1-a96fc93504fa f3cff5d6-4698-4191-ab55-0899f3659075</SectionRefs>
+				<DemarcationObjectRefs>1d5031ee-4c64-400d-b734-644c6616bb13 f5365670-343b-41ab-8287-9379c7fefda3</DemarcationObjectRefs>
+			</CombiningTrack>
+		</CombiningTracks>
+		<ErtmsBaliseGroups>
+			<ErtmsBaliseGroup baliseGroupRef="f4e95840-e5ee-4128-9605-d811161c4186">
+				<M_VERSION>16</M_VERSION>
+				<NID_C>425</NID_C>
+				<Q_LINK>1</Q_LINK>
+				<EuroBalise baliseRef="a19286b8-ea52-4758-a9f4-de1ea307817e">
+					<M_DUP>1</M_DUP>
+				</EuroBalise>
+				<NID_BG>2564</NID_BG>
+				<Q_UPDOWN>1</Q_UPDOWN>
+				<Q_MEDIA>1</Q_MEDIA>
+				<Q_LINKREACTION>1</Q_LINKREACTION>
+				<GeoPosMessage geoPosKilometerValue="12.5">
+					<Q_MPOSITION>1</Q_MPOSITION>
+				</GeoPosMessage>
+			</ErtmsBaliseGroup>
+			<ErtmsBaliseGroup baliseGroupRef="040694fb-e337-4a7f-b823-65225a33f67a">
+				<M_VERSION>16</M_VERSION>
+				<NID_C>425</NID_C>
+				<Q_LINK>1</Q_LINK>
+				<EuroBalise baliseRef="a19286b8-ea52-4758-a9f4-de1ea307817e">
+					<M_DUP>0</M_DUP>
+				</EuroBalise>
+				<NID_BG>9999</NID_BG>
+				<Q_UPDOWN>1</Q_UPDOWN>
+				<Q_MEDIA>1</Q_MEDIA>
+				<Q_LINKREACTION>2</Q_LINKREACTION>
+				<GeoPosMessage geoPosKilometerValue="15.39">
+					<Q_MPOSITION>0</Q_MPOSITION>
+				</GeoPosMessage>
+			</ErtmsBaliseGroup>
+		</ErtmsBaliseGroups>
+		<Telegrams>
+			<Telegram puic="e7299d9a-f406-4d01-a1c6-406bb3249e26" baliseRef="a19286b8-ea52-4758-a9f4-de1ea307817e">
+				<Packets>
+					<Packet_0 index="0">
+						<NID_PACKET>0</NID_PACKET>
+						<NID_VBCMK>0</NID_VBCMK>
+					</Packet_0>
+					<Packet_3 index="1">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>10</L_PACKET>
+						<Q_SCALE>0</Q_SCALE>
+						<D_VALIDNV>1000</D_VALIDNV>
+						<NID_C>86</NID_C>
+						<N_ITER>1</N_ITER>
+						<NID_C>87</NID_C>
+						<V_NVSHUNT>20</V_NVSHUNT>
+						<V_NVSTFF>18</V_NVSTFF>
+						<V_NVONSIGHT>10</V_NVONSIGHT>
+						<V_NVLIMSUPERV>20</V_NVLIMSUPERV>
+						<V_NVUNFIT>20</V_NVUNFIT>
+						<V_NVREL>20</V_NVREL>
+						<D_NVROLL>100</D_NVROLL>
+						<Q_NVSBTSMPERM>1</Q_NVSBTSMPERM>
+						<Q_NVEMRRLS>1</Q_NVEMRRLS>
+						<Q_NVGUIPERM>1</Q_NVGUIPERM>
+						<Q_NVSBFBPERM>1</Q_NVSBFBPERM>
+						<Q_NVINHSMICPERM>1</Q_NVINHSMICPERM>
+						<V_NVALLOWOVTRP>100</V_NVALLOWOVTRP>
+						<V_NVSUPOVTRP>100</V_NVSUPOVTRP>
+						<D_NVOVTRP>80</D_NVOVTRP>
+						<T_NVOVTRP>5</T_NVOVTRP>
+						<D_NVPOTRP>80</D_NVPOTRP>
+						<M_NVCONTACT>2</M_NVCONTACT>
+						<T_NVCONTACT>15</T_NVCONTACT>
+						<M_NVDERUN>1</M_NVDERUN>
+						<D_NVSTFF>80</D_NVSTFF>
+						<Q_NVDRIVER_ADHES>0</Q_NVDRIVER_ADHES>
+						<A_NVMAXREDADH1>60</A_NVMAXREDADH1>
+						<A_NVMAXREDADH2>61</A_NVMAXREDADH2>
+						<A_NVMAXREDADH3>63</A_NVMAXREDADH3>
+						<Q_NVLOCACC>1</Q_NVLOCACC>
+						<M_NVAVADH>1</M_NVAVADH>
+						<M_NVEBCL>2</M_NVEBCL>
+						<Q_NVKINT>0</Q_NVKINT>
+						<Q_NVKVINTSET>1</Q_NVKVINTSET>
+						<A_NVP12>1</A_NVP12>
+						<A_NVP23>2</A_NVP23>
+						<V_NVKVINT>20</V_NVKVINT>
+						<M_NVKVINT>1</M_NVKVINT>
+						<M_NVKVINT>2</M_NVKVINT>
+						<N_ITER>1</N_ITER>
+						<V_NVKVINT>21</V_NVKVINT>
+						<M_NVKVINT>1</M_NVKVINT>
+						<M_NVKVINT>2</M_NVKVINT>
+						<N_ITER>1</N_ITER>
+						<Q_NVKVINTSET>1</Q_NVKVINTSET>
+						<A_NVP12>1</A_NVP12>
+						<A_NVP23>1</A_NVP23>
+						<V_NVKVINT>20</V_NVKVINT>
+						<M_NVKVINT>1</M_NVKVINT>
+						<M_NVKVINT>2</M_NVKVINT>
+						<N_ITER>1</N_ITER>
+						<V_NVKVINT>22</V_NVKVINT>
+						<M_NVKVINT>1</M_NVKVINT>
+						<M_NVKVINT>2</M_NVKVINT>
+						<L_NVKRINT>1</L_NVKRINT>
+						<M_NVKRINT>20</M_NVKRINT>
+						<N_ITER>1</N_ITER>
+						<L_NVKRINT>2</L_NVKRINT>
+						<M_NVKRINT>31</M_NVKRINT>
+						<M_NVKTINT>1</M_NVKTINT>
+					</Packet_3>
+					<Packet_27 index="2">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<Q_SCALE>0</Q_SCALE>
+						<D_STATIC>0</D_STATIC>
+						<V_STATIC>10</V_STATIC>
+						<Q_FRONT>1</Q_FRONT>
+						<N_ITER>2</N_ITER>
+						<Q_DIFF>0</Q_DIFF>
+						<NC_CDDIFF>2</NC_CDDIFF>
+						<V_DIFF>12</V_DIFF>
+						<Q_DIFF>1</Q_DIFF>
+						<NC_CDDIFF>1</NC_CDDIFF>
+						<V_DIFF>5</V_DIFF>
+						<N_ITER>1</N_ITER>
+						<D_STATIC>150</D_STATIC>
+						<V_STATIC>10</V_STATIC>
+						<Q_FRONT>1</Q_FRONT>
+						<N_ITER>1</N_ITER>
+						<Q_DIFF>0</Q_DIFF>
+						<NC_CDDIFF>2</NC_CDDIFF>
+						<V_DIFF>12</V_DIFF>
+					</Packet_27>
+					<Packet_45 index="3">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<NID_MN>123456</NID_MN>
+					</Packet_45>
+					<Packet_45 index="4">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<NID_MN>123FFF</NID_MN>
+					</Packet_45>
+					<Packet_72 index="5">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>1</Q_DIR>
+						<L_PACKET>234</L_PACKET>
+						<Q_SCALE>0</Q_SCALE>
+						<Q_TEXTCLASS>0</Q_TEXTCLASS>
+						<Q_TEXTDISPLAY>0</Q_TEXTDISPLAY>
+						<D_TEXTDISPLAY>50</D_TEXTDISPLAY>
+						<M_MODETEXTDISPLAY>1</M_MODETEXTDISPLAY>
+						<M_LEVELTEXTDISPLAY>1</M_LEVELTEXTDISPLAY>
+						<L_TEXTDISPLAY>150</L_TEXTDISPLAY>
+						<T_TEXTDISPLAY>30</T_TEXTDISPLAY>
+						<M_MODETEXTDISPLAY>0</M_MODETEXTDISPLAY>
+						<M_LEVELTEXTDISPLAY>0</M_LEVELTEXTDISPLAY>
+						<Q_TEXTCONFIRM>1</Q_TEXTCONFIRM>
+						<Q_CONFTEXTDISPLAY>0</Q_CONFTEXTDISPLAY>
+						<Q_TEXTREPORT>0</Q_TEXTREPORT>
+						<NID_TEXTMESSAGE>1</NID_TEXTMESSAGE>
+						<NID_C>123</NID_C>
+						<NID_RBC>567</NID_RBC>
+						<L_TEXT>18</L_TEXT>
+						<X_TEXT>This is a message.</X_TEXT>
+					</Packet_72>
+					<Packet_139 index="6">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<Q_SCALE>0</Q_SCALE>
+						<D_REVERSE>0</D_REVERSE>
+						<V_REVERSE>34</V_REVERSE>
+					</Packet_139>
+					<Packet_140 index="7">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<NID_OPERATIONAL>12345678</NID_OPERATIONAL>
+					</Packet_140>
+					<Packet_140 index="8">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<NID_OPERATIONAL>123FFFFF</NID_OPERATIONAL>
+					</Packet_140>
+					<Packet_143 index="9">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<Q_RIU>0</Q_RIU>
+						<NID_C>86</NID_C>
+						<NID_RIU>0</NID_RIU>
+						<NID_RADIO>31302339600FFFFF</NID_RADIO>
+					</Packet_143>
+					<Packet_143 index="10">
+						<NID_PACKET>0</NID_PACKET>
+						<Q_DIR>0</Q_DIR>
+						<L_PACKET>0</L_PACKET>
+						<Q_RIU>0</Q_RIU>
+						<NID_C>86</NID_C>
+						<NID_RIU>0</NID_RIU>
+						<NID_RADIO>FFFFFFFFFFFFFFFF</NID_RADIO>
+					</Packet_143>
+				</Packets>
+				<Conditions>
+					<RouteCondition functionalRouteRef="d42021d0-2f20-4e49-a7aa-7eb2435ecb00" shuntingModeActive="True"/>
+				</Conditions>
+				<M_MCOUNT>1</M_MCOUNT>
+			</Telegram>
+			<Telegram puic="812ca28d-c25b-4e0c-a217-b95f27036639" baliseRef="a19286b8-ea52-4758-a9f4-de1ea307817e">
+				<Packets>
+					<Packet_0 index="0">
+						<NID_PACKET>0</NID_PACKET>
+						<NID_VBCMK>0</NID_VBCMK>
+					</Packet_0>
+				</Packets>
+				<Conditions>
+					<SignalCondition signalAspectRef="a761ba8b-e79d-4c9a-9766-b57ff7f45496"/>
+				</Conditions>
+				<M_MCOUNT>1</M_MCOUNT>
+			</Telegram>
+		</Telegrams>
+		<ErtmsRoutes>
+			<ErtmsRoute functionalRouteRef="d42021d0-2f20-4e49-a7aa-7eb2435ecb00" shuntingModeRoute="False">
+				<SectionTimer>
+					<SectionTimerStopLocation railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="346" direction="Upstream"/>
+					<T_SECTIONTIMER>10</T_SECTIONTIMER>
+				</SectionTimer>
+				<BaliseListRefs>3e7593ca-6ac2-4348-b341-5523c917d3e6 7628476f-5302-45f8-8ade-867aa53282a0</BaliseListRefs>
+				<ExcludedBaliseGroupRefs>3e7593ca-6ac2-4348-b341-5523c917d3e6 7628476f-5302-45f8-8ade-867aa53282a0</ExcludedBaliseGroupRefs>
+				<TemporaryShuntingRouteTimer temporaryShuntingAreaRef="1c1cd82b-2430-4169-b486-6ed55922600c" standStillTimer="12"/>
+				<ConditionalEmergencyStop dangerPointRef="a1615d1c-28c3-40fe-9fdd-9eb268325f6d">
+					<OrderedSectionOccupancyDetection>
+						<OrderedSection sectionRef="06138f9e-b7c7-4a78-9c47-aa39cec50d0e" index="0"/>
+						<OrderedSection sectionRef="1106e9e5-b4e2-4707-af73-4b6ca7399ed6" index="1"/>
+					</OrderedSectionOccupancyDetection>
+					<OtherTrigger state="Energized" objectRef="62aa9eab-171f-4dc5-b35c-c48eaa045762"/>
+					<ConditionalEmergencyStopMarker puic="2595fe05-f915-478d-b3d0-cde0cd6eb245" correctionFactor="12" radioBlockCenterRef="0853830a-abfa-4f20-a906-371c66ea58ce">
+						<Location>
+							<GeographicLocation dataAcquisitionMethod="Constructed">
+								<gml:Point srsName="EPSG:28992">
+									<gml:coordinates>202361.017,437300.21</gml:coordinates>
+								</gml:Point>
+							</GeographicLocation>
+						</Location>
+						<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" atMeasure="145" direction="None"/>
+					</ConditionalEmergencyStopMarker>
+				</ConditionalEmergencyStop>
+				<SpadRefs>910fe8c3-ec7a-44d1-a7af-0164a535776b</SpadRefs>
+				<LinkListL1Refs>3e7593ca-6ac2-4348-b341-5523c917d3e6 7628476f-5302-45f8-8ade-867aa53282a0</LinkListL1Refs>
+				<DetectableElementCondition reportDurationType="Temporary" state="Energized" detectableAndLockableType="DetectableElement" objectRef="3d28b7ca-91c8-4876-b6cc-3a64a19d46c1">
+					<ReportingElement>
+						<LevelCrossingRef>3c98ebe0-38b7-4e5b-ac30-e55d70a35296</LevelCrossingRef>
+					</ReportingElement>
+				</DetectableElementCondition>
+				<ConditionalRoute conditionalRouteRef="18705164-95e4-4c54-8fb0-38cd9192c248" conditionalRouteMode="Normal"/>
+			</ErtmsRoute>
+		</ErtmsRoutes>
+		<ErtmsAreas>
+			<ErtmsArea puic="b7bc0041-6b3d-4b13-a14b-48ac65fa68a1" level="2">
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<DemarcationMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="123"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="512"/>
+				</DemarcationMarkers>
+				<LevelTransitionRefs>ccd5d1c4-2e80-4c7b-8361-8151eb19eb3c</LevelTransitionRefs>
+			</ErtmsArea>
+		</ErtmsAreas>
+		<PositionReportParametersAreas>
+			<PositionReportParametersArea puic="a8c4f371-215e-4a22-bef8-ea4d7662483a">
+				<TrackFragments>
+					<TrackFragment railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" fromMeasure="123" toMeasure="512"/>
+				</TrackFragments>
+				<DemarcationMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="123"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="512"/>
+				</DemarcationMarkers>
+				<T_CYCLOC>5</T_CYCLOC>
+			</PositionReportParametersArea>
+		</PositionReportParametersAreas>
+		<NetworkRegistrationMarkers>
+			<NetworkRegistrationMarker puic="4b786b90-e1af-4f67-b6d1-6b06db0b06e5">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" fromMeasure="10" toMeasure="425"/>
+				<NID_MN>123456</NID_MN>
+			</NetworkRegistrationMarker>
+		</NetworkRegistrationMarkers>
+		<SectionBreakForcedPoints>
+			<SectionBreakForcedPoint puic="12dc5d62-bac2-4377-b87e-c1e3b0542074">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Design">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="5"/>
+			</SectionBreakForcedPoint>
+			<SectionBreakForcedPoint puic="15bbc9f9-851b-4a9f-af28-897d7ed733cd" sectionBreakProjectionRef="8a254b76-e257-4162-a21b-e6447fee2f83">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="Design">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RailConnectionInfo railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="125"/>
+			</SectionBreakForcedPoint>
+		</SectionBreakForcedPoints>
+		<ObjectControllerCabinets>
+			<ObjectControllerCabinet puic="26c7bd6e-2b38-4b8f-9303-fdd6028ef941" interlockingUnitRef="a2a2721c-897f-4d73-82ef-b6db5c07d9dd">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>202361.017,437300.21</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<ControlledObjectRefs>b4d009fa-46d3-4767-ae28-9f36694bbf0e b4d129fa-46d3-4767-ae28-9f36594bbf0e</ControlledObjectRefs>
+				<AxleCounterUnitRefs>d0afdf11-26dd-43aa-8051-d8b6e081c8a2</AxleCounterUnitRefs>
+				<AxleCounterEthernetConverter puic="d2b1445b-aea1-473c-94b5-393e0bf2e2a1" axleCounterUnitRef="d0afdf11-26dd-43aa-8051-d8b6e081c8a2">
+					<AxleCounterDetectionPointRefs>eecbef37-210d-4f8d-b89a-4db9779c1e07 dcfb222b-2c9e-4daf-96f5-b71a34fd4723</AxleCounterDetectionPointRefs>
+				</AxleCounterEthernetConverter>
+				<CabinetMonitoringUnit puic="23dcbcbe-82d3-44b8-8eab-d4eb6de1e199"/>
+			</ObjectControllerCabinet>
+		</ObjectControllerCabinets>
+	</Ertms>
+	<SystemConfiguration xmlns="http://www.prorail.nl/IMSpoor" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-SignalingDesign.xsd">
+		<CentralSafetySystemAreas>
+			<CentralSafetySystemArea puic="cf179da3-0010-47bb-9bfc-ba949bf98c82" centralSafetySystemRef="c914ab9c-97c2-41cd-8ba8-cc1708fdc904">
+				<EntryMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="123"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="532"/>
+				</EntryMarkers>
+				<ExitMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="143"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="512"/>
+				</ExitMarkers>
+			</CentralSafetySystemArea>
+		</CentralSafetySystemAreas>
+		<CentralSafetySystems>
+			<CentralSafetySystem puic="c914ab9c-97c2-41cd-8ba8-cc1708fdc904" restartTimer="30" axleCounterResetTimer="5" allowsResetByPms="False">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>80502.232,431958.462</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<RadioBlockCenterRefs>0853830a-abfa-4f20-a906-371c66ea58ce</RadioBlockCenterRefs>
+				<InterlockingUnitRefs>a2a2721c-897f-4d73-82ef-b6db5c07d9dd</InterlockingUnitRefs>
+				<WorkzoneSystemRefs>fb9d77f4-ad40-46be-8a55-4e47ce8b3ac3</WorkzoneSystemRefs>
+				<TemporaryShuntingAreaRefs>1c1cd82b-2430-4169-b486-6ed55922600c</TemporaryShuntingAreaRefs>
+				<TtiNotificationFunctionalRoute tunnelTechnicalInstallationRef="4c0303fc-adb8-4cb4-9298-f92d2a8d8792" functionalRouteRef="929b7d38-691c-4495-ace2-3857e1eb036f"/>
+				<TtiNotificationSection tunnelTechnicalInstallationRef="4c0303fc-adb8-4cb4-9298-f92d2a8d8792" sectionRef="f6255214-ebd9-445c-8cc0-22d69effb8cd"/>
+				<TtiNotificationWorkzone tunnelTechnicalInstallationRef="4c0303fc-adb8-4cb4-9298-f92d2a8d8792" workzoneSystemRef="0287b027-eac6-4f0e-8ff5-66227cb26b18"/>
+			</CentralSafetySystem>
+		</CentralSafetySystems>
+		<RadioBlockCenterAreas>
+			<RadioBlockCenterArea puic="c7583ff5-825a-486a-862b-f332edacd02e" radioBlockCenterRef="0853830a-abfa-4f20-a906-371c66ea58ce">
+				<DemarcationMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="123"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="512"/>
+				</DemarcationMarkers>
+			</RadioBlockCenterArea>
+		</RadioBlockCenterAreas>
+		<RadioBlockCenters>
+			<RadioBlockCenter puic="0853830a-abfa-4f20-a906-371c66ea58ce" acknowledgementTimer="55" generalMessageIntervalTimer="5" minimalUserDataRate="1024" permissionToShuntTimer="45" stopInShuntingSuppressionTimer="40" departureDetectionDelayTimer="15" couplingLength="50" permissionToDriveTimer="40" standStillDetectionInterval="5">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>80502.232,431958.462</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+				<NID_C>3</NID_C>
+				<NID_RBC>6</NID_RBC>
+				<NID_RADIO>1FFFFFFFFFFFFFFF</NID_RADIO>
+				<T_CYCLOC>5</T_CYCLOC>
+				<D_VALIDNV>130</D_VALIDNV>
+				<CsModeParameters maxRetransmissionAttempts="4" rxWindowSize="6" txWindowSize="14" rxIFrameBits="1024" txIFrameBits="312" acknowledgeTime="1.5" localProcessingDelayTime="79" outOfServiceTime="2" inactivityTime="2"/>
+				<MaRequestParameters>
+					<T_CYCRQST>10</T_CYCRQST>
+					<T_MAR>20</T_MAR>
+					<T_TIMEOUTRQST>1023</T_TIMEOUTRQST>
+				</MaRequestParameters>
+				<TcpParameters tcpNoDelay="True" maxTcpSegmentSize="1416" tcpKeepAliveProbes="3" tcpUserTimeout="20" tcpKeepAliveInterval="3" tcpKeepAliveTime="12"/>
+			</RadioBlockCenter>
+		</RadioBlockCenters>
+		<InterlockingAreas>
+			<!-- <InterlockingArea puic="a2a2721c-897f-4d73-82ef-b6db5c07d9dd" interlockingUnitRef="a2a2721c-897f-4d73-82ef-b6db5c07d9dd"> -->
+			<InterlockingArea puic="1209b9fc-328d-49dd-920b-968d984d23ad" interlockingUnitRef="a2a2721c-897f-4d73-82ef-b6db5c07d9dd">
+				<DemarcationMarkers>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Downstream" atMeasure="123"/>
+					<DemarcationMarker railConnectionRef="4c61f54d-bfe3-4c09-a362-d8125428af84" direction="Upstream" atMeasure="512"/>
+				</DemarcationMarkers>
+			</InterlockingArea>
+		</InterlockingAreas>
+		<InterlockingUnits>
+			<InterlockingUnit puic="a2a2721c-897f-4d73-82ef-b6db5c07d9dd">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>80502.232,431958.462</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+			</InterlockingUnit>
+		</InterlockingUnits>
+		<OpenLineTracks>
+			<OpenLineTrack puic="86f8ee02-ea86-4611-8fd4-a17024092119" openLineSafetySystemRef="04e9b18c-ea50-40a1-9b2b-07c4545c54a4">
+				<DemarcationObject objectRef="93225b78-1a21-44f1-813b-386850063c51" direction="Upstream"/>
+				<DemarcationObject objectRef="5f98b0ef-3d38-4dbf-8acc-b270b80c5179" direction="Upstream"/>
+			</OpenLineTrack>
+		</OpenLineTracks>
+		<OpenLineSafetySystems>
+			<OpenLineSafetySystem puic="04e9b18c-ea50-40a1-9b2b-07c4545c54a4" openLineSafetySystemType="RRK">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>80502.232,431958.462</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+			</OpenLineSafetySystem>
+		</OpenLineSafetySystems>
+		<TechnicalSystems>
+			<TechnicalSystem puic="62aa9eab-171f-4dc5-b35c-c48eaa045762" name="Bijzondere apparatuur">
+				<Location>
+					<GeographicLocation dataAcquisitionMethod="DGPS">
+						<gml:Point>
+							<gml:coordinates>80502.232,431958.462</gml:coordinates>
+						</gml:Point>
+					</GeographicLocation>
+				</Location>
+			</TechnicalSystem>
+		</TechnicalSystems>
+		<ConditionNotifications>
+			<ConditionNotification receivingSystemRef="5588bdaa-e048-4753-b0f2-46affd9275c3" objectRef="62aa9eab-171f-4dc5-b35c-c48eaa045762" isInverted="False" isSuppressed="False"/>
+		</ConditionNotifications>
+	</SystemConfiguration>
+	<Project>
+		<SituationChanges>
+			<Created>8b7244d1-205e-4a6c-a9ea-939af6e025b7</Created>
+			<Updated>389c790e-59e9-4774-9377-2be27666766e</Updated>
+			<Deleted>b374e918-14c1-4e62-854c-55fe1b4bd876</Deleted>
+		</SituationChanges>
+		<PreviousVersion documentName="vorigeversie.xml" hashcode="5df7a4f9ed769a5f5e7cf9d19654b891867d02efc578841032a93fba6fe219a2"/>
+		<BoundaryReference documentName="buurblad1.xml"/>
+		<BoundaryReference documentName="buurblad2.xml"/>
+		<ProjectMetadata dataExchangePhase="FunctionalDesign" projectDiscipline="SignalingDesign">
+			<UserArea>
+				<gml:Polygon>
+					<gml:outerBoundaryIs>
+						<gml:LinearRing>
+							<gml:coordinates>202922.9,437108 203018.2,437082.7 202984.8,437475.7 202945.4,437490.1 202922.9,437108</gml:coordinates>
+						</gml:LinearRing>
+					</gml:outerBoundaryIs>
+				</gml:Polygon>
+			</UserArea>
+			<WorkArea>
+				<gml:Polygon>
+					<gml:outerBoundaryIs>
+						<gml:LinearRing>
+							<gml:coordinates>202922.9,437108 203018.2,437082.7 202984.8,437475.7 202945.4,437490.1 202922.9,437108</gml:coordinates>
+						</gml:LinearRing>
+					</gml:outerBoundaryIs>
+				</gml:Polygon>
+			</WorkArea>
+			<ContextArea>
+				<gml:Polygon>
+					<gml:outerBoundaryIs>
+						<gml:LinearRing>
+							<gml:coordinates>202922.9,437108 203018.2,437082.7 202984.8,437475.7 202945.4,437490.1 202922.9,437108</gml:coordinates>
+						</gml:LinearRing>
+					</gml:outerBoundaryIs>
+				</gml:Polygon>
+			</ContextArea>
+		</ProjectMetadata>
+	</Project>
+</SignalingDesign>

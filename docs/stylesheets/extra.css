@@ -1,0 +1,50 @@
+
+@media screen and (min-width: 1200px) {
+    .md-grid {
+        max-width: 80%;
+    }
+
+    .md-sidebar {
+        min-width: 15rem;
+    }
+    .md-nav__list {
+        min-width: 13rem;
+    }
+
+}
+
+.md-header__button.md-logo {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  margin-top: 10px;
+  height: 25%;
+  width: 25%;
+}
+
+.md-source {
+    width: 200px;
+}
+
+
+:root {
+    --icon-color-light: #000; /* Light mode color */
+    --icon-color-dark: #fff;  /* Dark mode color */
+}
+
+@media (prefers-color-scheme: dark) {
+    .logo {
+        color: var(--icon-color-dark);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .logo {
+        color: var(--icon-color-light);
+    }
+}

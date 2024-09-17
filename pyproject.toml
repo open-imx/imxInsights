@@ -1,0 +1,107 @@
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+extend-select = ["I", "TRY", "UP"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=imxInsights --cov-report=term-missing --ignore=test_build.py"
+asyncio_mode = "strict"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+]
+
+[tool.isort]
+profile = "black"  # Adjust this to match your style preference
+
+[tool.hatch]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+source = "regex_commit"
+commit_message = "🚀 Version {new_version}"
+path = "imxInsights/__init__.py"
+tag_sign = false
+
+[tool.hatch.envs.default]
+python = "3.12"
+dependencies = [
+    "mypy",
+    "ruff",
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "pre-commit",
+    "filelock",
+    "distlib",
+]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest"
+test-cov-xml = "pytest --cov-report=xml"
+lint = [
+  "isort imxInsights/",
+  "ruff format imxInsights/",
+  "ruff format --check imxInsights/",
+  "mypy imxInsights/ --check-untyped-defs",
+
+]
+lint-check = [
+  "ruff format --check imxInsights/",
+  "ruff check imxInsights/",
+  "mypy imxInsights/ --check-untyped-defs",
+]
+docs-serve = "mkdocs serve"
+docs-build = "mkdocs build"
+
+[build-system]
+requires = ["hatchling", "hatch-regex-commit", "isort"]
+build-backend = "hatchling.build"
+
+[project]
+name = "imxInsights"
+authors = [
+    { name = "Hzd", email = "Hazedd@users.noreply.github.com" },
+    { name = "Open-Imx", email = "open-imx@organisation.noreply.github.com" },
+]
+description = "python imx insights module to get information from imx files"
+readme = "README.md"
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "loguru",
+    "lxml",
+    "types-lxml",
+    "shapely",
+    "types-shapely",
+    "pyproj",
+    "pandas",
+    "pandas-stubs",
+    "xlsxwriter",
+    "networkx",
+    "dateparser",
+    "types-dateparser",
+    "deepdiff",
+    "jinja2", # for pandas styler
+]
+
+[project.urls]
+
+Documentation = "https://open-imx.github.io/imxInsights/"
+Source = "https://github.com/open-imx/imxInsights"

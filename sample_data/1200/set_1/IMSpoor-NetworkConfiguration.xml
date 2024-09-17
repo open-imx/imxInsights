@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NetworkConfiguration xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-NetworkConfiguration.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" imxVersion="12.0.0">
+	<DocumentReferences>
+		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="0cf1e28c667cdd403ec284f71e6ac7379dd903ab5076bb24b96c3208e1853724"/>
+	</DocumentReferences>
+	<SystemNetworkModules>
+		<SystemNetworkModule puic="e19e0bd8-d40c-46c2-aadd-0a0f98dff5d4" moduleType="ETIS" name="ETIS-1" defaultRaStaId="#00000062">
+			<ComputingElement identification="ETIS 00">
+				<PhysicalNetworkInterface label="1">
+					<LogicalNetworkInterface puic="998f1786-5a8e-4c72-91c9-a52253d14776" ipAddress="12.0.0.123" vlanId="10"/>
+				</PhysicalNetworkInterface>
+			</ComputingElement>
+			<ComputingElement identification="ETIS 01">
+				<PhysicalNetworkInterface label="1">
+					<LogicalNetworkInterface puic="5eb35adf-62d5-445d-95a4-49204a1fbbcb" ipAddress="12.0.0.124" vlanId="10"/>
+				</PhysicalNetworkInterface>
+			</ComputingElement>
+		</SystemNetworkModule>
+		<SystemNetworkModule puic="4ec995c5-5fb4-4148-adaa-cd215012519c" moduleType="ASTRIS" name="ASTRIS-1" defaultRaStaId="#00000063">
+			<ComputingElement identification="ASTRIS 00">
+				<PhysicalNetworkInterface label="1">
+					<LogicalNetworkInterface puic="d04b89fb-ab16-4fd1-b43d-37f2fddff066" ipAddress="10.0.11.15" subnetMask="/16" gateway="10.0.11.1" vlanId="5">
+						<NetworkRoute nextHopIpAddress="10.0.11.1" targetIpAddress="10.0.12.1" targetSubnetMask="/16"/>
+					</LogicalNetworkInterface>
+				</PhysicalNetworkInterface>
+			</ComputingElement>
+		</SystemNetworkModule>
+	</SystemNetworkModules>
+	<RaStaNetworks>
+		<RaStaNetwork puic="4ece2cd9-9231-480a-8bb9-6c0a5472131a" md4SafetyCode="1bee69a46ba811185c194762abaeae90" name="ETIS-1 - ASTRIS-1 verbinding (RaSTA)">
+			<RaStaConnection systemNetworkModuleARef="e19e0bd8-d40c-46c2-aadd-0a0f98dff5d4" systemNetworkModuleBRef="4ec995c5-5fb4-4148-adaa-cd215012519c" raStaIdA="#00000062" raStaIdB="#00000063">
+				<RaStaChannel label="channel1" fromLogicalNetworkInterfaceRef="5eb35adf-62d5-445d-95a4-49204a1fbbcb" toLogicalNetworkInterfaceRef="d04b89fb-ab16-4fd1-b43d-37f2fddff066" udpPort="10420"/>
+			</RaStaConnection>
+		</RaStaNetwork>
+	</RaStaNetworks>
+	<SctpNetworks>
+		<SctpNetwork puic="00f025e7-d0ab-4033-b1cf-4664c85971fc" name="ETIS-1 - ASTRIS-1 verbinding (SCTP)">
+			<SctpConnection sctpPortNumber="1" clientSystemNetworkModuleRef="e19e0bd8-d40c-46c2-aadd-0a0f98dff5d4" serverSystemNetworkModuleRef="4ec995c5-5fb4-4148-adaa-cd215012519c">
+				<SctpChannel label="channel1" logicalNetworkInterfaceRef="998f1786-5a8e-4c72-91c9-a52253d14776"/>
+			</SctpConnection>
+		</SctpNetwork>
+	</SctpNetworks>
+</NetworkConfiguration>

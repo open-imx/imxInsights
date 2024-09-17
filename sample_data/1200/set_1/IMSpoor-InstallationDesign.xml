@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InstallationDesign xmlns="http://www.prorail.nl/IMSpoor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.prorail.nl/IMSpoor IMSpoor-InstallationDesign.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" imxVersion="12.0.0">
+	<DocumentReferences>
+		<BaseReference parentDocumentName="IMSpoor-SignalingDesign.xml" parentHashcode="ac83f35362b3a340b4ba8a0905552ff5f16b7158f1747fcd15ab750ed5597c55"/>
+	</DocumentReferences>
+	<ObjectControllers>
+		<ObjectController puic="b4d009fa-46d3-4767-ae28-9f36594bbf0e" objectControllerType="Point" objectControllerCabinetRef="26c7bd6e-2b38-4b8f-9303-fdd6028ef941">
+			<Location>
+				<GeographicLocation dataAcquisitionMethod="DGPS">
+					<gml:Point>
+						<gml:coordinates>202361.017,437300.21</gml:coordinates>
+					</gml:Point>
+				</GeographicLocation>
+			</Location>
+			<InterfaceControlBox puic="c988eaaf-861c-4637-b5b2-984e5f11f497" backplaneLocation="1" supplierType="InputOutput">
+				<CssControlledObjectConnection objectRef="45b379ef-0faf-4fd2-ac60-534e57bae347" functionName="Point_Steering">
+					<Pin pinNumber="A1" description="Point Steering +">
+						<RepeatFunction interfaceControlBoxRef="12ae4112-b739-4344-a506-62d30a3e998a" pinNumber="A1" isInverted="False"/>
+					</Pin>
+					<Pin pinNumber="A2" description="Point Steering -"/>
+					<Pin pinNumber="A3" description="Point Steering SIG"/>
+				</CssControlledObjectConnection>
+				<CssControlledObjectConnection objectRef="cdc88402-e3ec-4c47-872a-4de179c3deca" functionName="Enable release output 34.1 BLZ">
+					<Pin pinNumber="B5" description="Enable"/>
+				</CssControlledObjectConnection>
+			</InterfaceControlBox>
+			<InterfaceControlBox puic="12ae4112-b739-4344-a506-62d30a3e998a" backplaneLocation="1" supplierType="InputOutput" baseInterfaceControlBoxRef="c988eaaf-861c-4637-b5b2-984e5f11f497">
+				<CssControlledObjectConnection objectRef="45b379ef-0faf-4fd2-ac60-534e57bae347" functionName="Point_Steering">
+					<Pin pinNumber="A1" description="Point Steering +"/>
+					<Pin pinNumber="A2" description="Point Steering -"/>
+					<Pin pinNumber="A3" description="Point Steering SIG"/>
+				</CssControlledObjectConnection>
+				<CssControlledObjectConnection objectRef="cdc88402-e3ec-4c47-872a-4de179c3deca" functionName="Enable release output 34.1 BLZ">
+					<Pin pinNumber="B5" description="Enable"/>
+				</CssControlledObjectConnection>
+			</InterfaceControlBox>
+		</ObjectController>
+	</ObjectControllers>
+</InstallationDesign>
