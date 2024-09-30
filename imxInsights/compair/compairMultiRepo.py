@@ -224,7 +224,7 @@ class ImxCompareMultiRepo:
 
     @classmethod
     def from_multi_repo(cls, tree, container_order, containers):
-        logger.info(f"Compair containers.")
+        logger.info(f"Compair containers")
         _ = cls()
         _._containers = containers
         _.container_order = container_order
