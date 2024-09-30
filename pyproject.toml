@@ -86,6 +86,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "loguru",
+    "tqdm",
     "lxml",
     "types-lxml",
     "shapely",

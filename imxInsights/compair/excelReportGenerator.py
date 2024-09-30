@@ -9,6 +9,9 @@ from imxInsights.utils.pandas_helpers import (
     df_sort_by_list,
     styler_highlight_changes,
 )
+from loguru import logger
+from tqdm import tqdm
+import sys
 
 
 class ExcelReportGenerator:
@@ -96,36 +99,43 @@ class ExcelReportGenerator:
 
     def _create_diff_sheets(self, writer):
         sorted_sheet_names = sorted(self.diff.keys())
+        logger.info("Generate compair Excel")
+        with tqdm(total=len(sorted_sheet_names), file=sys.stdout) as pbar:
+            for sheet_name in sorted_sheet_names:
+                current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                pbar.set_description(f"{current_time} | {logger.level('INFO').name}    | processing {sheet_name}")
 
-        for sheet_name in sorted_sheet_names:
-            df = pd.DataFrame(
-                [item.get_change_dict() for item in self.diff[sheet_name]]
-            )
+                df = pd.DataFrame(
+                    [item.get_change_dict() for item in self.diff[sheet_name]]
+                )
 
-            extension_columns = [
-                col for col in df.columns if col.startswith("extension")
-            ]
-            columns_to_front = ["tag", "@puic", "status"]
-            df = df_columns_sort_start_end(df, columns_to_front, extension_columns)
+                extension_columns = [
+                    col for col in df.columns if col.startswith("extension")
+                ]
+                columns_to_front = ["tag", "@puic", "status"]
+                df = df_columns_sort_start_end(df, columns_to_front, extension_columns)
 
-            status_order = ["created", "changed", "unchanged", "deleted"]
-            df = df_sort_by_list(df, status_order)
+                status_order = ["created", "changed", "unchanged", "deleted"]
+                df = df_sort_by_list(df, status_order)
 
-            columns_to_strip = ["tag", "@puic"]
-            for col in columns_to_strip:
-                df[col] = df[col].str.replace(r"^[+-]{2}", "", regex=True)
+                columns_to_strip = ["tag", "@puic"]
+                for col in columns_to_strip:
+                    df[col] = df[col].str.replace(r"^[+-]{2}", "", regex=True)
 
-            styled_df = df.style.map(styler_highlight_changes)  # type: ignore
+                styled_df = df.style.map(styler_highlight_changes)  # type: ignore
 
-            sheet_name_short = shorten_sheet_name(sheet_name)
-            styled_df.to_excel(writer, sheet_name=sheet_name_short, index=False)
+                sheet_name_short = shorten_sheet_name(sheet_name)
+                styled_df.to_excel(writer, sheet_name=sheet_name_short, index=False)
 
-            worksheet = writer.sheets[sheet_name_short]
+                worksheet = writer.sheets[sheet_name_short]
 
-            if df["status"].eq("unchanged").all():
-                worksheet.set_tab_color("#808080")
+                if df["status"].eq("unchanged").all():
+                    worksheet.set_tab_color("#808080")
 
-            wrap_format = writer.book.add_format({"text_wrap": True})
-            for idx, col in enumerate(df.columns):
-                max_length = max(df[col].astype(str).map(len).max(), len(col)) + 2  # type: ignore
-                worksheet.set_column(idx, idx, max_length, wrap_format)
+                wrap_format = writer.book.add_format({"text_wrap": True})
+                for idx, col in enumerate(df.columns):
+                    max_length = max(df[col].astype(str).map(len).max(), len(col)) + 2  # type: ignore
+                    worksheet.set_column(idx, idx, max_length, wrap_format)
+
+                pbar.update(1)
+        logger.success("Compair Excel generated")
