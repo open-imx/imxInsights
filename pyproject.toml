@@ -55,6 +55,7 @@ lint = [
 
 ]
 lint-check = [
+  "ruff format --diff imxInsights/",
   "ruff format --check imxInsights/",
   "ruff check imxInsights/",
   "mypy imxInsights/ --check-untyped-defs",
