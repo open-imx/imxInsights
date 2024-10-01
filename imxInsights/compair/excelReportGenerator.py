@@ -141,6 +141,4 @@ class ExcelReportGenerator:
 
                 pbar.update(1)
 
-        logger.success(
-            "Compair Excel generated"
-        )
+        logger.success("Compair Excel generated")

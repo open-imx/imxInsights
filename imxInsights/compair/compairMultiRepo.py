@@ -14,7 +14,6 @@ from tqdm import tqdm
 import sys
 
 
-
 @dataclass
 class ChangedImxObject:
     """
@@ -25,6 +24,7 @@ class ChangedImxObject:
         status (ChangeStatus): The change status of the IMX object.
         changes (dict[str, Change]): A dictionary of changes for the IMX object.
     """
+
     puic: str
     status: ChangeStatus
     changes: dict[str, Change]
