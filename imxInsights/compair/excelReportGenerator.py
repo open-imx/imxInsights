@@ -103,7 +103,9 @@ class ExcelReportGenerator:
         with tqdm(total=len(sorted_sheet_names), file=sys.stdout) as pbar:
             for sheet_name in sorted_sheet_names:
                 current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                pbar.set_description(f"{current_time} | {logger.level('INFO').name}    | processing {sheet_name}")
+                pbar.set_description(
+                    f"{current_time} | {logger.level('INFO').name}    | processing {sheet_name}"
+                )
 
                 df = pd.DataFrame(
                     [item.get_change_dict() for item in self.diff[sheet_name]]
@@ -138,4 +140,7 @@ class ExcelReportGenerator:
                     worksheet.set_column(idx, idx, max_length, wrap_format)
 
                 pbar.update(1)
-        logger.success("Compair Excel generated")
+
+        logger.success(
+            "Compair Excel generated"
+        )

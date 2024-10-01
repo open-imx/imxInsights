@@ -25,7 +25,6 @@ class ChangedImxObject:
         status (ChangeStatus): The change status of the IMX object.
         changes (dict[str, Change]): A dictionary of changes for the IMX object.
     """
-
     puic: str
     status: ChangeStatus
     changes: dict[str, Change]
@@ -122,8 +121,6 @@ class ImxCompareMultiRepo:
         out = {}
 
         for imx_obj in tree.get_all():
-
-
             sorted_keys = self._sort_priority_keys(
                 self._get_all_properties_keys(imx_obj)
             )
@@ -174,11 +171,12 @@ class ImxCompareMultiRepo:
             return ChangeStatus.CHANGED
 
     def _set_diff(self, container_id_1, container_id_2):
-
         with tqdm(total=len(self._data.items()), file=sys.stdout) as pbar:
             for key, value in self._data.items():
                 current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                pbar.set_description(f"{current_time} | {logger.level('INFO').name}     | processing")
+                pbar.set_description(
+                    f"{current_time} | {logger.level('INFO').name}     | processing"
+                )
 
                 tags = {item for item in value["tag"].values() if item is not None}
                 tag = tags.pop() if tags else None
