@@ -11,7 +11,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 ![PyPI - License](https://img.shields.io/pypi/l/imxInsights)
 
-**Documentation**: <a href="https://ImxEra.github.io/imxInsights/" target="_blank">https://open-imx.github.io/imxInsights/</a>
+**Documentation**: <a href="https://open-imx.github.io/imxInsights/" target="_blank">https://open-imx.github.io/imxInsights/</a>
 
 **Source Code**: <a href="https://github.com/ImxEra/imxInsights" target="_blank">https://github.com/open-imx/imxInsights</a>
 
@@ -54,7 +54,6 @@ be continually updated until we reach the first stable version.
 - [X] Excel compair output
 - [X] Excel diff color dataframe and excel
 - [ ] Compair object metadata overview
-- [ ] Compair object type as timeline
 - [ ] Imx data as Geojson
 - [ ] Compair as geojson
 - [ ] Imx container metadata
@@ -78,6 +77,7 @@ be continually updated until we reach the first stable version.
 
 
 #### Backlog current features implementation
+- [ ] Compair object type as timeline
 - [ ] graph implementation
 - [ ] generate graph geometry
 - [ ] Situation changes support (read and check)
