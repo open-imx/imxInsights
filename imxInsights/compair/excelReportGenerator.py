@@ -102,7 +102,7 @@ class ExcelReportGenerator:
         logger.info("Generate compair Excel")
         with tqdm(total=len(sorted_sheet_names), file=sys.stdout) as pbar:
             for sheet_name in sorted_sheet_names:
-                current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 pbar.set_description(
                     f"{current_time} | {logger.level('INFO').name}    | processing {sheet_name}"
                 )

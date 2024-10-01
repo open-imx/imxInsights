@@ -173,7 +173,7 @@ class ImxCompareMultiRepo:
     def _set_diff(self, container_id_1, container_id_2):
         with tqdm(total=len(self._data.items()), file=sys.stdout) as pbar:
             for key, value in self._data.items():
-                current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 pbar.set_description(
                     f"{current_time} | {logger.level('INFO').name}     | processing"
                 )
