@@ -1,13 +1,13 @@
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Any
+from datetime import datetime
 
-from imxInsights.compair.changes import Change, ChangeStatus, get_changes
 from imxInsights.compair.excelReportGenerator import ExcelReportGenerator
+from imxInsights.compair.changes import Change, ChangeStatus, get_changes
 from imxInsights.compair.helpers import (
     parse_dict_to_value_objects,
-    remove_empty_dicts,
     transform_dict,
+    remove_empty_dicts,
 )
 from loguru import logger
 from tqdm import tqdm
@@ -133,12 +133,13 @@ class ImxCompareMultiRepo:
                 sorted_keys, properties, self.container_order
             )
 
+            # create empty dicts
             tag_dict: dict[str, Any] = {item: None for item in self.container_order}
             children_dict: dict[str, Any] = {
                 item: None for item in self.container_order
             }
             parent_dict: dict[str, Any] = {item: None for item in self.container_order}
-
+            # fill dicts
             for item in imx_obj:
                 tag_dict[item.container_id] = item.path
                 children_dict[item.container_id] = [
@@ -152,15 +153,18 @@ class ImxCompareMultiRepo:
             merged_dict["parent"] = parent_dict
 
             # TODO: Ensure that if 'parent' is the same as '@puic', it's set to None. uhh why?
-            merged_dict["children"] = children_dict
+            merged_dict["childrenRefs"] = {key: ' '.join(value) if value is not None else None for key, value in children_dict.items()}
 
             out[imx_obj[0].puic] = merged_dict
 
         self._data = out
 
     @staticmethod
-    def determine_overall_status(diff_dict) -> ChangeStatus:
-        unique_statuses = set([item.status for item in diff_dict.values()])
+    def _determine_object_overall_status(diff_dict) -> ChangeStatus:
+        #todo: find better way to handle parent
+        unique_statuses = set([value.status for key, value in diff_dict.items() if key != 'parent'])
+        # if added or removed, we have a unchanged in the parent if NOne and flatten children .......
+
         if unique_statuses == {ChangeStatus.UNCHANGED}:
             return ChangeStatus.UNCHANGED
         elif unique_statuses == {ChangeStatus.ADDED}:
@@ -198,12 +202,13 @@ class ImxCompareMultiRepo:
                     parse_dict_to_value_objects(transform_dict(dict_2))
                 )
 
+                # children of removed or added objects are not processed well...
                 diff_dict = get_changes(dict_1_flat, dict_2_flat)
 
                 self.diff[tag].append(
                     ChangedImxObject(
-                        puic=value["@puic"][container_id_1],
-                        status=self.determine_overall_status(diff_dict),
+                        puic=key,
+                        status=self._determine_object_overall_status(diff_dict),
                         changes=diff_dict,
                     )
                 )

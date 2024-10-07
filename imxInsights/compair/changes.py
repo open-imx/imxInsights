@@ -39,39 +39,8 @@ class Change:
     analyse: Any | None = None
 
 
-def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Change]:
-    """
-    Compares two dictionaries and returns a dictionary that shows differences,
-    unchanged values, and changes between them.
-
-    Utilizes DeepDiff to perform the comparison and includes custom operators
-    to handle specific types like UUIDs and Shapely objects.
-
-    Args:
-        dict1: The first dictionary to compare.
-        dict2: The second dictionary to compare.
-
-    Returns:
-        A dictionary where keys represent the paths to changed elements,
-        and values are `Change` objects describing the type of change.
-    """
+def process_deep_diff(dd: DeepDiff):
     changes = {}
-
-    # verbose should diff dicts in a list, make sure we set cutoff to 1
-    dd = DeepDiff(
-        dict1,
-        dict2,
-        ignore_order=True,
-        verbose_level=2,
-        cutoff_distance_for_pairs=1,
-        cutoff_intersection_for_pairs=1,
-        report_repetition=True,
-        custom_operators=[
-            UUIDListOperator(regex_paths=[r"root\['.*Refs'\]$"]),
-            ShapelyPointDiffer(types=[Point]),
-            ShapelyLineDiffer(types=[LineString]),
-        ],
-    )
 
     if "dictionary_item_added" in dd.keys():
         for key, value in dd["dictionary_item_added"].items():
@@ -85,13 +54,16 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
 
     if "dictionary_item_removed" in dd.keys():
         for key, value in dd["dictionary_item_removed"].items():
-            changes[convert_deepdiff_path(key)] = Change(
-                status=ChangeStatus.REMOVED,
-                t1=value,
-                t2=None,
-                diff_string=f"--{value}",
-                analyse=None,
-            )
+            if isinstance(value, dict):
+                changes[convert_deepdiff_path(key)] = Change(
+                    status=ChangeStatus.REMOVED,
+                    t1=value,
+                    t2=None,
+                    diff_string=f"--{value}",
+                    analyse=None,
+                )
+            else:
+                raise NotImplementedError(f"{type(value)}")
 
     if "iterable_item_removed" in dd.keys():
         for key, value in dd["iterable_item_removed"].items():
@@ -136,7 +108,8 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
                     status=ChangeStatus.ADDED,
                     t1=None,
                     t2=value["new_value"],
-                    diff_string=f"++{value['new_value']}",  # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
+                    diff_string=f"++{value['new_value']}",
+                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -145,7 +118,8 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
                     status=ChangeStatus.REMOVED,
                     t1=value["old_value"],
                     t2=None,
-                    diff_string=f"--{value['old_value']}",  # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
+                    diff_string=f"--{value['old_value']}",
+                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -154,7 +128,8 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
                     status=ChangeStatus.TYPE_CHANGE,
                     t1=value["old_value"],
                     t2=value["new_value"],
-                    diff_string=f"{value['old_value']} -> {value['new_value']}",  # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
+                    diff_string=f"{value['old_value']} -> {value['new_value']}",
+                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -173,19 +148,78 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
                 analyse=analyse,
             )
 
+    return changes
+
+
+def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Change]:
+    """
+    Compares two dictionaries and returns a dictionary that shows differences,
+    unchanged values, and changes between them.
+
+    Utilizes DeepDiff to perform the comparison and includes custom operators
+    to handle specific types like UUIDs and Shapely objects.
+
+    Args:
+        dict1: The first dictionary to compare.
+        dict2: The second dictionary to compare.
+
+    Returns:
+        A dictionary where keys represent the paths to changed elements,
+        and values are `Change` objects describing the type of change.
+    """
+
+    # verbose should diff dicts in a list, make sure we set cutoff to 1
+    dd = DeepDiff(
+        dict1,
+        dict2,
+        ignore_order=True,
+        verbose_level=2,
+        cutoff_distance_for_pairs=1,
+        cutoff_intersection_for_pairs=1,
+        report_repetition=True,
+        custom_operators=[
+            UUIDListOperator(regex_paths=[r"root\['.*Refs'\]$"]),
+            ShapelyPointDiffer(types=[Point]),
+            ShapelyLineDiffer(types=[LineString]),
+        ],
+    )
+
     # we got the unchanged left
+    # todo: should split the lists, make sure to check if still the same or changes are made.
+    changes = process_deep_diff(dd)
+
+
     for key, value in dict1.items():
         if isinstance(value, list):
-            value = flatten_dict({key: value})
-            for key_2, value_2 in value.items():
-                if key_2 not in changes.keys():
-                    changes[key_2] = Change(
-                        status=ChangeStatus.UNCHANGED,
-                        t1=value_2,
-                        t2=value_2,
-                        diff_string=f"{value_2}",
-                        analyse=None,
-                    )
+            pass
+            # tester_1 = DeepDiff(value, dict2[key])
+            # tester_2 = process_deep_diff(tester_1)
+            # print()
+            #
+            #
+            # # if key in dict2.keys() and dict2[key] is None:
+            # #     value = flatten_dict({key: value})
+            # #     for key_2, value_2 in value.items():
+            # #         if key_2 not in changes.keys():
+            # #             changes[key_2] = Change(
+            # #                 status=ChangeStatus.REMOVED,
+            # #                 t1=value_2,
+            # #                 t2=None,
+            # #                 diff_string=f"--{value_2}",
+            # #                 analyse=None,
+            # #             )
+            # #
+            # # else:
+            # #     value = flatten_dict({key: value})
+            # #     for key_2, value_2 in value.items():
+            # #         if key_2 not in changes.keys():
+            # #             changes[key_2] = Change(
+            # #                 status=ChangeStatus.UNCHANGED,
+            # #                 t1=value_2,
+            # #                 t2=value_2,
+            # #                 diff_string=f"{value_2}",
+            # #                 analyse=None,
+            # #             )
         else:
             if key not in changes.keys():
                 changes[key] = Change(

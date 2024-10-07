@@ -58,7 +58,6 @@ be continually updated until we reach the first stable version.
 - [ ] Compair as geojson
 - [ ] Imx container metadata
 - [ ] Imx single file metadata
-- [ ] 3d Measure calculator
 - [ ] Documentation update
 - [ ] min tests coverage 95%
 - [ ] clean git by fresh upload 🎉
@@ -67,6 +66,7 @@ be continually updated until we reach the first stable version.
 
 ####  Q4-1 2024
 - [ ] (Imx) Area's and area classifier
+- [ ] 3d Measure calculator
 - [ ] Ref as objects
 - [ ] nice ref display
 - [ ] parent path display
@@ -77,7 +77,7 @@ be continually updated until we reach the first stable version.
 
 
 #### Backlog current features implementation
-- [ ] Compair object type as timeline
+- [ ] Compair objects as timeline
 - [ ] graph implementation
 - [ ] generate graph geometry
 - [ ] Situation changes support (read and check)

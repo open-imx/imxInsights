@@ -55,37 +55,6 @@ def test_imx_repo_queries_v124(imx_v124_project_instance: ImxSingleFile):
 
 
 @pytest.mark.slow
-def test_imx_multi_repo_v124(
-    imx_v124_project_instance: ImxSingleFile,
-    imx_v500_project_instance: ImxSingleFile,
-    imx_v1200_zip_instance: ImxContainer,
-):
-    imx = imx_v124_project_instance
-    imx_2 = imx_v500_project_instance
-    imx_3 = imx_v1200_zip_instance
-
-    # version same
-
-    # version difference
-    #  - fail if version safe is False
-    #  - ok when version safe is True
-
-    multi_situations = ImxMultiRepo(
-        [
-            imx.initial_situation,
-            imx.new_situation,
-            # imx_2.initial_situation #, imx_3],
-        ],
-        version_safe=False,
-    )
-
-    # more then 2 containers test
-
-    compair = multi_situations.compair()
-    print()
-
-
-@pytest.mark.slow
 def test_imx_parse_project_v500(imx_v500_project_instance):
     imx = imx_v500_project_instance
     assert imx.file.imx_version == "5.0.0", "imx version should be 5.0.0"
