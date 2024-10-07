@@ -85,6 +85,7 @@ class UUIDListOperator(BaseOperator):
                         "diff_analyse",
                         level,
                         {
+                            "type": "UUIDListOperator",
                             "added": added_items,
                             "removed": removed_items,
                             "unchanged": unchanged_items,
@@ -110,6 +111,7 @@ class UUIDListOperator(BaseOperator):
                         "diff_analyse",
                         level,
                         {
+                            "type": "UUIDListOperator",
                             "added": added_items,
                             "removed": removed_items,
                             "unchanged": unchanged_items,

@@ -36,7 +36,9 @@ class ChangedImxObject:
         Returns:
             A dictionary with change details and status.
         """
-        return {key: value.diff_string for key, value in self.changes.items()} | {
+        # todo: make analyse optional
+        analyse = {f'{key}_analyse': value.analyse['display'] for key, value in self.changes.items() if value.analyse is not None}
+        return {key: value.diff_string for key, value in self.changes.items()} | analyse | {
             "status": self.status.value
         }
 
@@ -150,7 +152,7 @@ class ImxCompareMultiRepo:
                 )
 
             merged_dict["tag"] = tag_dict
-            merged_dict["parent"] = parent_dict
+            merged_dict["parentRef"] = parent_dict
 
             # TODO: Ensure that if 'parent' is the same as '@puic', it's set to None. uhh why?
             merged_dict["childrenRefs"] = {key: ' '.join(value) if value is not None else None for key, value in children_dict.items()}
@@ -162,7 +164,7 @@ class ImxCompareMultiRepo:
     @staticmethod
     def _determine_object_overall_status(diff_dict) -> ChangeStatus:
         #todo: find better way to handle parent
-        unique_statuses = set([value.status for key, value in diff_dict.items() if key != 'parent'])
+        unique_statuses = set([value.status for key, value in diff_dict.items() if key != 'parentRef'])
         # if added or removed, we have a unchanged in the parent if NOne and flatten children .......
 
         if unique_statuses == {ChangeStatus.UNCHANGED}:

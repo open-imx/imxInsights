@@ -130,6 +130,7 @@ class ExcelReportGenerator:
                     f"{current_time} | {logger.level('INFO').name}    | processing {sheet_name}"
                 )
 
+                # todo: pandas dataframe should be moved to object changes, including styler below.
                 df = pd.DataFrame(
                     [item.get_change_dict() for item in dict_lower_case_merged[sheet_name]]
                 )

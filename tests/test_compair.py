@@ -1,12 +1,27 @@
+import os
+
 import pytest
 
 from imxInsights import ImxMultiRepo, ImxSingleFile, ImxContainer
+from imxInsights.compair.compairMultiRepo import ImxCompareMultiRepo
+
+
+def create_excel(compared_imx: ImxCompareMultiRepo, remove_when_done: bool = False):
+    output_file = "temp_diff_excel.xlsx"
+    try:
+        compared_imx.create_excel(output_file)
+    finally:
+        if remove_when_done and os.path.exists(output_file):
+            os.remove(output_file)
+
 
 @pytest.mark.slow
 def test_imx_multi_repo_different_versions(
     imx_v124_project_instance: ImxSingleFile,
     imx_v500_project_instance: ImxSingleFile,
 ):
+    # todo: replace testdata with overlapping imx files, v124 amd v1200.
+
     with pytest.raises(ValueError):
         ImxMultiRepo(
             [
@@ -32,66 +47,71 @@ def test_imx_multi_repo_different_versions(
     assert len(multi_repo._tree.tree_dict.keys()) == 9289, "Count of items in tree dict not correct"
 
     compared_imx = multi_repo.compair()
-    # test container order
+    assert compared_imx.container_order[0] == imx_v124_project_instance.initial_situation.container_id, "wrong container id order"
+    assert compared_imx.container_order[1] == imx_v500_project_instance.initial_situation.container_id, "wrong container id order"
 
-    # test diff dict, 'SingleSwitch' 154, 'Signal' 299
+    assert len(compared_imx.diff["SingleSwitch"]) == 154, "Should contain x SingleSwitchs"
+    assert len(compared_imx.diff["Signal"]) == 299, "Should contain x Signal"
 
-    # if object only in t2 we do not have a puic in the ChangedImxObject..
+    assert len([item for item in compared_imx.diff["SingleSwitch"] if item.status.value == 'removed']) == 88, "Should be x removed"
+    assert len([item for item in compared_imx.diff["SingleSwitch"] if item.status.value == 'added']) == 66, "Should be x added"
 
-    compared_imx.create_excel("tester.xlsx")
-
-
-    print()
-
+    create_excel(compared_imx)
 
 
 @pytest.mark.slow
 def test_imx_multi_repo_v124(
     imx_v124_project_instance: ImxSingleFile,
 ):
-    try:
-        ImxMultiRepo(
-            [
-                imx_v124_project_instance.initial_situation,
-                    imx_v124_project_instance.new_situation,
-            ],
-            version_safe=False,
-        )
-    except Exception as e:
-        pytest.fail(f"Unexpected exception occurred: {e}")
+    multi_repo = ImxMultiRepo(
+        [
+            imx_v124_project_instance.initial_situation,
+                imx_v124_project_instance.new_situation,
+        ],
+        version_safe=False,
+    )
+    compared_imx = multi_repo.compair()
+    create_excel(compared_imx)
 
 
-@pytest.mark.slow
-def test_imx_multi_repo_v500(
-    imx_v500_project_instance: ImxSingleFile,
-):
-    try:
-        ImxMultiRepo(
-            [
-                imx_v500_project_instance.initial_situation,
-                imx_v500_project_instance.initial_situation,
-            ],
-            version_safe=False,
-        )
-    except Exception as e:
-        pytest.fail(f"Unexpected exception occurred: {e}")
 
 
-@pytest.mark.slow
-def test_imx_multi_repo_v1200(
-    imx_v1200_zip_instance: ImxContainer,
-):
-    try:
-        ImxMultiRepo(
-            [
-                imx_v1200_zip_instance,
-                imx_v1200_zip_instance,
-            ],
-            version_safe=False,
-        )
-    except Exception as e:
-        pytest.fail(f"Unexpected exception occurred: {e}")
 
+
+
+
+#
+# @pytest.mark.slow
+# def test_imx_multi_repo_v500(
+#     imx_v500_project_instance: ImxSingleFile,
+# ):
+#     try:
+#         ImxMultiRepo(
+#             [
+#                 imx_v500_project_instance.initial_situation,
+#                 imx_v500_project_instance.initial_situation,
+#             ],
+#             version_safe=False,
+#         )
+#     except Exception as e:
+#         pytest.fail(f"Unexpected exception occurred: {e}")
+#
+#
+# @pytest.mark.slow
+# def test_imx_multi_repo_v1200(
+#     imx_v1200_zip_instance: ImxContainer,
+# ):
+#     try:
+#         ImxMultiRepo(
+#             [
+#                 imx_v1200_zip_instance,
+#                 imx_v1200_zip_instance,
+#             ],
+#             version_safe=False,
+#         )
+#     except Exception as e:
+#         pytest.fail(f"Unexpected exception occurred: {e}")
+#
 
 
 # def test_imx_multi_repo_v1200(

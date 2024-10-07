@@ -86,6 +86,7 @@ class ShapelyPointDiffer(BaseOperator):
             "diff_analyse",
             level,
             {
+                "type": "ShapelyPointDiffer",
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
                 "point_z_distance": z_distance,
@@ -221,6 +222,7 @@ class ShapelyLineDiffer(BaseOperator):
             "geometry",
             level,
             {
+                "type": "ShapelyLineDiffer",
                 "line_almost_equal": almost_equal,
                 "intersection_over_union": round(intersection_over_union, 3),
                 "line_planer_length_difference": round(length_difference, 3),
