@@ -1,6 +1,6 @@
 import sys
 from datetime import datetime
-from typing import Any, AnyStr
+from typing import Any
 
 import pandas as pd
 from loguru import logger
