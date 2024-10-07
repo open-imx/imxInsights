@@ -1,17 +1,18 @@
+import sys
 from dataclasses import dataclass
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from imxInsights.compair.excelReportGenerator import ExcelReportGenerator
-from imxInsights.compair.changes import Change, ChangeStatus, get_changes
-from imxInsights.compair.helpers import (
-    parse_dict_to_value_objects,
-    transform_dict,
-    remove_empty_dicts,
-)
 from loguru import logger
 from tqdm import tqdm
-import sys
+
+from imxInsights.compair.changes import Change, ChangeStatus, get_changes
+from imxInsights.compair.excelReportGenerator import ExcelReportGenerator
+from imxInsights.compair.helpers import (
+    parse_dict_to_value_objects,
+    remove_empty_dicts,
+    transform_dict,
+)
 
 
 @dataclass
@@ -37,10 +38,16 @@ class ChangedImxObject:
             A dictionary with change details and status.
         """
         # todo: make analyse optional
-        analyse = {f'{key}_analyse': value.analyse['display'] for key, value in self.changes.items() if value.analyse is not None}
-        return {key: value.diff_string for key, value in self.changes.items()} | analyse | {
-            "status": self.status.value
+        analyse = {
+            f"{key}_analyse": value.analyse["display"]
+            for key, value in self.changes.items()
+            if value.analyse is not None
         }
+        return (
+            {key: value.diff_string for key, value in self.changes.items()}
+            | analyse
+            | {"status": self.status.value}
+        )
 
 
 class ImxCompareMultiRepo:
@@ -155,7 +162,10 @@ class ImxCompareMultiRepo:
             merged_dict["parentRef"] = parent_dict
 
             # TODO: Ensure that if 'parent' is the same as '@puic', it's set to None. uhh why?
-            merged_dict["childrenRefs"] = {key: ' '.join(value) if value is not None else None for key, value in children_dict.items()}
+            merged_dict["childrenRefs"] = {
+                key: " ".join(value) if value is not None else None
+                for key, value in children_dict.items()
+            }
 
             out[imx_obj[0].puic] = merged_dict
 
@@ -163,8 +173,10 @@ class ImxCompareMultiRepo:
 
     @staticmethod
     def _determine_object_overall_status(diff_dict) -> ChangeStatus:
-        #todo: find better way to handle parent
-        unique_statuses = set([value.status for key, value in diff_dict.items() if key != 'parentRef'])
+        # todo: find better way to handle parent
+        unique_statuses = set(
+            [value.status for key, value in diff_dict.items() if key != "parentRef"]
+        )
         # if added or removed, we have a unchanged in the parent if NOne and flatten children .......
 
         if unique_statuses == {ChangeStatus.UNCHANGED}:
@@ -177,7 +189,7 @@ class ImxCompareMultiRepo:
             return ChangeStatus.CHANGED
 
     def _set_diff(self, container_id_1, container_id_2):
-        with tqdm(total=len(self._data.items()), file=sys.stdout) as pbar:
+        with tqdm(total=len(self._data.items()), file=sys.stdout) as pbar:  # type: ignore
             for key, value in self._data.items():
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 pbar.set_description(
@@ -229,7 +241,7 @@ class ImxCompareMultiRepo:
 
     @classmethod
     def from_multi_repo(cls, tree, container_order, containers):
-        logger.info(f"Compair containers")
+        logger.info("Compair containers")
         _ = cls()
         _._containers = containers
         _.container_order = container_order

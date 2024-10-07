@@ -11,7 +11,6 @@ from imxInsights.compair.custom_operators.shapely_diff_operator import (
     ShapelyPointDiffer,
 )
 from imxInsights.compair.helpers import convert_deepdiff_path
-from imxInsights.utils.flatten_unflatten import flatten_dict
 
 
 class ChangeStatus(Enum):
@@ -187,7 +186,6 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
     # we got the unchanged left
     # todo: should split the lists, make sure to check if still the same or changes are made.
     changes = process_deep_diff(dd)
-
 
     for key, value in dict1.items():
         if isinstance(value, list):

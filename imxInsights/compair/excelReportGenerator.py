@@ -1,6 +1,10 @@
+import sys
 from datetime import datetime
+from typing import Any, AnyStr
 
 import pandas as pd
+from loguru import logger
+from tqdm import tqdm
 
 from imxInsights.utils.excel_helpers import shorten_sheet_name
 from imxInsights.utils.flatten_unflatten import hash_sha256
@@ -9,9 +13,6 @@ from imxInsights.utils.pandas_helpers import (
     df_sort_by_list,
     styler_highlight_changes,
 )
-from loguru import logger
-from tqdm import tqdm
-import sys
 
 
 class ExcelReportGenerator:
@@ -98,32 +99,39 @@ class ExcelReportGenerator:
                     )
 
     def _create_diff_sheets(self, writer):
-
         def merge_dict_keep_first_key(d: dict) -> dict:
-            merged_dict = {}
-            original_keys = {}
+            merged_dict: dict[str, Any] = {}
+            original_keys: dict[str, Any] = {}
 
             for key, value in d.items():
                 lower_key = key.lower()
 
                 if lower_key in original_keys:
                     original_key = original_keys[lower_key]
-                    if isinstance(merged_dict[original_key], list) and isinstance(value, list):
+                    if isinstance(merged_dict[original_key], list) and isinstance(
+                        value, list
+                    ):
                         merged_dict[original_key].extend(value)
-                    elif isinstance(merged_dict[original_key], dict) and isinstance(value, dict):
-                        merged_dict[original_key] = merge_dict_keep_first_key({**merged_dict[original_key], **value})
+                    elif isinstance(merged_dict[original_key], dict) and isinstance(
+                        value, dict
+                    ):
+                        merged_dict[original_key] = merge_dict_keep_first_key(
+                            {**merged_dict[original_key], **value}
+                        )
                     else:
                         merged_dict[original_key] = value
                 else:
                     merged_dict[key] = value
-                    original_keys[lower_key] = key  # Track the first occurrence of the key
+                    original_keys[lower_key] = (
+                        key  # Track the first occurrence of the key
+                    )
 
             return merged_dict
 
         dict_lower_case_merged = merge_dict_keep_first_key(self.diff)
         sorted_sheet_names = sorted(dict_lower_case_merged.keys())
         logger.info("Generate compair Excel")
-        with tqdm(total=len(sorted_sheet_names), file=sys.stdout) as pbar:
+        with tqdm(total=len(sorted_sheet_names), file=sys.stdout) as pbar:  # type: ignore
             for sheet_name in sorted_sheet_names:
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 pbar.set_description(
@@ -132,7 +140,10 @@ class ExcelReportGenerator:
 
                 # todo: pandas dataframe should be moved to object changes, including styler below.
                 df = pd.DataFrame(
-                    [item.get_change_dict() for item in dict_lower_case_merged[sheet_name]]
+                    [
+                        item.get_change_dict()
+                        for item in dict_lower_case_merged[sheet_name]
+                    ]
                 )
 
                 extension_columns = [
@@ -166,4 +177,3 @@ class ExcelReportGenerator:
                 pbar.update(1)
 
         logger.success("Compair Excel generated")
-
