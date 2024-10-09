@@ -7,6 +7,7 @@ extend-select = ["I", "TRY", "UP"]
 [tool.pytest.ini_options]
 addopts = "--cov=imxInsights --cov-report=term-missing --ignore=test_build.py"
 asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope="function"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "serial",

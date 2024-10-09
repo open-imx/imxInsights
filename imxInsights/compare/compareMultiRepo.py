@@ -3,15 +3,22 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
-from imxInsights.compair.changes import Change, ChangeStatus, get_changes
-from imxInsights.compair.excelReportGenerator import ExcelReportGenerator
-from imxInsights.compair.helpers import (
+from imxInsights.compare.changes import Change, ChangeStatus, get_object_changes
+from imxInsights.compare.excelReportGenerator import ExcelReportGenerator
+from imxInsights.compare.helpers import (
+    merge_dict_keep_first_key,
     parse_dict_to_value_objects,
     remove_empty_dicts,
     transform_dict,
+)
+from imxInsights.utils.pandas_helpers import (
+    df_columns_sort_start_end,
+    df_sort_by_list,
+    styler_highlight_changes,
 )
 
 
@@ -30,19 +37,26 @@ class ChangedImxObject:
     status: ChangeStatus
     changes: dict[str, Change]
 
-    def get_change_dict(self) -> dict[str, str]:
+    def get_change_dict(self, add_analyse: bool) -> dict[str, str]:
         """
         Get a dictionary representation of the changes.
+
+        Args:
+            add_analyse (bool): Whether to include the analyse details in the result.
 
         Returns:
             A dictionary with change details and status.
         """
-        # todo: make analyse optional
-        analyse = {
-            f"{key}_analyse": value.analyse["display"]
-            for key, value in self.changes.items()
-            if value.analyse is not None
-        }
+        analyse = (
+            {
+                f"{key}_analyse": value.analyse["display"]
+                for key, value in self.changes.items()
+                if value.analyse is not None
+            }
+            if add_analyse
+            else {}
+        )
+
         return (
             {key: value.diff_string for key, value in self.changes.items()}
             | analyse
@@ -173,12 +187,9 @@ class ImxCompareMultiRepo:
 
     @staticmethod
     def _determine_object_overall_status(diff_dict) -> ChangeStatus:
-        # todo: find better way to handle parent
         unique_statuses = set(
             [value.status for key, value in diff_dict.items() if key != "parentRef"]
         )
-        # if added or removed, we have a unchanged in the parent if NOne and flatten children .......
-
         if unique_statuses == {ChangeStatus.UNCHANGED}:
             return ChangeStatus.UNCHANGED
         elif unique_statuses == {ChangeStatus.ADDED}:
@@ -193,7 +204,7 @@ class ImxCompareMultiRepo:
             for key, value in self._data.items():
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 pbar.set_description(
-                    f"{current_time} | {logger.level('INFO').name}     | processing"
+                    f"{current_time} | {logger.level('INFO').name}     | comparing"
                 )
 
                 tags = {item for item in value["tag"].values() if item is not None}
@@ -216,8 +227,7 @@ class ImxCompareMultiRepo:
                     parse_dict_to_value_objects(transform_dict(dict_2))
                 )
 
-                # children of removed or added objects are not processed well...
-                diff_dict = get_changes(dict_1_flat, dict_2_flat)
+                diff_dict = get_object_changes(dict_1_flat, dict_2_flat)
 
                 self.diff[tag].append(
                     ChangedImxObject(
@@ -230,12 +240,99 @@ class ImxCompareMultiRepo:
                 pbar.update(1)
         logger.success("Compair done")
 
-    def create_excel(self, file_path: str | None = None):
+    def get_object_types(self) -> list[str]:
+        dict_lower_case_merged = merge_dict_keep_first_key(self.diff)
+        return sorted(dict_lower_case_merged.keys())
+
+    def get_pandas(
+        self,
+        object_type: str | None = None,
+        add_analyse: bool = False,
+        styled_df: bool = False,
+    ) -> pd.DataFrame | dict[str, pd.DataFrame]:
+        dict_lower_case_merged = merge_dict_keep_first_key(self.diff)
+
+        # If an object_type is specified, get its DataFrame; otherwise, get all DataFrames
+        if object_type:
+            return self._get_dataframe_for_type(
+                dict_lower_case_merged, object_type, add_analyse, styled_df
+            )
+        else:
+            return self._get_all_dataframes(
+                dict_lower_case_merged, add_analyse, styled_df
+            )
+
+    def _get_all_dataframes(
+        self,
+        dict_lower_case_merged: dict[str, list],
+        add_analyse: bool,
+        styled_df: bool,
+    ) -> dict[str, pd.DataFrame]:
+        result = {}
+        object_types = sorted(dict_lower_case_merged.keys())
+
+        for item in object_types:
+            result[item] = self._create_dataframe(
+                dict_lower_case_merged[item], add_analyse, styled_df
+            )
+
+        return result
+
+    def _get_dataframe_for_type(
+        self,
+        dict_lower_case_merged: dict[str, list],
+        object_type: str,
+        add_analyse: bool,
+        styled_df: bool,
+    ) -> pd.DataFrame:
+        if object_type in dict_lower_case_merged:
+            return self._create_dataframe(
+                dict_lower_case_merged[object_type], add_analyse, styled_df
+            )
+        else:
+            raise ValueError(f"Object type '{object_type}' not found.")  # NOQA TRY003
+
+    @staticmethod
+    def _create_dataframe(
+        items: list, add_analyse: bool, styled_df: bool
+    ) -> pd.DataFrame:
+        df = pd.DataFrame([item.get_change_dict(add_analyse) for item in items])
+
+        extension_columns = [col for col in df.columns if col.startswith("extension")]
+        columns_to_front = ["tag", "@puic", "status"]
+        df = df_columns_sort_start_end(df, columns_to_front, extension_columns)
+
+        status_order = [
+            ChangeStatus.ADDED.value,
+            ChangeStatus.CHANGED.value,
+            ChangeStatus.UNCHANGED.value,
+            ChangeStatus.REMOVED.value,
+            ChangeStatus.TYPE_CHANGE.value,
+        ]
+        df = df_sort_by_list(df, status_order)
+
+        columns_to_strip = ["tag", "@puic"]
+        for col in columns_to_strip:
+            df[col] = df[col].str.replace(r"^[+-]{2}", "", regex=True)
+
+        if styled_df:
+            return df.style.map(styler_highlight_changes)  # type: ignore
+        else:
+            return df
+
+    def create_excel(
+        self,
+        file_path: str | None = None,
+        add_analyse: bool = False,
+        styled_df: bool = True,
+    ):
         file_path = (
             file_path or f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         )
         report_generator = ExcelReportGenerator(
-            self.diff, self._containers, self.container_order
+            self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
+            self._containers,
+            self.container_order,
         )
         report_generator.create_excel(file_path)
 

@@ -163,3 +163,45 @@ def convert_deepdiff_path(deepdiff_path: str) -> str:
     deepdiff_path = deepdiff_path.lstrip(".")
 
     return deepdiff_path
+
+
+def merge_dict_keep_first_key(d: dict) -> dict:
+    """
+    Merges a dictionary by keeping the first occurrence of each key (case-insensitive).
+
+    This function processes a dictionary and merges keys while preserving the first key's
+    original case. If duplicate keys (case-insensitive) are found, their values are merged
+    based on their types:
+    - Lists are concatenated.
+    - Dictionaries are merged recursively.
+    - Other values are replaced by the most recent occurrence.
+
+    Args:
+        d: The dictionary to be merged, where keys may have different cases.
+
+    Returns:
+        A new dictionary with merged keys and values, maintaining the first key's original case.
+    """
+    merged_dict: dict[str, Any] = {}
+    original_keys: dict[str, Any] = {}
+
+    for key, value in d.items():
+        lower_key = key.lower()
+
+        if lower_key in original_keys:
+            original_key = original_keys[lower_key]
+            if isinstance(merged_dict[original_key], list) and isinstance(value, list):
+                merged_dict[original_key].extend(value)
+            elif isinstance(merged_dict[original_key], dict) and isinstance(
+                value, dict
+            ):
+                merged_dict[original_key] = merge_dict_keep_first_key(
+                    {**merged_dict[original_key], **value}
+                )
+            else:
+                merged_dict[original_key] = value
+        else:
+            merged_dict[key] = value
+            original_keys[lower_key] = key  # Track the first occurrence of the key
+
+    return merged_dict

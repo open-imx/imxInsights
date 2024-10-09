@@ -5,12 +5,13 @@ from typing import Any
 from deepdiff import DeepDiff  # type: ignore
 from shapely import LineString, Point
 
-from imxInsights.compair.custom_operators.refs_diff_operator import UUIDListOperator
-from imxInsights.compair.custom_operators.shapely_diff_operator import (
+from imxInsights.compare.custom_operators.refs_diff_operator import UUIDListOperator
+from imxInsights.compare.custom_operators.shapely_diff_operator import (
     ShapelyLineDiffer,
     ShapelyPointDiffer,
 )
-from imxInsights.compair.helpers import convert_deepdiff_path
+from imxInsights.compare.helpers import convert_deepdiff_path
+from imxInsights.utils.flatten_unflatten import flatten_dict
 
 
 class ChangeStatus(Enum):
@@ -150,7 +151,9 @@ def process_deep_diff(dd: DeepDiff):
     return changes
 
 
-def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Change]:
+def get_object_changes(
+    dict1: dict[str, Any], dict2: dict[str, Any]
+) -> dict[str, Change]:
     """
     Compares two dictionaries and returns a dictionary that shows differences,
     unchanged values, and changes between them.
@@ -183,49 +186,18 @@ def get_changes(dict1: dict[str, Any], dict2: dict[str, Any]) -> dict[str, Chang
         ],
     )
 
-    # we got the unchanged left
-    # todo: should split the lists, make sure to check if still the same or changes are made.
     changes = process_deep_diff(dd)
 
-    for key, value in dict1.items():
-        if isinstance(value, list):
-            pass
-            # tester_1 = DeepDiff(value, dict2[key])
-            # tester_2 = process_deep_diff(tester_1)
-            # print()
-            #
-            #
-            # # if key in dict2.keys() and dict2[key] is None:
-            # #     value = flatten_dict({key: value})
-            # #     for key_2, value_2 in value.items():
-            # #         if key_2 not in changes.keys():
-            # #             changes[key_2] = Change(
-            # #                 status=ChangeStatus.REMOVED,
-            # #                 t1=value_2,
-            # #                 t2=None,
-            # #                 diff_string=f"--{value_2}",
-            # #                 analyse=None,
-            # #             )
-            # #
-            # # else:
-            # #     value = flatten_dict({key: value})
-            # #     for key_2, value_2 in value.items():
-            # #         if key_2 not in changes.keys():
-            # #             changes[key_2] = Change(
-            # #                 status=ChangeStatus.UNCHANGED,
-            # #                 t1=value_2,
-            # #                 t2=value_2,
-            # #                 diff_string=f"{value_2}",
-            # #                 analyse=None,
-            # #             )
-        else:
-            if key not in changes.keys():
-                changes[key] = Change(
-                    status=ChangeStatus.UNCHANGED,
-                    t1=value,
-                    t2=value,
-                    diff_string=f"{value}",
-                    analyse=None,
-                )
+    # we got the unchanged left
+    flatten_dict_1 = flatten_dict(dict1)
+    for key, value in flatten_dict_1.items():
+        if key not in changes:
+            changes[key] = Change(
+                status=ChangeStatus.UNCHANGED,
+                t1=value,
+                t2=value,
+                diff_string=f"{value}",
+                analyse=None,
+            )
 
     return changes
