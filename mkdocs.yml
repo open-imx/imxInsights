@@ -93,6 +93,7 @@ nav:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md
 #        - Way of working: context/way_of_working.md
+        - Product Vision: context/vision.md
     - Reference:
         - Imx:
           - SingleFileImx: reference/single_file_imx.md
@@ -109,9 +110,9 @@ nav:
             - RepoBuilders: reference/repo/repo_builders.md
             - BuildExceptions: reference/repo/repo_exceptions.md
             - ImxMultiRepo: reference/repo/imx_multi_repo.md
-        - ImxCompair:
-            - CompairRepo: reference/compair/imx_compair_multirepo.md
-            - CustomOperators: reference/compair/imx_compair_operator.md
+        - ImxCompare:
+            - CompareRepo: reference/compare/imx_compare_multirepo.md
+            - CustomOperators: reference/compare/imx_compare_operator.md
 
         - Exceptions:
            - Custom Exceptions: reference/exceptions/exceptions.md

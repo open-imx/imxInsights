@@ -14,10 +14,12 @@ It will make it a lot easier for us maintainers and smooth out the experience fo
 We use [Hatch](https://hatch.pypa.io/latest/install/) to manage the development environment and production build. Ensure it's installed on your system.
 
 ```bash
-hatch build env
+hatch env create
 ```
 
 #### Local environments
+Make sure the IDE is using the created environment.
+
 [Hatch configuration](https://hatch.pypa.io/1.0/config/hatch/):
 >
 > Configuration for Hatch itself is stored in a `config.toml` file located by default in one of the following platform-specific directories.

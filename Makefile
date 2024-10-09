@@ -34,7 +34,6 @@ lint:
 typecheck:
 	mypy imxInsights/ tests/
 
-# todo: make sure in production covar is at least 90%
 test:
 	pytest --cov=imxInsights/ --cov-report=term-missing --cov-fail-under=80
 
@@ -58,12 +57,8 @@ docs-serve:
 
 docs-publish:
 	mkdocs build
-# 	mkdocs gh-deploy
 
 
 check-all: test lint typecheck # docs-publish
 
 check: lint typecheck
-
-build-cli-app:
-	python -m PyInstaller cli/imx_to_excel.py --onefile --add-data "imxInsights/custom_puic_config.yaml:imxInsights/."
