@@ -75,5 +75,41 @@ This initiative aims to provide a collaborative environment for developers, data
 
 ### 🗪 Discord Community Channel 🤝
 
-
 💥 We invite you to join the [👉 open-imx community on Discord](https://discord.gg/wBses7bPFg). 
+
+
+## Dependencies
+[dateparser](https://pypi.org/project/dateparser/),
+[types-dateparser](https://pypi.org/project/types-dateparser/),
+[deepdiff](https://pypi.org/project/deepdiff/),
+[jinja2](https://pypi.org/project/Jinja2/),
+[lxml](https://pypi.org/project/lxml/),
+[types-lxml](https://pypi.org/project/types-lxml/),
+[loguru](https://pypi.org/project/loguru/),
+[networkx](https://pypi.org/project/networkx/),
+[types-networkx](https://pypi.org/project/types-networkx/),
+[pandas](https://pypi.org/project/pandas/),
+[pandas-stubs](https://pypi.org/project/pandas-stubs/),
+[pyproj](https://pypi.org/project/pyproj/),
+[shapely](https://pypi.org/project/shapely/),
+[types-shapely](https://pypi.org/project/types-shapely/),
+[tqdm](https://pypi.org/project/tqdm/),
+[tqdm-stubs](https://pypi.org/project/tqdm-stubs/),
+[xlsxwriter](https://pypi.org/project/XlsxWriter/),
+[orjson](https://pypi.org/project/orjson/)
+
+
+### Development dependencies
+[bumpversion](https://pypi.org/project/bumpversion/),
+[hatch](https://pypi.org/project/hatch/),
+[mkdocs](https://pypi.org/project/mkdocs/),
+[mkdocs-material](https://pypi.org/project/mkdocs-material/),
+[mkdocstrings](https://pypi.org/project/mkdocstrings/),
+[pre-commit](https://pypi.org/project/pre-commit/),
+[pytest](https://pypi.org/project/pytest/),
+[pytest-asyncio](https://pypi.org/project/pytest-asyncio/),
+[pytest-cov](https://pypi.org/project/pytest-cov/),
+[ruff](https://pypi.org/project/ruff/),
+[filelock](https://pypi.org/project/filelock/),
+[distlib](https://pypi.org/project/distlib/),
+[mypy](https://pypi.org/project/mypy/)

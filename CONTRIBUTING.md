@@ -63,10 +63,6 @@ hatch run docs-serve
 
 We use pre-commit to automatically run linters and formatters before each commit to maintain consistent code quality. 
 
-## Styleguides
-
-Todo
-
 ### Commit Messages
 
 * Use the present tense ("Add feature" not "Added feature")
@@ -76,7 +72,9 @@ Todo
 * Consider starting the commit message with an applicable emoji: [https://gitmoji.dev/](https://gitmoji.dev/)
 
 ## Publish a new version
-TODO
+**When you push the tag on GitHub, the workflow will automatically publish it on PyPi and a GitHub release will be created as draft.**
+
+We should bump the version manually. Additionally, we need to implement an automatic build number increment for every merge into the master branch. 
 
 ### Bump version
 You can bump the version, create a commit and associated tag with one command:
@@ -93,22 +91,9 @@ hatch version minor
 hatch version major
 ```
 
-Your default Git text editor will open so you can add information about the release.
-
-**When you push the tag on GitHub, the workflow will automatically publish it on PyPi and a GitHub release will be created as draft.**
-
-It'll automatically watch for changes in your code.
-
-### TODO: description steps for release
-
-
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
 [Code of Conduct](https://xxxxxx).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to <>.
-
-## init project started with
-frankie coociecutter hipster stuff
-https://github.com/frankie567/cookiecutter-hipster-pypackage

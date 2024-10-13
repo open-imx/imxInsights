@@ -105,6 +105,7 @@ dependencies = [
     "types-dateparser",
     "deepdiff",
     "jinja2", # for pandas styler 😊
+    "orjson",
 ]
 
 [project.urls]

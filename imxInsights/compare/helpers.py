@@ -1,7 +1,7 @@
 import re
 from typing import Any
 
-from imxInsights.utils.shapley_helpers import GmlShapleyFactory
+from imxInsights.utils.shapely_gml import GmlShapleyFactory
 
 
 def transform_dict(d: dict[str, Any]) -> dict[str, Any]:

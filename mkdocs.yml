@@ -14,6 +14,8 @@ theme:
       - navigation.expand
       # - toc.integrate
       - search.suggest
+      - content.code.copy
+
     name: material
     icon:
         logo: material/library
@@ -45,14 +47,14 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
-extra_javascript:
-  - javascripts/extra.js
 
 markdown_extensions:
     - toc:
         permalink: true
     - pymdownx.highlight:
         anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
     - pymdownx.tasklist:
         custom_checkbox: true
     - pymdownx.inlinehilite
@@ -72,6 +74,7 @@ plugins:
                     - https://docs.python.org/3.12/objects.inv
                     - https://shapely.readthedocs.io/en/latest/objects.inv
                     - https://lxml.de/apidoc/objects.inv
+
                 options:
                     docstring_style: google
                     members_order: source
@@ -80,6 +83,7 @@ plugins:
                     show_symbol_type_heading: true
                     show_symbol_type_toc: true
                     show_root_toc_entry: false
+
 #                    show_root_heading: false
 #                    show_root_members_full_path: false
 
@@ -95,7 +99,7 @@ nav:
     - Getting started:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md
-        - Jupyter Notebooks : examples/notebooks.md
+#        - Jupyter Notebooks : examples/notebooks.md
 #        - Way of working:
 #          - Load and Parse: context/1.md
 #          - Domain: context/2.md
@@ -111,20 +115,23 @@ nav:
 #              - RailConnection: reference/todo.md
 #              - Groupings: reference/todo.md
           - ImxFile: reference/imx_file.md
-        - ImxRepo:
+        - Repo:
             - ImxRepo: reference/repo/imx_repo.md
             - RepoConfig: reference/repo/config.md
             - RepoBuilders: reference/repo/repo_builders.md
             - BuildExceptions: reference/repo/repo_exceptions.md
             - ImxMultiRepo: reference/repo/imx_multi_repo.md
-        - ImxCompare:
+        - Compare:
             - CompareRepo: reference/compare/imx_compare_multirepo.md
             - CustomOperators: reference/compare/imx_compare_operator.md
-
         - Exceptions:
            - Custom Exceptions: reference/exceptions/exceptions.md
            - Exception Handler: reference/exceptions/exceptions_handler.md
            - ImxExceptions: reference/exceptions/exceptions_imx.md
+        - Utils:
+            - ShapelyGml: reference/utils/shapley_gml.md
+            - ShapelyGeojson: reference/utils/shapley_geojson.md
+            - ShapelyTransform: reference/utils/shapley_transform.md
     - Contributing: contribution.md
     - Code of conduct: code_of_conduct.md
     - License: license.md

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from lxml.etree import _Element as Element
 from shapely.geometry import Polygon
 
-from imxInsights.utils.shapley_helpers import GmlShapleyFactory
+from imxInsights.utils.shapely_gml import GmlShapleyFactory
 
 
 @dataclass
