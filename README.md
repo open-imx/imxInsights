@@ -41,29 +41,39 @@ rewriting due to fundamental shifts in how imx files are utilized.
 
     ***-   We recommend using the stable and feature richer 0.1.0 release on for imx versions "1.2.4" and "5.0.0".***
 
-### Backlog and Roadmap
-<a href="https://github.com/orgs/open-imx/projects/5/" target="_blank">https://github.com/orgs/open-imx/projects/5/</a>
-
-## Features
-- [X] Imx 1.2.4 5.0.0 and 12.0.0 file import
-- [X] Imx single file 
-- [X] Imx zip container
-- [X] ImxExtension objects
-- [X] GML shapley geometry
-- [X] RailConnection shapley geometry
-- [X] Known parent and children
-- [X] Imx data as Pandas dataframe
-- [X] Imx Compair imx version ignore
-- [X] Compair object type between 2 versions
-- [X] Compair as pandas dataframe
-- [X] Excel compair output
-- [X] Excel diff color dataframe and excel
-
 ## Supported Python Versions
 
 !!! warning  
     ***Python Typehints are awesome therefor 3.9 and below will NOT be supported***.
 
-## Contributing
-Contributions welcome! For more information on the design of the library, see [contribution guidelines for this project](CONTRIBUTING.md).
+## Backlog and Roadmap
+<a href="https://github.com/orgs/open-imx/projects/5/" target="_blank">https://github.com/orgs/open-imx/projects/5/</a>
 
+### Contributing
+
+We welcome contributions from everyone! 
+If you're interested in contributing to the project, please refer to our [contribution guidelines](CONTRIBUTING.md) for more information on the library's design. 
+For any questions or discussions, feel free to ask in our [Discord channel](https://discord.gg/wBses7bPFg).
+
+## Features
+- [X] Imx 1.2.4 5.0.0 and 12.0.0 (container) file import
+- [X] ImxExtension objects
+- [X] GML shapley geometry
+- [X] RailConnection shapley geometry
+- [X] Known parent and children
+- [X] Imx data as Pandas dataframe
+- [X] Imx Compair imx (situations)
+- [X] Compair between different IMX versions
+- [X] Compair as pandas dataframe
+- [X] Excel compair output
+- [X] Excel diff color dataframe and excel
+
+
+## Open-IMX Initiative
+**imxInsights** is part of the **Open-IMX initiative**, which is dedicated to enhancing the accessibility and usability of IMX data. 
+This initiative aims to provide a collaborative environment for developers, data analysts, and railway professionals to effectively work with IMX data.
+
+### 🗪 Discord Community Channel 🤝
+
+
+💥 We invite you to join the [👉 open-imx community on Discord](https://discord.gg/wBses7bPFg). 

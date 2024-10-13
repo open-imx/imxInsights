@@ -100,10 +100,11 @@ dependencies = [
     "pandas-stubs",
     "xlsxwriter",
     "networkx",
+    "types-networkx",
     "dateparser",
     "types-dateparser",
     "deepdiff",
-    "jinja2", # for pandas styler
+    "jinja2", # for pandas styler 😊
 ]
 
 [project.urls]

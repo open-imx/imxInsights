@@ -97,4 +97,8 @@ While we support comparisons between different IMX versions, this feature requir
     ```py
     --8<-- "docs/examples/basic_use/containerImx_compare.py"
     ```
+=== "Different IMX version"
+    ```py
+    --8<-- "docs/examples/basic_use/different_imx_version_compare.py"
+    ```
 

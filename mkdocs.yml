@@ -88,12 +88,19 @@ watch:
     - imxInsights
 
 nav:
-    - About: index.md
+    - About:
+      - Readme: index.md
+      - Product Vision: context/vision.md
+#      - Open-IMX: context/open-imx.md
     - Getting started:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md
-#        - Way of working: context/way_of_working.md
-        - Product Vision: context/vision.md
+        - Jupyter Notebooks : examples/notebooks.md
+#        - Way of working:
+#          - Load and Parse: context/1.md
+#          - Domain: context/2.md
+#          - Compare: context/2.md
+#          - Graph: context/3.md
     - Reference:
         - Imx:
           - SingleFileImx: reference/single_file_imx.md

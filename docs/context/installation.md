@@ -36,19 +36,36 @@ For more code samples and snippets in the example section / folder and use the a
 
 
 ## Dependencies
+[dateparser](https://pypi.org/project/dateparser/),
+[types-dateparser](https://pypi.org/project/types-dateparser/),
+[deepdiff](https://pypi.org/project/deepdiff/),
+[jinja2](https://pypi.org/project/Jinja2/),
+[lxml](https://pypi.org/project/lxml/),
+[types-lxml](https://pypi.org/project/types-lxml/),
+[loguru](https://pypi.org/project/loguru/),
+[networkx](https://pypi.org/project/networkx/),
+[types-networkx](https://pypi.org/project/types-networkx/),
+[pandas](https://pypi.org/project/pandas/),
+[pandas-stubs](https://pypi.org/project/pandas-stubs/),
+[pyproj](https://pypi.org/project/pyproj/),
+[shapely](https://pypi.org/project/shapely/),
+[types-shapely](https://pypi.org/project/types-shapely/),
+[tqdm](https://pypi.org/project/tqdm/),
+[tqdm-stubs](https://pypi.org/project/tqdm-stubs/),
+[xlsxwriter](https://pypi.org/project/XlsxWriter/)
 
-[lxml](https://lxml.de/)
-, [shapely](https://pypi.org/project/shapely/)
-, [pyproj](https://pypi.org/project/pyproj/)
-, [loguru](https://pypi.org/project/loguru/)
-, [pandas](https://pandas.pydata.org/)
-, [xlsxwriter](https://pypi.org/project/XlsxWriter/)
 
 ### Development dependencies
-[hatch](https://github.com/pypa/hatch)
-, [ruff](https://github.com/astral-sh/ruff)
-, [mypy](https://mypy.readthedocs.io/en/stable/)
-, [bumpversion](https://github.com/peritus/bumpversion)
-, [mkdocs](https://www.mkdocs.org/)
-, [mkdocstrings](https://github.com/mkdocstrings/mkdocstrings)
-, [mkdocs-material](https://squidfunk.github.io/mkdocs-material/)
+[bumpversion](https://pypi.org/project/bumpversion/),
+[hatch](https://pypi.org/project/hatch/),
+[mkdocs](https://pypi.org/project/mkdocs/),
+[mkdocs-material](https://pypi.org/project/mkdocs-material/),
+[mkdocstrings](https://pypi.org/project/mkdocstrings/),
+[pre-commit](https://pypi.org/project/pre-commit/),
+[pytest](https://pypi.org/project/pytest/),
+[pytest-asyncio](https://pypi.org/project/pytest-asyncio/),
+[pytest-cov](https://pypi.org/project/pytest-cov/),
+[ruff](https://pypi.org/project/ruff/),
+[filelock](https://pypi.org/project/filelock/),
+[distlib](https://pypi.org/project/distlib/),
+[mypy](https://pypi.org/project/mypy/)

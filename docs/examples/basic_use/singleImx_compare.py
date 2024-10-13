@@ -8,9 +8,9 @@ multi_repo = ImxMultiRepo(
     [
         imx.initial_situation,
         imx.new_situation,
-    ],
-    version_safe=False,
+    ]
 )
+
 # compare
 compared_imx = multi_repo.compare()
 

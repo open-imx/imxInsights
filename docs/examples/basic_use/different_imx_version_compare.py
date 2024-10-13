@@ -1,7 +1,7 @@
-from imxInsights import ImxContainer, ImxMultiRepo
+from imxInsights import ImxSingleFile, ImxContainer, ImxMultiRepo
 
 
-imx_a = ImxContainer(r"path to xml zip container or folder")
+imx_a = ImxSingleFile(r"path to xml file")
 imx_b = ImxContainer(r"path to xml zip container or folder")
 
 # create multi repo
@@ -9,7 +9,8 @@ multi_repo = ImxMultiRepo(
     [
         imx_a,
         imx_b,
-    ]
+    ],
+    version_safe=False,
 )
 
 # compare
