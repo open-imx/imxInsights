@@ -74,7 +74,6 @@ plugins:
                     - https://docs.python.org/3.12/objects.inv
                     - https://shapely.readthedocs.io/en/latest/objects.inv
                     - https://lxml.de/apidoc/objects.inv
-
                 options:
                     docstring_style: google
                     members_order: source
@@ -99,21 +98,12 @@ nav:
     - Getting started:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md
-#        - Jupyter Notebooks : examples/notebooks.md
-#        - Way of working:
-#          - Load and Parse: context/1.md
-#          - Domain: context/2.md
-#          - Compare: context/2.md
-#          - Graph: context/3.md
     - Reference:
         - Imx:
           - SingleFileImx: reference/single_file_imx.md
           - ContainerizedImx: reference/containerized_imx.md
           - Domain objects:
               - ImxObject: reference/imx_object.md
-#              - TrackAsset: reference/todo.md
-#              - RailConnection: reference/todo.md
-#              - Groupings: reference/todo.md
           - ImxFile: reference/imx_file.md
         - Repo:
             - ImxRepo: reference/repo/imx_repo.md

@@ -27,4 +27,3 @@ def test_rs_wgs_linestring():
     wgs_linestring = ShapelyTransform.rd_to_wgs(rd_linestring)
     rd_linestring_back = ShapelyTransform.wgs_to_rd(wgs_linestring)
     assert rd_linestring.equals_exact(rd_linestring_back, 3), "Round trip should result the same"
-

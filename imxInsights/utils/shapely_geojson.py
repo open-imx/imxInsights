@@ -1,60 +1,97 @@
-from __future__ import annotations
-
 from enum import Enum
 from pathlib import Path
-from typing import IO, cast
 
-import orjson
-from shapely import (  # MultiLineString,; MultiPoint,; MultiPolygon,
+from geojson import Feature as GeoJsonFeature
+from geojson import FeatureCollection as GeoJsonFeatureCollection
+from geojson import GeometryCollection as GeoJsonGeometryCollection
+from geojson import LineString as GeoJsonLineString
+from geojson import MultiLineString as GeoJsonMultiLineString
+from geojson import MultiPoint as GeoJsonMultiPoint
+from geojson import MultiPolygon as GeoJsonMultiPolygon
+from geojson import Point as GeoJsonPoint
+from geojson import Polygon as GeoJsonPolygon
+from geojson import dump as geojson_dump
+from geojson import dumps as geojson_dumps
+from shapely.geometry import (
+    GeometryCollection,
     LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
     Point,
     Polygon,
 )
-from shapely.geometry import mapping
 
 
-class GeoJsonFeature:
+class ShapelyGeoJsonFeature:
     """
-    A geojson feature build from one or more shapely geometries and a set of properties as a dictionary.
-
-    !!! danger "Warning!"
-
-        It's possible to use multi geometry types, but most applications wont support geojson multigeometry types, same as nested property dictionaries.
+    A class to represent a GeoJSON feature with Shapely geometries.
 
     Args:
-        geometry_list: List of Shapley Geometries.
-        properties: Optional dictionary of properties
-
+        geometry_list (list[Point | LineString | Polygon]):
+            A list of Shapely geometry objects (Point, LineString, or Polygon).
+        properties (dict | None, optional):
+            A dictionary of properties associated with the feature. Default is None.
     """
 
     def __init__(
         self,
-        geometry_list: list[Point | LineString | Polygon],
+        geometry_list: list[
+            Point
+            | LineString
+            | Polygon
+            | MultiLineString
+            | MultiPoint
+            | MultiPolygon
+            | GeometryCollection
+        ],
         properties: dict | None = None,
     ) -> None:
-        self.geometry_list = geometry_list
+        self._geometry_list = []
+        if geometry_list:
+            for geom in geometry_list:
+                if isinstance(geom, Point | LineString | Polygon):
+                    self._geometry_list.append(geom)
+                else:
+                    raise ValueError("geometry is not a shapley geometry")  # NOQA TRY004 TRY003
+
         self.properties = properties or {}
 
     @property
     def geometry_list(self) -> list[Point | LineString | Polygon]:
-        """List of Shapely geometries that make up the feature."""
-        return self._geometry_list
+        """
+        Get the list of geometries.
 
-    @geometry_list.setter
-    def geometry_list(self, geometries: list[Point | LineString | Polygon]) -> None:
-        if not all(
-            isinstance(geom, Point | LineString | Polygon) for geom in geometries
-        ):
-            raise ValueError("All geometries must be instances of Shapely geometries.")  # NOQA TRY003
-        self._geometry_list = geometries
+        Returns:
+            list[Point | LineString | Polygon]:
+                The list of Shapely geometries.
+        """
+        return self._geometry_list
 
     @property
     def properties(self) -> dict:
-        """Dictionary of properties associated with the feature."""
+        """
+        Get the properties of the feature.
+
+        Returns:
+            dict:
+                The properties associated with the feature.
+        """
         return self._properties
 
     @properties.setter
     def properties(self, props: dict | None) -> None:
+        """
+        Set the properties of the feature.
+
+        Args:
+            props (dict | None):
+                A dictionary of properties to set. If None, the properties will be cleared.
+
+        Raises:
+            ValueError:
+                If props is not a dictionary.
+        """
         if props is None:
             self._properties = {}
         elif not isinstance(props, dict):
@@ -62,171 +99,111 @@ class GeoJsonFeature:
         else:
             self._properties = props
 
-    @property
-    def __geo_interface__(self) -> dict:
-        geometries = self._get_geo_interface()
-        if len(self.geometry_list) > 1:
-            geometry = {"type": "GeometryCollection", "geometries": geometries}
+    @staticmethod
+    def _get_point_coordinates(point_item: Point):
+        return list(point_item.coords)
+
+    @staticmethod
+    def _get_line_coordinates(line_item: LineString):
+        return list(line_item.coords)
+
+    @staticmethod
+    def _get_polygon_coordinates(polygon_item: Polygon):
+        polygon_entries = [tuple(polygon_item.exterior.coords)]
+        for i, hole in enumerate(polygon_item.interiors):
+            polygon_entries.append(tuple(hole.coords))
+        return polygon_entries
+
+    def as_feature(self):
+        """
+        Convert the ShapelyGeoJsonFeature to a GeoJSON feature.
+
+        Returns:
+            GeoJsonFeature:
+                The corresponding GeoJSON feature representation.
+        """
+        if not self.geometry_list:
+            return GeoJsonFeature(geometry=None, properties=self.properties)
+
+        # point feature
+        elif len(self.geometry_list) == 1 and isinstance(self.geometry_list[0], Point):
+            return GeoJsonFeature(
+                geometry=GeoJsonPoint(
+                    *self._get_point_coordinates(self.geometry_list[0])
+                ),
+                properties=self.properties,
+            )
+        elif all(isinstance(geom, Point) for geom in self.geometry_list):
+            return GeoJsonFeature(
+                geometry=GeoJsonMultiPoint(
+                    *[self._get_point_coordinates(_) for _ in self.geometry_list]
+                ),
+                properties=self.properties,
+            )
+
+        # line feature
+        elif len(self.geometry_list) == 1 and isinstance(
+            self.geometry_list[0], LineString
+        ):
+            return GeoJsonFeature(
+                geometry=GeoJsonLineString(
+                    *[
+                        self._get_line_coordinates(geom)
+                        for geom in self.geometry_list
+                        if isinstance(geom, LineString)
+                    ]
+                ),
+                properties=self.properties,
+            )
+        elif all(isinstance(geom, LineString) for geom in self.geometry_list):
+            return GeoJsonFeature(
+                geometry=GeoJsonMultiLineString(
+                    [tuple(geom.coords) for geom in self.geometry_list]
+                ),
+                properties=self.properties,
+            )
+
+        # polygon feature
+        elif len(self.geometry_list) == 1 and isinstance(
+            self.geometry_list[0], Polygon
+        ):
+            return GeoJsonFeature(
+                geometry=GeoJsonPolygon(
+                    *[
+                        self._get_polygon_coordinates(geom)
+                        for geom in self.geometry_list
+                        if isinstance(geom, Polygon)
+                    ]
+                ),
+                properties=self.properties,
+            )
+        elif all(isinstance(geom, Polygon) for geom in self.geometry_list):
+            return GeoJsonFeature(
+                geometry=GeoJsonMultiPolygon(
+                    [*[self._get_polygon_coordinates(_) for _ in self.geometry_list]]
+                ),
+                properties=self.properties,
+            )
+
+        # geometry collection feature
         else:
-            geometry = {"geometry": geometries}
-
-        return {
-            "type": "Feature",
-            "properties": self.properties,
-        } | geometry
-
-    def _get_geo_interface(
-        self,
-    ) -> None | list[dict]:
-        geometries: list[dict] = []
-
-        if len(self.geometry_list) == 0:
-            return None
-
-        elif len(self.geometry_list) > 1:
+            geometries = []
             for item in self.geometry_list:
-                geometries.append(item.__geo_interface__)
+                if isinstance(item, Point):
+                    geometries.append(GeoJsonPoint(*self._get_point_coordinates(item)))
+                elif isinstance(item, LineString):
+                    geometries.append(
+                        GeoJsonLineString(self._get_line_coordinates(item))
+                    )
+                elif isinstance(item, Polygon):
+                    geometries.append(
+                        GeoJsonPolygon(self._get_polygon_coordinates(item))
+                    )
 
-        else:
-            if self.geometry_list[0].is_empty:
-                return None
-            else:
-                geometries.append(
-                    self.geometry_list[0].__geo_interface__
-                )  # Append to the list.
-
-        return geometries if geometries else None  # Return None if the list is empty.
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, GeoJsonFeature):
-            return NotImplemented
-        return self.__geo_interface__ == other.__geo_interface__
-
-    def __repr__(self) -> str:
-        return f"<GeoJsonFeature {self.__geo_interface__}>"
-
-    def as_dict(self) -> dict:
-        """Return the GeoJSON representation as a dictionary.
-
-        Returns:
-            dict: The GeoJSON dictionary representation of the feature.
-        """
-        return self.__geo_interface__
-
-
-class GeoJsonFeatureCollection:
-    """
-    GeoJson FeatureCollection stores geojson Features.
-
-    Args:
-        geojson_features: List of GeoJsonFeatures or BaseGeometry objects.
-        crs: Optional CRS that will be included in the geojson.
-    """
-
-    def __init__(
-        self,
-        geojson_features: list[GeoJsonFeature | Point | LineString | Polygon],
-        crs: CrsEnum | None = None,
-    ) -> None:
-        self.features: list[GeoJsonFeature] = []
-        self.features = [self._to_geojson_feature(item) for item in geojson_features]
-        self.crs = crs
-
-    @property
-    def features(self) -> list[GeoJsonFeature]:
-        """List of GeoJsonFeatures in the collection."""
-        return self._features
-
-    @features.setter
-    def features(
-        self, items: list[GeoJsonFeature | Point | LineString | Polygon]
-    ) -> None:
-        """
-        Set the features in the collection.
-
-        Args:
-            items (list[GeoJsonFeature | BaseGeometry]): List of GeoJsonFeatures or geometries.
-        """
-        self._features = [
-            item
-            if isinstance(item, GeoJsonFeature)
-            else GeoJsonFeature([cast(Point | LineString | Polygon, item)])
-            for item in items
-        ]
-
-    @staticmethod
-    def _to_geojson_feature(
-        item: GeoJsonFeature | Point | LineString | Polygon,
-    ) -> GeoJsonFeature:
-        if isinstance(item, GeoJsonFeature):
-            return item
-        return GeoJsonFeature([cast(Point | LineString | Polygon, item)])
-
-    def _get_crs_dict(self) -> dict:
-        return {
-            "crs": {
-                "type": "name",
-                "properties": {"name": f"urn:ogc:def:crs:EPSG::{self.crs}"},
-            }
-        }
-
-    @property
-    def __geo_interface__(self) -> dict:
-        crs_dict = self._get_crs_dict() if self.crs is not None else {}
-        return crs_dict | {
-            "type": "FeatureCollection",
-            "features": [feature.__geo_interface__ for feature in self.features],
-        }
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, GeoJsonFeatureCollection):
-            return NotImplemented
-        return self.__geo_interface__ == other.__geo_interface__
-
-    def __len__(self) -> int:
-        return len(self.features)
-
-    def __repr__(self) -> str:
-        return f"<GeoJsonFeatureCollection {self.features}>"
-
-    def as_dict(self) -> dict:
-        """Return the FeatureCollection as a dictionary.
-
-        Returns:
-            The GeoJSON FeatureCollection representation.
-        """
-        return self.__geo_interface__
-
-    @staticmethod
-    def _dump(
-        feature_collection: GeoJsonFeatureCollection,
-        file_path: IO[str],
-        *args,
-        **kwargs,
-    ) -> None:
-        """
-        Dump a FeatureCollection to a file as GeoJSON.
-
-        Args:
-            feature_collection: The feature collection to dump.
-            file_path: The output file path.
-
-        """
-
-    def as_string(self) -> str:
-        """Convert the instance to a GeoJSON string representation.
-
-        Returns:
-            A GeoJSON-formatted string representing the instance.
-        """
-        return orjson.dumps(
-            mapping(self), default=default, option=orjson.OPT_INDENT_2
-        ).decode("utf-8")
-
-    def to_file(self, file_path: str | Path) -> None:
-        """Writes the collection to a GeoJSON file."""
-        with open(file_path, mode="w") as file:
-            file.write(self.as_string())
+            return GeoJsonFeature(
+                geometry=GeoJsonGeometryCollection(geometries),
+                properties=self.properties,
+            )
 
 
 class CrsEnum(Enum):
@@ -242,27 +219,43 @@ class CrsEnum(Enum):
     """Amersfoort / RD New (Rijksdriehoeksstelsel) + NAP (Normaal Amsterdams Peil) - EPSG:7415."""
 
 
-def default(obj):
-    """Return the WKT representation of Shapely geometries or call the superclass method.
+class ShapelyGeoJsonFeatureCollection:
+    """
+    Shapley GeoJson FeatureCollection stores geojson Features.
 
     Args:
-        obj: The object to encode.
-
-    Returns:
-        WKT representation of the geometry if it's a Shapely object, otherwise invokes the default encoder.
+        features: List of GeoJsonFeatures or BaseGeometry objects.
+        crs: Optional CRS that will be included in the geojson.
     """
-    if isinstance(obj, Point | LineString | Polygon):
-        if hasattr(obj, "wkt"):
-            return obj.wkt
+
+    def __init__(
+        self,
+        features: list[ShapelyGeoJsonFeature],
+        crs: CrsEnum | None = None,
+    ) -> None:
+        self.features: list[ShapelyGeoJsonFeature] = features
+        self.crs = crs
+
+    def _as_feature_collection(self):
+        if self.crs:
+            return FeatureCollection(
+                [_.as_feature() for _ in self.features], crs=self.crs
+            )
+        return FeatureCollection([_.as_feature() for _ in self.features])
+
+    def geojson_str(self):
+        return geojson_dumps(self._as_feature_collection(), sort_keys=False)
+
+    def to_geojson_file(self, file_path: str | Path):
+        with open(file_path, mode="w") as file:
+            geojson_dump(self._as_feature_collection(), file, indent=4)
 
 
-feature_point = GeoJsonFeature([Point(1, 1)], {"name": "Point Feature"})
-feature_line = GeoJsonFeature(
-    [LineString([(0, 0), (1, 1), (2, 2)])], {"name": "LineString Feature"}
-)
-collection = GeoJsonFeatureCollection(
-    [feature_point, feature_line], crs=CrsEnum.RD_NEW_NAP
-)
-geojson_str = collection.as_string()
-
-print()
+class FeatureCollection(GeoJsonFeatureCollection):
+    def __init__(self, features, **extra):
+        super().__init__(features, **extra)
+        if "crs" in extra:
+            self["crs"] = {
+                "type": "name",
+                "properties": {"name": f"urn:ogc:def:crs:EPSG::{extra['crs']}"},
+            }

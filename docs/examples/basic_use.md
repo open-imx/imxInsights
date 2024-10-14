@@ -81,6 +81,18 @@ When working with `ImxSingleFile`, remember to interact with specific instances 
     --8<-- "docs/examples/basic_use/containerImx_main.py:16:"
     ```
 
+## GeoJson
+GeoJSON is a open format for representing geographical data. Below are code snippets demonstrating how to work with GeoJSON in both contexts.
+
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/basic_use/singleImx_geojson.py:4:"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/basic_use/containerImx_geojson.py:4:"
+    ```
+
 ## Comparing IMX Containers and Situations
 
 Using the `ImxSingleFile` and `ImxMultiRepo` classes, you can seamlessly compare IMX containers or specific scenarios across different versions of the IMX format. Objects sharing the same PUIC are recognized as identical, which simplifies comparisons across various contexts and versions.

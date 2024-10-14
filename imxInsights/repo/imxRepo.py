@@ -6,10 +6,17 @@ from collections.abc import Iterable
 from pathlib import Path
 
 import pandas as pd
+from loguru import logger
 
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.tree.imxObjectTree import ObjectTree
+from imxInsights.utils.shapely_geojson import (
+    CrsEnum,
+    ShapelyGeoJsonFeature,
+    ShapelyGeoJsonFeatureCollection,
+)
+from imxInsights.utils.shapely_transform import ShapelyTransform
 
 
 class ImxRepo:
@@ -220,3 +227,69 @@ class ImxRepo:
             out_dict[imx_path] = self.get_pandas_df(imx_path)
 
         return out_dict
+
+    def get_geojson(
+        self,
+        object_path: list[str],
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ) -> ShapelyGeoJsonFeatureCollection:
+        """
+        Generate a GeoJSON feature collection from a list of object types or paths.
+
+        Args:
+            object_path: A list of object paths used to fetch the corresponding data.
+            to_wgs: convert to WGS84
+            extension_properties: add extension properties to geojson
+
+        Returns:
+            ShapelyGeoJsonFeatureCollection: A GeoJSON feature collection containing the geographical features.
+
+        """
+        features: list[ShapelyGeoJsonFeature] = []
+        for item in self.get_by_paths(object_path):
+            location = None
+            if item.geometry is not None:
+                location = item.geometry
+            if item.geographic_location is not None and hasattr(
+                item.geographic_location, "shapely"
+            ):
+                location = item.geographic_location.shapely
+
+            if location:
+                geometry = ShapelyTransform.rd_to_wgs(location) if to_wgs else location
+                features.append(
+                    ShapelyGeoJsonFeature(
+                        [geometry],
+                        item.properties
+                        | (item.extension_properties if extension_properties else {}),
+                    )
+                )
+        return ShapelyGeoJsonFeatureCollection(
+            features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
+        )
+
+    def create_geojson_files(
+        self,
+        directory_path: str | Path,
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ):
+        """
+        Create GeoJSON files for the specified object types or paths and save them to the given directory.
+
+        Args:
+            directory_path: The directory where the GeoJSON files will be created.
+            to_wgs: convert to WGS84
+            extension_properties: add extension properties to geojson
+
+        """
+        for path in self.get_all_paths():
+            dir_path = Path(directory_path)
+            dir_path.mkdir(parents=True, exist_ok=True)
+            geojson_feature_collection = self.get_geojson(
+                [path], to_wgs=to_wgs, extension_properties=extension_properties
+            )
+            geojson_file_path = dir_path / f"{path}.geojson"
+            geojson_feature_collection.to_geojson_file(geojson_file_path)
+            logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")

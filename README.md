@@ -67,6 +67,9 @@ For any questions or discussions, feel free to ask in our [Discord channel](http
 - [X] Compair as pandas dataframe
 - [X] Excel compair output
 - [X] Excel diff color dataframe and excel
+- [ ] Imx objects as GeoJson
+- [ ] Compare as GeoJson
+- [ ] Transform from and to WGS/RD
 
 
 ## Open-IMX Initiative
