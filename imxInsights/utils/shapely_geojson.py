@@ -244,7 +244,7 @@ class ShapelyGeoJsonFeatureCollection:
         return FeatureCollection([_.as_feature() for _ in self.features])
 
     def geojson_str(self):
-        return geojson_dumps(self._as_feature_collection(), sort_keys=False)
+        return geojson_dumps(self._as_feature_collection(), sort_keys=True)
 
     def to_geojson_file(self, file_path: str | Path):
         with open(file_path, mode="w") as file:

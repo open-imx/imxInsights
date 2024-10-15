@@ -87,8 +87,8 @@ def test_feature_collection():
     tester_1 = collection._as_feature_collection()
     assert len(tester_1['features']) == 5, "Should have x features"
     tester_2 = collection.geojson_str()
-    assert '{"type": "FeatureCollection"' in tester_2, "Should contain type: FeatureCollection"
+    assert '"type": "FeatureCollection"' in tester_2, "Should contain type: FeatureCollection"
     collection.crs = CrsEnum.WGS84
     tester_3 = collection.geojson_str()
-    assert '"crs": {"type":' in tester_3, "Should contain type: FeatureCollection"
+    assert '"crs": {"properties":' in tester_3, "Should contain CRS"
     # collection.to_geojson_file("tester.geojson")
