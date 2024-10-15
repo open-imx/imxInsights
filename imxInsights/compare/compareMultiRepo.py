@@ -1,6 +1,7 @@
 import sys
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -9,6 +10,7 @@ from tqdm import tqdm
 
 from imxInsights.compare.changes import Change, ChangeStatus, get_object_changes
 from imxInsights.compare.excelReportGenerator import ExcelReportGenerator
+from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.compare.helpers import (
     merge_dict_keep_first_key,
     parse_dict_to_value_objects,
@@ -20,6 +22,12 @@ from imxInsights.utils.pandas_helpers import (
     df_sort_by_list,
     styler_highlight_changes,
 )
+from imxInsights.utils.shapely_geojson import (
+    CrsEnum,
+    ShapelyGeoJsonFeature,
+    ShapelyGeoJsonFeatureCollection,
+)
+from imxInsights.utils.shapely_transform import ShapelyTransform
 
 
 @dataclass
@@ -36,6 +44,7 @@ class ChangedImxObject:
     puic: str
     status: ChangeStatus
     changes: dict[str, Change]
+    geometry: GeometryChange | None
 
     def get_change_dict(self, add_analyse: bool) -> dict[str, str]:
         """
@@ -157,6 +166,9 @@ class ImxCompareMultiRepo:
             )
 
             # create empty dicts
+            geometry_dict: dict[str, Any] = {
+                item: None for item in self.container_order
+            }
             tag_dict: dict[str, Any] = {item: None for item in self.container_order}
             children_dict: dict[str, Any] = {
                 item: None for item in self.container_order
@@ -171,10 +183,11 @@ class ImxCompareMultiRepo:
                 parent_dict[item.container_id] = (
                     item.parent.puic if item.parent is not None else None
                 )
+                geometry_dict[item.container_id] = item.geometry
 
             merged_dict["tag"] = tag_dict
             merged_dict["parentRef"] = parent_dict
-
+            merged_dict["_geometry"] = geometry_dict
             # TODO: Ensure that if 'parent' is the same as '@puic', it's set to None. uhh why?
             merged_dict["childrenRefs"] = {
                 key: " ".join(value) if value is not None else None
@@ -208,7 +221,7 @@ class ImxCompareMultiRepo:
                 )
 
                 tags = {item for item in value["tag"].values() if item is not None}
-                tag = tags.pop() if tags else None
+                tag = tags.pop() if tags else "unknown"
 
                 if tag not in self.diff.keys():
                     self.diff[tag] = []
@@ -216,9 +229,13 @@ class ImxCompareMultiRepo:
                 dict_1 = {
                     key_2: value_2[container_id_1] for key_2, value_2 in value.items()
                 }
+                geometry_1 = dict_1["_geometry"]
+                del dict_1["_geometry"]
                 dict_2 = {
                     key_2: value_2[container_id_2] for key_2, value_2 in value.items()
                 }
+                geometry_2 = dict_2["_geometry"]
+                del dict_2["_geometry"]
 
                 dict_1_flat = remove_empty_dicts(
                     parse_dict_to_value_objects(transform_dict(dict_1))
@@ -234,9 +251,9 @@ class ImxCompareMultiRepo:
                         puic=key,
                         status=self._determine_object_overall_status(diff_dict),
                         changes=diff_dict,
+                        geometry=GeometryChange(t1=geometry_1, t2=geometry_2),
                     )
                 )
-
                 pbar.update(1)
         logger.success("Compair done")
 
@@ -254,7 +271,7 @@ class ImxCompareMultiRepo:
 
         # If an object_type is specified, get its DataFrame; otherwise, get all DataFrames
         if object_type:
-            return self._get_dataframe_for_type(
+            return self._get_dataframe_for_path(
                 dict_lower_case_merged, object_type, add_analyse, styled_df
             )
         else:
@@ -278,7 +295,7 @@ class ImxCompareMultiRepo:
 
         return result
 
-    def _get_dataframe_for_type(
+    def _get_dataframe_for_path(
         self,
         dict_lower_case_merged: dict[str, list],
         object_type: str,
@@ -335,6 +352,43 @@ class ImxCompareMultiRepo:
             self.container_order,
         )
         report_generator.create_excel(file_path)
+
+    def get_geojson(
+        self,
+        object_paths: list[str],
+        to_wgs: bool = True,
+    ):
+        features = []
+        for path in object_paths:
+            for item in self.diff[path]:
+                if item.geometry and item.geometry.t2:
+                    geometry = item.geometry.t2
+                    transformed_geometry = (
+                        ShapelyTransform.rd_to_wgs(geometry) if to_wgs else geometry
+                    )
+                    features.append(
+                        ShapelyGeoJsonFeature(
+                            geometry_list=[transformed_geometry],
+                            properties=item.get_change_dict(add_analyse=True),
+                        )
+                    )
+
+        return ShapelyGeoJsonFeatureCollection(
+            features, CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
+        )
+
+    def create_geojson_files(
+        self,
+        directory_path: str | Path,
+        to_wgs: bool = True,
+    ):
+        for key, value in self.diff.items():
+            dir_path = Path(directory_path)
+            dir_path.mkdir(parents=True, exist_ok=True)
+            geojson_feature_collection = self.get_geojson([key], to_wgs=to_wgs)
+            geojson_file_path = dir_path / f"{key}.geojson"
+            geojson_feature_collection.to_geojson_file(geojson_file_path)
+            logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
     @classmethod
     def from_multi_repo(cls, tree, container_order, containers):

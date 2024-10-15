@@ -1,6 +1,8 @@
 import pytest
 
-from imxInsights import ImxMultiRepo, ImxSingleFile, ImxContainer
+from imxInsights import ImxSingleFile, ImxContainer
+
+# TODO: add get GEOJSON and GEOJSON WRITE TO FILES
 
 
 @pytest.mark.slow
@@ -55,7 +57,7 @@ def test_imx_repo_queries_v124(imx_v124_project_instance: ImxSingleFile):
 
 
 @pytest.mark.slow
-def test_imx_parse_project_v500(imx_v500_project_instance):
+def test_imx_parse_project_v500(imx_v500_project_instance: ImxSingleFile):
     imx = imx_v500_project_instance
     assert imx.file.imx_version == "5.0.0", "imx version should be 5.0.0"
     assert (
@@ -68,7 +70,7 @@ def test_imx_parse_project_v500(imx_v500_project_instance):
 
 
 @pytest.mark.slow
-def test_imx_parse_v1200_zip(imx_v1200_zip_instance):
+def test_imx_parse_v1200_zip(imx_v1200_zip_instance: ImxContainer):
     imx = imx_v1200_zip_instance
     assert (
         imx.files.signaling_design.imx_version == "12.0.0"
@@ -78,7 +80,7 @@ def test_imx_parse_v1200_zip(imx_v1200_zip_instance):
 
 
 @pytest.mark.slow
-def test_imx_parse_v1200_dir(imx_v1200_dir_instance):
+def test_imx_parse_v1200_dir(imx_v1200_dir_instance: ImxContainer):
     imx = imx_v1200_dir_instance
     assert (
         imx.files.signaling_design.imx_version == "12.0.0"

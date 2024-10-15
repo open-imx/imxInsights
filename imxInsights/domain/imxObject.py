@@ -66,7 +66,7 @@ class ImxObject:
         self.parent: ImxObject | None = parent
         self.children: list[ImxObject | None] = []
         self.imx_extensions: list[ImxObject] = []
-        self.geometry: (
+        self._geometry: (
             LineString
             | Point
             | Polygon
@@ -116,6 +116,35 @@ class ImxObject:
     @property
     def geographic_location(self) -> ImxGeographicLocation | None:
         return ImxGeographicLocation.from_element(self._element)
+
+    @property
+    def geometry(
+        self,
+    ) -> (
+        LineString
+        | Point
+        | Polygon
+        | MultiLineString
+        | MultiPoint
+        | MultiPolygon
+        | GeometryCollection
+    ):
+        if self.geographic_location is not None:
+            return self.geographic_location.shapely
+        return self._geometry
+
+    @geometry.setter
+    def geometry(
+        self,
+        geometry: LineString
+        | Point
+        | Polygon
+        | MultiLineString
+        | MultiPoint
+        | MultiPolygon
+        | GeometryCollection,
+    ):
+        self._geometry = geometry
 
     @property
     def extension_properties(self) -> dict[str, str]:

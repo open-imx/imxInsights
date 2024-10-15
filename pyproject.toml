@@ -105,9 +105,17 @@ dependencies = [
     "types-dateparser",
     "deepdiff",
     "jinja2", # for pandas styler 😊
+    "orjson",
+    "geojson",
 ]
 
 [project.urls]
 
 Documentation = "https://open-imx.github.io/imxInsights/"
 Source = "https://github.com/open-imx/imxInsights"
+
+[[tool.mypy.overrides]]
+module = [
+    "geojson",
+]
+ignore_missing_imports = true
