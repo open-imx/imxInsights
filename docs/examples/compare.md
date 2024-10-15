@@ -6,15 +6,59 @@ We leverage Pandas to manage tabular data, facilitating the analysis and export 
 
 While we support comparisons between different IMX versions, this feature requires explicit selection. Below, we have some sample code to illustrate how to use these classes effectively:
 
+## MultiRepo
+If IMX objects share the same unique key (puic) this is used to collect multiple instances in different containers. 
+The order is crucial for comparison. Currently, we support more than two containers, but the diff is limited to A vs. B. 
+Timeline comparisons will be supported in the future.
+
+First we need to create a multy repo, then we need to get the compare.
+
 === "SingleImx"
     ```py
-    --8<-- "docs/examples/compare/singleImx_compare.py"
+    --8<-- "docs/examples/compare/singleImx_compare.py::15"
     ```
 === "ContainerImx"
     ```py
-    --8<-- "docs/examples/compare/containerImx_compare.py"
+    --8<-- "docs/examples/compare/containerImx_compare.py::17"
     ```
 === "Different IMX version"
     ```py
-    --8<-- "docs/examples/compare/different_imx_version_compare.py"
+    --8<-- "docs/examples/compare/different_imx_version_compare.py::17"
     ```
+
+## Get pandas dataframe
+Each row represents an IMX object, while the columns denote the attribute or element values. 
+We utilize the IMX path to identify an object type or generate an Excel report of all paths. 
+For added items, we prefix them with `++`, for deleted items `--` and for changes we denote changes with `->`.
+
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/compare/singleImx_compare.py:16:21"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/compare/containerImx_compare.py:18:23"
+    ```
+=== "Different IMX version"
+    ```py
+    --8<-- "docs/examples/compare/different_imx_version_compare.py:18:23"
+    ```
+
+## GeoJSON
+
+Basically the same as a DataFrame, but when GML coordinates are present, they also include geometry. 
+RailConnections are supported, and future features will include objects without GML.
+
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/compare/singleImx_compare.py:22:"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/compare/containerImx_compare.py:24:"
+    ```
+=== "Different IMX version"
+    ```py
+    --8<-- "docs/examples/compare/different_imx_version_compare.py:24"
+    ```
+

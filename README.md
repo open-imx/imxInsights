@@ -13,10 +13,10 @@
 
 **Documentation**: <a href="https://open-imx.github.io/imxInsights/" target="_blank">https://open-imx.github.io/imxInsights/</a>
 
-**Source Code**: <a href="https://github.com/ImxEra/imxInsights" target="_blank">https://github.com/open-imx/imxInsights</a>
+**Source Code**: <a href="https://github.com/open-imx/imxInsights" target="_blank">https://github.com/open-imx/imxInsights</a>
 
 ***THIS LIBRARY*** is a personal project and therefore no responsibility for the functionality, accuracy, or usage of this library. 
-***THE PUBLIC retains full ownership and responsibility for the codebase.*** 
+***THE PUBLIC retains full ownership and responsibility for the codebase.***
 
 !!! danger "Warning!"  
 
@@ -29,32 +29,6 @@
     The intended audience for `imxInsights` consists of end users with basic Python knowledge. Therefore, the module offers a minimalistic API that is thoroughly documented. 
     We leverage the remarkable `makedocs` plugins to effortlessly generate a polished website from documentations and markdown files.
 
-
-## This repository host the imx 12.0 implementation     
-
-Transitioning from version 1.2.4 / 5.0.0 to 12.0.0 of this library necessitates extensive changes and significant code 
-rewriting due to fundamental shifts in how imx files are utilized. 
-
-!!! danger "New concept, breaking changes!"  
-    ***This project is currently under active development and is not yet in its final form.***
-    ***As such, there may be frequent changes, incomplete features, or potential instability.***
-
-    ***-   We recommend using the stable and feature richer 0.1.0 release on for imx versions "1.2.4" and "5.0.0".***
-
-## Supported Python Versions
-
-!!! warning  
-    ***Python Typehints are awesome therefor 3.9 and below will NOT be supported***.
-
-## Backlog and Roadmap
-<a href="https://github.com/orgs/open-imx/projects/5/" target="_blank">https://github.com/orgs/open-imx/projects/5/</a>
-
-### Contributing
-
-We welcome contributions from everyone! 
-If you're interested in contributing to the project, please refer to our [contribution guidelines](CONTRIBUTING.md) for more information on the library's design. 
-For any questions or discussions, feel free to ask in our [Discord channel](https://discord.gg/wBses7bPFg).
-
 ## Features
 - [X] Imx 1.2.4 5.0.0 and 12.0.0 (container) file import
 - [X] ImxExtension objects
@@ -63,10 +37,10 @@ For any questions or discussions, feel free to ask in our [Discord channel](http
 - [X] Known parent and children
 - [X] Imx data as Pandas dataframe
 - [X] Imx Compair imx (situations)
-- [X] Compair between different IMX versions
-- [X] Compair as pandas dataframe
-- [X] Excel compair output
-- [X] Excel diff color dataframe and excel
+- [X] Compare between different IMX versions
+- [X] Compare as pandas dataframe
+- [X] Excel compare output
+- [X] Excel diff, color dataframe and excel
 - [X] Imx objects as GeoJson
 - [X] Compare as GeoJson
 - [X] Transform from and to WGS/RD
@@ -80,6 +54,26 @@ This initiative aims to provide a collaborative environment for developers, data
 
 💥 We invite you to join the [👉 open-imx community on Discord](https://discord.gg/wBses7bPFg). 
 
+
+## This repository host the imx 12.0 implementation     
+
+Transitioning from version 1.2.4 / 5.0.0 to 12.0.0 of this library necessitates extensive changes and significant code 
+rewriting due to fundamental shifts in how imx files are utilized. 
+
+!!! danger "New concept, breaking changes!"  
+    ***This project is currently under active development and is not yet in its final form.***
+    ***As such, there may be frequent changes, incomplete features, or potential instability.***
+
+    ***-   We recommend using the stable and feature richer 0.1.0 release on for imx versions "1.2.4" and "5.0.0".***
+
+## Backlog and Roadmap
+<a href="https://github.com/orgs/open-imx/projects/5/" target="_blank">https://github.com/orgs/open-imx/projects/5/</a>
+
+### Contributing
+
+We welcome contributions from everyone! 
+If you're interested in contributing to the project, please refer to our [contribution guidelines](CONTRIBUTING.md) for more information on the library's design. 
+For any questions or discussions, feel free to ask in our [Discord channel](https://discord.gg/wBses7bPFg).
 
 ## Dependencies
 [dateparser](https://pypi.org/project/dateparser/),
@@ -99,7 +93,6 @@ This initiative aims to provide a collaborative environment for developers, data
 [tqdm](https://pypi.org/project/tqdm/),
 [tqdm-stubs](https://pypi.org/project/tqdm-stubs/),
 [xlsxwriter](https://pypi.org/project/XlsxWriter/),
-[orjson](https://pypi.org/project/orjson/)
 [geojson](https://pypi.org/project/geojson/)
 
 ### Development dependencies

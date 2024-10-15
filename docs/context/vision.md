@@ -17,10 +17,13 @@ In summary, we believe that Python will help us create a powerful and user-frien
 Python is known by its ease of use, clean syntax and allows efficient code writing and quick onboarding of new users and contributors and has strong community backing that provides valuable resources, documentation and extensive library support. The rich ecosystem, especially for data analysis provides powerful tools for delivering valuable insights, aligning perfectly with our focus on data-driven decision-making and enabling us to deliver valuable insights to our users.
 
 
-### Rust
-While Python excels in ease of use and flexibility, we recognize the importance of performance in certain aspects. 
-That's why we want to use Rust for performance-critical components. Rust is known for its speed and concurrency support. 
-By "Rustifying" performance-heavy operations, we can ensure that our platform remains responsive and efficient without sacrificing the user-friendly nature of Python.
+[//]: # (### Rust)
+
+[//]: # (While Python excels in ease of use and flexibility, we recognize the importance of performance in certain aspects. )
+
+[//]: # (That's why we want to use Rust for performance-critical components. Rust is known for its speed and concurrency support. )
+
+[//]: # (By "Rustifying" performance-heavy operations, we can ensure that our platform remains responsive and efficient without sacrificing the user-friendly nature of Python.)
 
 
 ## Goals and Objectives
@@ -57,10 +60,9 @@ A long-term roadmap is guided by the evolving needs of the industry. Community i
 - **Establishing a Clear Roadmap:** Our roadmap addresses the evolving demands of railway professionals while promoting innovation and progress.
 
 
-The Technical Steering Committee meetings take place on a monthly basis. 
-They are usually on the second Wednesday of the month in the evening Europe-time.
+The Technical Steering Committee meetings take place on a monthly basis.
 These monthly meetings are open to everybody and you are welcome to join us there and say hi. 
-The meeting MS team link gets published in our Discord channel roughly 1 week before the meeting.
+The meeting MS team link gets published in our Discord channel, roughly 1 week before the meeting.
 
 
 ## Current Features
@@ -68,18 +70,6 @@ The meeting MS team link gets published in our Discord channel roughly 1 week be
 - **Data Visualization and Reporting**: **imxInsights** presents complex IMX data in formats that are easy to understand and act upon, including population overviews, geographical standards, and difference analysis. 
 
     *We use industry standard like pandas for tabluar views and geojson for spatial data, this way we make sure we have interopibility whit other appliactions in the ecosystem.*
-
-## Future Features
-
-- **Network Insights**: By introducing these network analytics capabilities, **imxInsights** will empowering our users with analytics of routes. Primarly this feature will be used for **Geometric Generation** of objects like train detection sections for a clear visual representation.
- 
-    - The next step we will be building an API to retrieve route information. This will support queries to analyze routes and compare them against various "ways" or alternatives. *This feature can be used as a fundation for advanced analitics like Route Optimization or failer impact analyses.*
-
-- **Validation and Analitics**: Ensuring a safe rail design requires data to be complete and accurate. In the near future, the data exchange scope and data fill guidelines will be integrated into the reports. 
-
-    *Additionally, there are plans to develop a validation rule engine to enable automated data checks, ensuring consistency and reliability.*
-
-
 
 
 ## Target Audience
@@ -95,4 +85,15 @@ Overall, **imxInsights** is designed to support anyone invested in the railway e
 ## Real-World Use Cases
 - **Review Process Support**: Achieving a safe rail design requires implementing traceable changes within the dataset. A critical aspect of this process is a structured change review, involving multiple stakeholders. **imxInsights** generates standardized difference reports facilitating this review process. 
 
-   *Future updates will further enhance workflow support within **imxInsights** to streamline collaboration and oversight.*
+    *In the near future updates will further enhance workflow support within **imxInsights** to streamline collaboration and oversight.*
+
+## Future Features
+
+- **Network Insights**: By introducing these network analytics capabilities, **imxInsights** will empowering our users with analytics of routes. Primarly this feature will be used for **Geometric Generation** of objects like train detection sections for a clear visual representation.
+ 
+    - The next step we will be building an API to retrieve route information. This will support queries to analyze routes and compare them against various "ways" or alternatives. *This feature can be used as a fundation for advanced analitics like Route Optimization or failer impact analyses.*
+
+- **Validation and Analitics**: Ensuring a safe rail design requires data to be complete and accurate. In the near future, the data exchange scope and data fill guidelines will be integrated into the reports. 
+
+    *Additionally, there are plans to develop a validation rule engine to enable automated data checks, ensuring consistency and reliability.*
+

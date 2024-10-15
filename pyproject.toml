@@ -36,7 +36,7 @@ dependencies = [
     "pytest-cov",
     "pytest-asyncio",
     "mkdocs-material",
-    "mkdocstrings[python]",
+    "mkdocstrings[python]==0.25.2",
     "pre-commit",
     "filelock",
     "distlib",
@@ -105,7 +105,6 @@ dependencies = [
     "types-dateparser",
     "deepdiff",
     "jinja2", # for pandas styler 😊
-    "orjson",
     "geojson",
 ]
 

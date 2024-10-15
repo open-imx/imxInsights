@@ -358,6 +358,20 @@ class ImxCompareMultiRepo:
         object_paths: list[str],
         to_wgs: bool = True,
     ):
+        """
+        Generate a GeoJSON feature collection for the specified object paths.
+
+        This function creates a list of GeoJSON features from the objects in the
+        specified paths.
+
+        Args:
+            object_paths: A list of object paths to extract geometry from.
+            to_wgs: If True, converts the geometries to WGS84.
+
+        Returns:
+            A collection of GeoJSON features.
+        """
+
         features = []
         for path in object_paths:
             for item in self.diff[path]:
@@ -382,6 +396,18 @@ class ImxCompareMultiRepo:
         directory_path: str | Path,
         to_wgs: bool = True,
     ):
+        """
+        Create GeoJSON files for all objects in the diff dictionary.
+
+        This function generates GeoJSON files for each key in the diff dictionary and
+        saves them in the specified directory.
+
+        Args:
+            directory_path: The path to the directory where the files will be saved.
+            to_wgs: If True, converts the geometries to WGS84.
+
+        """
+
         for key, value in self.diff.items():
             dir_path = Path(directory_path)
             dir_path.mkdir(parents=True, exist_ok=True)
