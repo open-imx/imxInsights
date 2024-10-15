@@ -208,7 +208,7 @@ class ImxCompareMultiRepo:
                 )
 
                 tags = {item for item in value["tag"].values() if item is not None}
-                tag = tags.pop() if tags else None
+                tag = tags.pop() if tags else "unknown"
 
                 if tag not in self.diff.keys():
                     self.diff[tag] = []
