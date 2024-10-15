@@ -100,7 +100,7 @@ This initiative aims to provide a collaborative environment for developers, data
 [tqdm-stubs](https://pypi.org/project/tqdm-stubs/),
 [xlsxwriter](https://pypi.org/project/XlsxWriter/),
 [orjson](https://pypi.org/project/orjson/)
-
+[geojson](https://pypi.org/project/geojson/)
 
 ### Development dependencies
 [bumpversion](https://pypi.org/project/bumpversion/),
