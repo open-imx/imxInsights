@@ -94,7 +94,7 @@ nav:
     - About:
       - Readme: index.md
       - Product Vision: context/vision.md
-#      - Open-IMX: context/open-imx.md
+      - Open-IMX: context/open-imx.md
     - Getting started:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md

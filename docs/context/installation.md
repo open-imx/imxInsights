@@ -1,10 +1,10 @@
 # Distribution and installation
 
+## Version 0.1.x
+
 Until we achieve the MVP of the library, we will build a Python wheel upon each release, which you can download from GitHub. 
 In the future, we will release the new version on PyPI.
 
-
-## Version 0.1.x
 !!! info  
     ***We recommend using the stable and feature richer 0.1.0 release on for imx versions "1.2.4" and "5.0.0".***
 
@@ -14,23 +14,37 @@ The 0.1.x version of imxInsights is distributed on [PYPI](https://pypi.org) and 
 pip install imxInsights
 ```
 
+## ImxInsights v0.2.x
+This project is still in development, currently you have two options:
+
+1. **Fork the repository** and use it now.
+2. **Wait for the official release**, then download the wheel file and install it via pip:
+3. **Wait for the official pypi** and install it via pip.
+
+We aim to release it on pypi end of Q4 2024.
+
 
 ## Code samples and snippets
 Below are minimal examples to load single imx file or imx containers. 
 For more code samples and snippets in the example section / folder and use the api reference for exploration.
 
 
-### Single file IMX
+### Load Single File IMX
 
 ```py
---8<-- "docs/examples/basic_use/singleImx_main.py"
+--8<-- "docs/examples/basic_use/singleImx_main.py::12"
 ```
 
 
-### Containerized IMX
-
+### Load Containerized IMX
 
 ```py
---8<-- "docs/examples/basic_use/containerImx_main.py"
+--8<-- "docs/examples/basic_use/containerImx_main.py::11"
 ```
 
+
+### Get Insights
+
+```py
+--8<-- "docs/examples/basic_use/containerImx_main.py:11:"
+```

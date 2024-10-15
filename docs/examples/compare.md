@@ -31,34 +31,18 @@ Each row represents an IMX object, while the columns denote the attribute or ele
 We utilize the IMX path to identify an object type or generate an Excel report of all paths. 
 For added items, we prefix them with `++`, for deleted items `--` and for changes we denote changes with `->`.
 
-=== "SingleImx"
-    ```py
-    --8<-- "docs/examples/compare/singleImx_compare.py:16:21"
-    ```
-=== "ContainerImx"
-    ```py
-    --8<-- "docs/examples/compare/containerImx_compare.py:18:23"
-    ```
-=== "Different IMX version"
-    ```py
-    --8<-- "docs/examples/compare/different_imx_version_compare.py:18:23"
-    ```
+We use color highlighting to detect changes in dataframes and Excel exports. 
+This visual aid helps easily spot differences between values, making data comparison more efficient and user-friendly.
+
+```py
+--8<-- "docs/examples/compare/singleImx_compare.py:16:21"
+```
 
 ## GeoJSON
 
 Basically the same as a DataFrame, but when GML coordinates are present, they also include geometry. 
-RailConnections are supported, and future features will include objects without GML.
+RailConnections are supported, and future features will include other objects without GML.
 
-=== "SingleImx"
-    ```py
-    --8<-- "docs/examples/compare/singleImx_compare.py:22:"
-    ```
-=== "ContainerImx"
-    ```py
-    --8<-- "docs/examples/compare/containerImx_compare.py:24:"
-    ```
-=== "Different IMX version"
-    ```py
-    --8<-- "docs/examples/compare/different_imx_version_compare.py:24"
-    ```
-
+```py
+--8<-- "docs/examples/compare/singleImx_compare.py:22:"
+```

@@ -139,7 +139,14 @@ class ImxRepo:
 
     def get_build_exceptions(self) -> defaultdict[str, list[ImxException]]:
         """
-        todo: make docs
+        Retrieve build exceptions from the tree structure.
+
+        This method returns any build exceptions that occurred during the build process. The result is a dictionary
+        where the keys are strings representing different build steps  or processes, and the values are lists
+        of `ImxException` instances.
+
+        Returns:
+            A dictionary where the keys represent the build processes step, and the values are lists of `ImxException` that were raised.
         """
         return self._tree.build_extensions.exceptions
 
