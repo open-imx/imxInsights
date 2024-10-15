@@ -67,14 +67,27 @@ After loading an IMX file, you can effortlessly extract valuable information fro
 
 When working with `ImxSingleFile`, remember to interact with specific instances to retrieve information. With `ImxContainer`, you can directly access the object for your queries.
 
-```py
---8<-- "docs/examples/basic_use/singleImx_main.py:12:"
-```
+
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/basic_use/singleImx_main.py:12:"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/basic_use/containerImx_main.py:15:"
+    ```
+
+
 
 ## GeoJson
 GeoJSON is a open format for representing geographical data. Below are code snippets demonstrating how to work with GeoJSON.
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/basic_use/singleImx_geojson.py:4:"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/basic_use/containerImx_geojson.py:4:"
+    ```
 
-```py
---8<-- "docs/examples/basic_use/singleImx_geojson.py:4:"
-```
 

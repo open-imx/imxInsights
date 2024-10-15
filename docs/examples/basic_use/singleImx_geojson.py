@@ -5,8 +5,11 @@ imx = ImxSingleFile(r"path to xml file")
 # get a feature collection by giving it a path
 feature_collection = imx.initial_situation.get_geojson(["Signal"])
 
-# do not convert coordinates to WGS84 but keep them as RD + NAP and add extension object properties
-feature_collection_rd = imx.initial_situation.get_geojson(["Signal"], to_wgs=False, extension_properties=True)
+# keep coordinates as RD + NAP and add extension object properties
+feature_collection_rd = imx.initial_situation.get_geojson(
+    ["Signal"],
+    to_wgs=False, extension_properties=True
+)
 
 # get a string representation of the geojson
 geojson_str = feature_collection_rd.geojson_str()

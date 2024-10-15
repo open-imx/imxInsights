@@ -32,7 +32,7 @@ For more code samples and snippets in the example section / folder and use the a
 ### Load Single File IMX
 
 ```py
---8<-- "docs/examples/basic_use/singleImx_main.py::12"
+--8<-- "docs/examples/basic_use/singleImx_main.py::8"
 ```
 
 
