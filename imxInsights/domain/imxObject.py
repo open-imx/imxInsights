@@ -31,14 +31,11 @@ class ImxObject:
     """
     Represents an object within an IMX file.
 
-    ??? info
+    !!! info
         This class is used to encapsulate the data and functionality for an object within an IMX file.
         It contains attributes parsed from the XML element representing the object, and methods to
-        manipulate and query the object.
-
-    Todo:
-        = Find way to make immutable after building repo.
-        - Move back to repo, specific types like trackassets should be in domain.
+        manipulate and query the object. In the future we will add specific domain objects like
+        TrackAssets, RailConnections ect.
 
     Args:
         element: The XML element representing the object.

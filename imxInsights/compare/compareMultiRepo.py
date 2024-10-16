@@ -357,7 +357,7 @@ class ImxCompareMultiRepo:
         self,
         object_paths: list[str],
         to_wgs: bool = True,
-    ):
+    ) -> ShapelyGeoJsonFeatureCollection:
         """
         Generate a GeoJSON feature collection for the specified object paths.
 

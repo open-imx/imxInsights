@@ -17,8 +17,8 @@ pip install imxInsights
 ## ImxInsights v0.2.x
 This project is still in development, currently you have two options:
 
-1. **Fork the repository** and use it now.
-2. **Wait for the official release**, then download the wheel file and install it via pip:
+1. **Download the repository from github** build a wheel and use it now.
+2. **Wait for the official release**, then download the wheel file and install it via pip.
 3. **Wait for the official pypi** and install it via pip.
 
 We aim to release it on pypi end of Q4 2024.
@@ -45,6 +45,11 @@ For more code samples and snippets in the example section / folder and use the a
 
 ### Get Insights
 
-```py
---8<-- "docs/examples/basic_use/containerImx_main.py:11:"
-```
+=== "SingleImx"
+    ```py
+    --8<-- "docs/examples/basic_use/singleImx_main.py:9:"
+    ```
+=== "ContainerImx"
+    ```py
+    --8<-- "docs/examples/basic_use/containerImx_main.py:12:"
+    ```
