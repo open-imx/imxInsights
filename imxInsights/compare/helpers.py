@@ -13,12 +13,10 @@ def transform_dict(d: dict[str, Any]) -> dict[str, Any]:
     by consolidating these list items into structured lists under their base paths.
 
     Args:
-        d: A dictionary with keys that may represent nested structures
-           with indexed list items.
+        d : A dictionary with keys that may represent nested structures with indexed list items.
 
     Returns:
-        A transformed dictionary where indexed list items are grouped
-        under their respective base paths.
+        A transformed dictionary where indexed list items are grouped under their respective base paths.
     """
     result: dict[str, Any] = {}
     temp_dict: dict[str, list[dict[str, Any]]] = {}

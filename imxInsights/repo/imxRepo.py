@@ -31,7 +31,7 @@ class ImxRepo:
         path: Path of the IMX container or IMX File.
     """
 
-    # todo: maybe we should inheritance from the tree so we dont need to duplicated the methods
+    # todo: maybe we should inheritance from the tree so we do not need to duplicated the methods or use protocol
 
     def __init__(self, imx_file_path: Path | str):
         # todo: imx_file_path should be only Path
@@ -168,14 +168,14 @@ class ImxRepo:
             pd.DataFrame: pandas dataframe of the object properties
         """
 
-        def extract_overview_properties(item, props_in_overview=None):
+        def extract_overview_properties(item, input_props=None):
             props = (
                 item.properties
-                if props_in_overview is None
+                if input_props is None
                 else {
                     key: value
                     for key, value in item.properties.items()
-                    if key in props_in_overview
+                    if key in input_props
                 }
             )
             return {

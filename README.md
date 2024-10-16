@@ -48,7 +48,7 @@
 
 ## Open-IMX Initiative
 **imxInsights** is part of the **Open-IMX initiative**, which is dedicated to enhancing the accessibility and usability of IMX data. 
-This initiative aims to provide a collaborative environment for developers, data analysts, and railway professionals to effectively work with IMX data.
+This initiative aims to provide a collaborative environment for developers, data analysts and railway professionals to effectively work with IMX data.
 
 ### 🗪 Discord Community Channel 🤝
 
@@ -72,7 +72,7 @@ rewriting due to fundamental shifts in how imx files are utilized.
 ### Contributing
 
 We welcome contributions from everyone! 
-If you're interested in contributing to the project, please refer to our [contribution guidelines](CONTRIBUTING.md) for more information on the library's design. 
+If you're interested in contributing to the project, please refer to our [contribution guidelines](https://raw.githubusercontent.com/open-imx/imxInsights/refs/heads/main/CONTRIBUTING.md) for more information. 
 For any questions or discussions, feel free to ask in our [Discord channel](https://discord.gg/wBses7bPFg).
 
 ## Dependencies

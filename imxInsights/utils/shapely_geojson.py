@@ -114,13 +114,13 @@ class ShapelyGeoJsonFeature:
             polygon_entries.append(tuple(hole.coords))
         return polygon_entries
 
-    def as_feature(self):
+    def as_feature(self) -> GeoJsonFeature:
         """
         Convert the ShapelyGeoJsonFeature to a GeoJSON feature.
 
         Returns:
-            GeoJsonFeature:
-                The corresponding GeoJSON feature representation.
+            The corresponding GeoJSON feature representation.
+
         """
         if not self.geometry_list:
             return GeoJsonFeature(geometry=None, properties=self.properties)
@@ -243,15 +243,29 @@ class ShapelyGeoJsonFeatureCollection:
             )
         return FeatureCollection([_.as_feature() for _ in self.features])
 
-    def geojson_str(self):
+    def geojson_str(self) -> str:
+        """Generate a GeoJSON string representation of the FeatureCollection.
+
+        Returns:
+            A string containing the GeoJSON representation of the FeatureCollection.
+
+        """
         return geojson_dumps(self._as_feature_collection(), sort_keys=True)
 
-    def to_geojson_file(self, file_path: str | Path):
+    def to_geojson_file(self, file_path: str | Path) -> None:
+        """Write the FeatureCollection to a GeoJSON file.
+
+        Args:
+            file_path: The path where the GeoJSON file will be saved.
+
+        """
         with open(file_path, mode="w") as file:
             geojson_dump(self._as_feature_collection(), file, indent=4)
 
 
 class FeatureCollection(GeoJsonFeatureCollection):
+    """Custom FeatureCollection that adds a crs string (old geojson spec)."""
+
     def __init__(self, features, **extra):
         super().__init__(features, **extra)
         if "crs" in extra:

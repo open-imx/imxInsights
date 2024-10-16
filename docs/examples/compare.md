@@ -35,8 +35,15 @@ We use color highlighting to detect changes in dataframes and Excel exports.
 This visual aid helps easily spot differences between values, making data comparison more efficient and user-friendly.
 
 ```py
---8<-- "docs/examples/compare/singleImx_compare.py:16:21"
+--8<-- "docs/examples/compare/singleImx_compare.py:16:23"
 ```
+
+### Excel
+It is what it is... the world still runs on Excel, so we've provided an Excel output.
+```py
+--8<-- "docs/examples/compare/singleImx_compare.py:25:29"
+```
+
 
 ## GeoJSON
 
@@ -44,5 +51,5 @@ Basically the same as a DataFrame, but when GML coordinates are present, they al
 RailConnections are supported, and future features will include other objects without GML.
 
 ```py
---8<-- "docs/examples/compare/singleImx_compare.py:22:"
+--8<-- "docs/examples/compare/singleImx_compare.py:30:"
 ```

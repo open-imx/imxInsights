@@ -21,7 +21,7 @@ class ImxGeographicLocation:
 
     """
 
-    _element: _Element  # todo: find solution for mypy stuff
+    _element: _Element
     shapely: Point | LineString | Polygon = field(init=False)
     azimuth: float | None = field(init=False, default=None)
     data_acquisition_method: str | None = field(init=False, default=None)
