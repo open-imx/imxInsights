@@ -35,19 +35,26 @@ class ImxRepo:
 
     def __init__(self, imx_file_path: Path | str):
         # todo: imx_file_path should be only Path
-        self.container_id: str = str(uuid.uuid4())
         self._tree: ObjectTree = ObjectTree()
+        self.container_id: str = str(uuid.uuid4())
         self.imx_version: str | None = None
+        self.path: Path = self._get_file_path(imx_file_path=imx_file_path)
+
+    def _get_file_path(self, imx_file_path: Path | str) -> Path:
+        """
+        Get Path of temp zip folder of to directory containing imx files.
+
+        Args:
+            imx_file_path: The path to the Imx files directory or zip.
+
+        """
         if zipfile.is_zipfile(imx_file_path):
-            imx_file_path = self._parse_zip_container(imx_file_path)
-        elif isinstance(imx_file_path, str):
-            imx_file_path = Path(imx_file_path)
-        self.path: Path = (
-            imx_file_path if isinstance(imx_file_path, Path) else Path(imx_file_path)
-        )
+            return self._parse_zip_container(imx_file_path)
+        else:
+            return Path(imx_file_path)
 
     @staticmethod
-    def _parse_zip_container(imx_container_as_zip: str | Path):
+    def _parse_zip_container(imx_container_as_zip: str | Path) -> Path:
         """
         Parse the IMX container if it's a zip file.
 
@@ -61,7 +68,7 @@ class ImxRepo:
             temp_path = Path(temp_dir)
             with zipfile.ZipFile(imx_container_as_zip, "r") as zip_ref:
                 zip_ref.extractall(temp_path)
-            return temp_path
+            return Path(temp_path)
 
     def get_all(self) -> Iterable[ImxObject]:
         """
@@ -148,7 +155,7 @@ class ImxRepo:
         Returns:
             A dictionary where the keys represent the build processes step, and the values are lists of `ImxException` that were raised.
         """
-        return self._tree.build_extensions.exceptions
+        return self._tree.build_exceptions.exceptions
 
     def get_pandas_df(
         self, object_type_or_path: str | None = None, puic_as_index: bool = True

@@ -78,8 +78,8 @@ class ImxMultiRepo:
         for container in containers:
             self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
             self._merge_tree(
-                container._tree.build_extensions.exceptions,
-                self._tree.build_extensions.exceptions,
+                container._tree.build_exceptions.exceptions,
+                self._tree.build_exceptions.exceptions,
             )
         self._tree.update_keys()
 
@@ -94,8 +94,8 @@ class ImxMultiRepo:
         self.containers.append(container)
         self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
         self._merge_tree(
-            container._tree.build_extensions.exceptions,
-            self._tree.build_extensions.exceptions,
+            container._tree.build_exceptions.exceptions,
+            self._tree.build_exceptions.exceptions,
         )
 
     def remove_container(self, container: ImxRepo):
@@ -108,8 +108,8 @@ class ImxMultiRepo:
         self.containers.remove(container)
         self._remove_tree(container._tree.tree_dict, self._tree.tree_dict)
         self._remove_tree(
-            container._tree.build_extensions.exceptions,
-            self._tree.build_extensions.exceptions,
+            container._tree.build_exceptions.exceptions,
+            self._tree.build_exceptions.exceptions,
         )
 
     def compare(self) -> ImxCompareMultiRepo:

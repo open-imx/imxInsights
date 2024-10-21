@@ -3,6 +3,7 @@ from pathlib import Path
 from loguru import logger
 
 from imxInsights.file.imxFile import ImxFile
+from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
 from imxInsights.file.singleFileImx.imxSituation import ImxSituation
 
 
@@ -29,6 +30,8 @@ class ImxSingleFile:
         self.situation: ImxSituation | None = None
         self.new_situation: ImxSituation | None = None
         self.initial_situation: ImxSituation | None = None
+        self.project_metadata: SingleImxMetadata | None = None
+        self._populate_project_metadata()
 
         for situation_type, attribute_name in [
             ("Situation", "situation"),
@@ -40,7 +43,12 @@ class ImxSingleFile:
                     f".//{{http://www.prorail.nl/IMSpoor}}{situation_type}"
                 )
                 if situation is not None:
-                    imx_situation = ImxSituation(imx_file_path, situation, self.file)
+                    imx_situation = ImxSituation(
+                        imx_file_path, situation, self.file, self.project_metadata
+                    )
                     setattr(self, attribute_name, imx_situation)
 
         logger.success(f"finished processing {self.file.path.name}")
+
+    def _populate_project_metadata(self):
+        self.project_metadata = SingleImxMetadata.from_element(self.file.root)

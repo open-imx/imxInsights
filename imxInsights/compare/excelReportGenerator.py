@@ -31,7 +31,7 @@ class ExcelReportGenerator:
         info_worksheet = workbook.add_worksheet("Info")
 
         info_data = [
-            ["ImxInsights", "v0.2.0-alpha"],
+            ["ImxInsights", ""],
             ["Processing Timestamp", datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         ]
 
@@ -75,22 +75,23 @@ class ExcelReportGenerator:
         else:
             info_data.append(["path", container.path.name])
             for file in container.files:
-                info_data.append(["  * file name", file.path.name])
-                info_data.append(["    - file hash", file.file_hash])
-                info_data.append(["    - calculated hash", hash_sha256(file.path)])
-                if hasattr(file, "base_reference"):
-                    info_data.append(
-                        [
-                            "    - base reference file",
-                            file.base_reference.parent_document_name,
-                        ]
-                    )
-                    info_data.append(
-                        [
-                            "    - base reference hash",
-                            file.base_reference.parent_hashcode,
-                        ]
-                    )
+                if file is not None:
+                    info_data.append(["  * file name", file.path.name])
+                    info_data.append(["    - file hash", file.file_hash])
+                    info_data.append(["    - calculated hash", hash_sha256(file.path)])
+                    if hasattr(file, "base_reference"):
+                        info_data.append(
+                            [
+                                "    - base reference file",
+                                file.base_reference.parent_document_name,
+                            ]
+                        )
+                        info_data.append(
+                            [
+                                "    - base reference hash",
+                                file.base_reference.parent_hashcode,
+                            ]
+                        )
 
     def _create_diff_sheets(self, writer):
         sorted_dict = dict(sorted(self.pandas_df_dict.items()))

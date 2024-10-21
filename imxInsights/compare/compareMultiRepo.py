@@ -17,6 +17,8 @@ from imxInsights.compare.helpers import (
     remove_empty_dicts,
     transform_dict,
 )
+
+# from imxInsights.report.diffExcel import ExcelImxDiffReport
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     df_sort_by_list,
@@ -344,14 +346,26 @@ class ImxCompareMultiRepo:
         styled_df: bool = True,
     ):
         file_path = (
-            file_path or f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            file_path
+            if file_path is not None
+            else f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         )
+
+        # ExcelImxDiffReport.create_excel(
+        #     self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
+        #     self._containers,
+        #     self.container_order,
+        #     file_path=Path(file_path),
+        #     add_log=True,
+        # )
+        # print()
+
         report_generator = ExcelReportGenerator(
             self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
             self._containers,
             self.container_order,
         )
-        report_generator.create_excel(file_path)
+        report_generator.create_excel(f"{file_path}")
 
     def get_geojson(
         self,

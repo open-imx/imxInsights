@@ -40,7 +40,7 @@ def test_imx_multi_repo_different_versions(
     assert multi_repo.container_order[0] == imx_v124_project_instance.initial_situation.container_id, "wrong container id order"
     assert multi_repo.container_order[1] == imx_v500_project_instance.initial_situation.container_id, "wrong container id order"
     assert len(multi_repo.containers) == 2, "should contain x containers"
-    assert len(multi_repo._tree.build_extensions.exceptions) == 0, "should not have build errors"
+    assert len(multi_repo._tree.build_exceptions.exceptions) == 0, "should not have build errors"
     assert len(multi_repo._tree.keys) == 9289, "Count of keys in tree not correct"
     assert len(multi_repo._tree.tree_dict.keys()) == 9289, "Count of items in tree dict not correct"
 

@@ -19,14 +19,14 @@ class ObjectTree:
 
     Attributes:
         tree_dict (defaultdict[str, list[ImxObject]]): The dictionary representing the tree of ImxObjects.
-        build_extensions (BuildExceptions): Holds exceptions encountered during the build process.
+        build_exceptions (BuildExceptions): Holds exceptions encountered during the build process.
     """
 
     def __init__(self):
         # todo: not private for easy debug, should be private, objects should return stuff
         self.tree_dict: defaultdict[str, list[ImxObject]] = defaultdict(list)
         self._keys: frozenset[str] = frozenset()
-        self.build_extensions: BuildExceptions = BuildExceptions()
+        self.build_exceptions: BuildExceptions = BuildExceptions()
 
     @property
     def keys(self) -> frozenset[str]:
@@ -96,7 +96,7 @@ class ObjectTree:
         duplicates = [k for (k, v) in tree_to_add.items() if len(v) > 1]
         if len(duplicates) != 0:
             for puic in duplicates:
-                self.build_extensions.add(ImxDuplicatedPuicsInContainer(), puic)
+                self.build_exceptions.add(ImxDuplicatedPuicsInContainer(), puic)
 
         for key, value in tree_to_add.items():
             if key not in self._keys:
@@ -107,9 +107,9 @@ class ObjectTree:
 
         self.update_keys()
 
-        extend_objects(self.tree_dict, self.build_extensions, imx_file, element)
+        extend_objects(self.tree_dict, self.build_exceptions, imx_file, element)
         add_children(self.tree_dict, self.find)
-        build_rail_connections(self.get_by_types, self.find, self.build_extensions)
+        build_rail_connections(self.get_by_types, self.find, self.build_exceptions)
 
         # todo: link ref and refs
         # add_refs(self.objects(), self.find, self.build_extensions)
