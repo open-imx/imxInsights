@@ -1,9 +1,9 @@
+from datetime import datetime
 from pathlib import Path
 
 from loguru import logger
 from lxml.etree import QName
 from lxml.etree import _Element as Element
-from pydantic.schema import datetime
 
 from imxInsights.file.imxFile import ImxFile
 from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata

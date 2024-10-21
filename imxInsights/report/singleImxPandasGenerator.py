@@ -1,8 +1,8 @@
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame
-from pydantic.schema import datetime
 
 from imxInsights.file.imxFile import ImxFile
 from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
