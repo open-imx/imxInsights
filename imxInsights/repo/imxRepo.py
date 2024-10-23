@@ -307,3 +307,6 @@ class ImxRepo:
             geojson_file_path = dir_path / f"{path}.geojson"
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
+
+    def population_excel(self):
+        pass
