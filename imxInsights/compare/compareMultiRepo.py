@@ -359,9 +359,8 @@ class ImxCompareMultiRepo:
         #     add_log=True,
         # )
         # print()
-
         report_generator = ExcelReportGenerator(
-            self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
+            self.get_pandas(styled_df=styled_df, add_analyse=add_analyse),
             self._containers,
             self.container_order,
         )
