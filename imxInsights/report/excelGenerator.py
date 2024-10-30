@@ -57,6 +57,7 @@ class ExcelReport:
         header: bool = True,
     ):
         # todo: we should make the header stick and add auto filter and protect the damn sheet
+
         df.to_excel(
             self.writer,
             sheet_name=sheet_name,
@@ -82,6 +83,8 @@ class ExcelReport:
         cell_format: str | None = None,
         cell_format_range: list[int] | None = None,
     ):
+        # todo: we should make the header stick and add auto filter and protect the damn sheet
+
         if not cell_format:
             df = pd.DataFrame(data)
             return self.add_dataframe(
