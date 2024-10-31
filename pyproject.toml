@@ -46,7 +46,8 @@ dependencies = [
 python = ["3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.default.scripts]
-test = "pytest"
+test = "pytest --runslow"
+test-no-slow = "pytest"
 test-cov-xml = "pytest --cov-report=xml"
 lint = [
   "isort imxInsights/",

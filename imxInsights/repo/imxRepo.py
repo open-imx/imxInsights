@@ -31,8 +31,6 @@ class ImxRepo:
         path: Path of the IMX container or IMX File.
     """
 
-    # todo: maybe we should inheritance from the tree so we do not need to duplicated the methods or use protocol
-
     def __init__(self, imx_file_path: Path | str):
         # todo: imx_file_path should be only Path
         self._tree: ObjectTree = ObjectTree()
@@ -242,6 +240,41 @@ class ImxRepo:
 
         return out_dict
 
+    def get_pandas_df_overview(self) -> pd.DataFrame:
+        nodes = list(self.get_all())
+        paths = [self._get_full_path(node) for node in nodes]
+
+        list_of_columns = [
+            "tag",
+            "parentRef",
+            "@puic",
+            "@name",
+            "status",
+            "Metadata.@isInService",
+            "Metadata.@lifeCycleStatus",
+            "Metadata.@originType",
+            "Metadata.@registrationTime",
+            "Metadata.@source",
+        ]
+
+        properties = [
+            {key: prop[key] for key in list_of_columns if key in prop}
+            for prop in [node.properties for node in nodes]
+        ]
+
+        max_depth = max(len(path) for path in paths)
+        padded_paths = [
+            path[:-1] + [""] * (max_depth - len(path)) + [path[-1]] for path in paths
+        ]
+
+        df = pd.DataFrame(properties)
+
+        index = pd.MultiIndex.from_tuples(
+            padded_paths, names=[f"Level{i + 1}" for i in range(max_depth)]
+        )
+        df.index = index
+        return df
+
     def get_geojson(
         self,
         object_path: list[str],
@@ -308,5 +341,14 @@ class ImxRepo:
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
-    def population_excel(self):
-        pass
+    @staticmethod
+    def _get_full_path(node):
+        """Recursively get the path from a node to the top ancestor."""
+        path: list[str] = []
+        current = node
+        while current:
+            path.insert(0, current.puic)
+            current = current.parent
+        path.insert(0, node.path.split(".")[0])
+        path.append(node.path)
+        return path

@@ -48,27 +48,23 @@ class ImxContainerMetadata:
         if project_metadata_element is None:
             return None
 
-        # Extract metadata from the project element
         self.external_project_reference = project_metadata_element.get(
             "externalProjectReference"
         )
         self.project_name = project_metadata_element.get("projectName")
 
-        # Set project discipline if available
         project_discipline = project_metadata_element.get("projectDiscipline")
         if project_discipline:
             self.project_discipline = Imx12ProjectDisciplineEnum.from_string(
                 project_discipline
             )
 
-        # Set data exchange phase if available
         data_exchange_phase = project_metadata_element.get("dataExchangePhase")
         if data_exchange_phase:
             self.data_exchange_phase = Imx12DataExchangePhaseEnum.from_string(
                 data_exchange_phase
             )
 
-        # Parse created and planned delivery dates
         self.created_date = parse_date(
             project_metadata_element.get("createdDate", None)
         )

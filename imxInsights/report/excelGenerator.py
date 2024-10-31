@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 
 import pandas as pd
+from loguru import logger
 from pandas.io.formats.style import Styler
 
 
@@ -17,9 +18,9 @@ class ExcelReport:
     @staticmethod
     def _initialize_formats():
         return {
-            "h1": {"bold": True, "font_size": 20, "align": "left"},
-            "h2": {"bold": True, "font_size": 16, "align": "left"},
-            "h3": {"bold": True, "font_size": 12, "align": "left"},
+            "h1": {"bold": True, "font_size": 24, "align": "left"},
+            "h2": {"bold": True, "font_size": 18, "align": "left"},
+            "h3": {"bold": True, "font_size": 14, "align": "left"},
             "bold": {"bold": True},
             "italic": {"italic": True},
             "bold_italic": {"bold": True, "italic": True},
@@ -56,8 +57,6 @@ class ExcelReport:
         index: bool = True,
         header: bool = True,
     ):
-        # todo: we should make the header stick and add auto filter and protect the damn sheet
-
         df.to_excel(
             self.writer,
             sheet_name=sheet_name,
@@ -83,8 +82,6 @@ class ExcelReport:
         cell_format: str | None = None,
         cell_format_range: list[int] | None = None,
     ):
-        # todo: we should make the header stick and add auto filter and protect the damn sheet
-
         if not cell_format:
             df = pd.DataFrame(data)
             return self.add_dataframe(
@@ -133,11 +130,11 @@ class ExcelReport:
         value,
         cell_format: str | dict | None = None,
     ):
-        worksheet = self._get_or_create_worksheet(sheet)
+        worksheet = self.get_or_create_worksheet(sheet)
         format_object = self._get_format_object(cell_format)
         worksheet.write(row, column, value, format_object)
 
-    def _get_or_create_worksheet(self, sheet: str):
+    def get_or_create_worksheet(self, sheet: str):
         if sheet not in self.writer.sheets:
             return self.writer.book.add_worksheet(sheet)
         return self.writer.sheets[sheet]
@@ -159,23 +156,48 @@ class ExcelReport:
         for sheet_name in sheets:
             self.writer.sheets[sheet_name].set_tab_color(color)
 
-    def format_column(self, sheet_name: str, col_num: int, cell_format: str | dict):
+    def format_column(
+        self,
+        sheet_name: str,
+        first_col: int,
+        last_col: int,
+        cell_format: str | dict,
+        width: int | None = None,
+        options: None | dict = None,
+    ):
         worksheet = self.get_sheet(sheet_name)
         format_object = self._get_format_object(cell_format)
-        # this seems not to work:
-        worksheet.set_column(col_num, col_num, None, format_object)
+        worksheet.set_column(first_col, last_col, width, format_object, options)
 
-    def format_row(self, sheet_name: str, row_num: int, cell_format: str | dict):
+    def format_row(
+        self,
+        sheet_name: str,
+        row_num: int,
+        cell_format: str | dict,
+        height: None | int = None,
+        options: None | dict = None,
+    ):
         worksheet = self.get_sheet(sheet_name)
         format_object = self._get_format_object(cell_format)
-        # this seems not to work:
-        worksheet.set_row(row_num, None, format_object)
+        worksheet.set_row(row_num, height, format_object, options)
 
     def save(self):
         self.writer.close()
         self.temp_file.close()
-        shutil.copy(self.temp_file.name, self.file_path)
-        Path(self.temp_file.name).unlink()
+
+        while True:
+            try:
+                shutil.copy(self.temp_file.name, self.file_path)
+                Path(self.temp_file.name).unlink()
+                logger.success("File saved successfully.")
+                break
+            except PermissionError:
+                logger.warning(
+                    f"Permission denied: Unable to save file at {self.file_path}."
+                )
+                if input("Do you want to retry? (y/n): ").strip().lower() != "y":
+                    logger.warning(f"File {self.file_path} was not saved.")
+                    break
 
     def get_sheet(self, sheet_name: str):
         return self.writer.sheets[sheet_name]

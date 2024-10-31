@@ -1,39 +1,19 @@
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 from pandas import DataFrame
 
-from imxInsights.file.imxFile import ImxFile
-from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
-from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
-from imxInsights.repo.tree.buildExceptions import BuildExceptions
+from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.utils.flatten_unflatten import hash_sha256
 
 
 class SingleImxPandasGenerator:
-    def __init__(
-        self,
-        container_id: str,
-        input_file_path: Path,
-        imx_file: ImxFile,
-        project_metadata: SingleImxMetadata | None,
-        build_exceptions: BuildExceptions,
-        situation: ImxSituationEnum,
-        reference_date: datetime | None,
-        perspective_date: datetime | None,
-    ):
-        self._container_id = container_id
-        self._input_file_path = input_file_path
-        self._imx_file = imx_file
-        self._project_metadata = project_metadata
-        self._build_exceptions = build_exceptions
+    def __init__(self, situation: ImxSituationProtocol):
         self._situation = situation
-        self._reference_date = reference_date
-        self._perspective_date = perspective_date
 
+    @staticmethod
     def _generate_df_from_dict(
-        self, info_dict: dict, info_type: str, suffix: str = ""
+        info_dict: dict, info_type: str, suffix: str = ""
     ) -> DataFrame:
         """Helper method to generate DataFrame from a dictionary."""
         return pd.DataFrame(
@@ -46,19 +26,19 @@ class SingleImxPandasGenerator:
     def imx_info_df(self) -> DataFrame:
         """Generate DataFrame containing general IMX info."""
         imx_info = {
-            "container_id": self._container_id,
-            "file_path": self._input_file_path,
-            "calculated_file_hash": hash_sha256(self._input_file_path),
-            "imx_version": self._imx_file.imx_version,
+            "container_id": self._situation.container_id,
+            "file_path": self._situation._imx_file.absolute_path,
+            "calculated_file_hash": hash_sha256(self._situation._imx_file.path),
+            "imx_version": self._situation.imx_version,
         }
         return self._generate_df_from_dict(imx_info, "General Info")
 
     def project_metadata_df(self) -> DataFrame:
         """Get project metadata as a DataFrame."""
-        if self._project_metadata is None:
+        if self._situation.project_metadata is None:
             return DataFrame()
 
-        metadata = self._project_metadata
+        metadata = self._situation.project_metadata
         metadata_info = {
             "project_name": metadata.project_name,
             "external_project_reference": metadata.external_project_reference,
@@ -74,12 +54,12 @@ class SingleImxPandasGenerator:
     def situation_info(self) -> DataFrame:
         """Generate DataFrame for situation info."""
         situation_info: dict[str, str | Path | None] = {
-            "situation_type": self._situation.name,
-            "perspective_date": self._perspective_date.isoformat()
-            if self._perspective_date
+            "situation_type": self._situation.situation_type.name,
+            "perspective_date": self._situation.perspective_date.isoformat()
+            if self._situation.perspective_date
             else "NONE",
-            "reference_date": self._reference_date.isoformat()
-            if self._reference_date
+            "reference_date": self._situation.reference_date.isoformat()
+            if self._situation.reference_date
             else "NONE",
         }
         return self._generate_df_from_dict(situation_info, "Situation Info")
@@ -87,7 +67,8 @@ class SingleImxPandasGenerator:
     def build_errors_df(self) -> DataFrame:
         """Generate DataFrame containing build errors."""
         error_data: list[tuple[str, str, str, str]] = []
-        for key, value in self._build_exceptions.exceptions.items():
+        build_exceptions = self._situation.get_build_exceptions()
+        for key, value in build_exceptions.items():
             for item in value:
                 error_data.append((f"{item.msg}", f"{item.msg}", key, item.level.name))
 

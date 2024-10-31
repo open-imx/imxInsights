@@ -9,6 +9,7 @@ from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
 from pandas import DataFrame
 
 
+@pytest.mark.slow
 def create_excel(compared_imx: ImxCompareMultiRepo):
     with tempfile.NamedTemporaryFile(delete=False, suffix=f".xlsx") as temp_file:
         compared_imx.create_excel(temp_file.name, styled_df=True, add_analyse=True)

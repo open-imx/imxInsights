@@ -1,124 +1,118 @@
-# from datetime import datetime
-# from pathlib import Path
-#
-# import pandas as pd
-# from loguru import logger
-#
-# from imxInsights.file.singleFileImx.imxSituation import ImxSituation
-# from imxInsights.report.commen import create_container_imx_info, create_single_imx_info
-# from imxInsights.report.excelGenerator import ExcelReportGenerator
-# from imxInsights.utils.flatten_unflatten import hash_sha256
-#
-#
-# def create_metadata_info_sheet():
-#     additional_info = {
-#         "Create date": datetime.now().strftime("%Y-%m-%d"),
-#     }
-#     return pd.DataFrame(list(additional_info.items()), columns=["Key", "Value"])
-#
-#
-# class ExcelImxDiffReport(ExcelReportGenerator):
-#     def __init__(
-#         self,
-#         pandas_df_dict: dict[str, pd.DataFrame],
-#         containers: list[ImxSituation],
-#         container_order: tuple[str, ...],
-#         file_path: str | Path,
-#     ):
-#         super().__init__(file_path)
-#         self.pandas_df_dict: dict[str, pd.DataFrame] = pandas_df_dict
-#         self.containers: list[ImxSituation] = containers
-#         self.container_order: tuple[str, ...] = container_order
-#
-#     def _create_info_sheet(self):
-#         sheet_name = "Info"
-#         empty_row = 0
-#         self.add_dataframe(
-#             create_metadata_info_sheet(), sheet_name, startrow=empty_row, startcol=1
-#         )
-#         empty_row = +1
-#
-#         self.add_list_of_lists(
-#             [["ImxInsights version", "v0.2.0-alpha"]],
-#             sheet_name,
-#             startrow=empty_row,
-#             startcol=1,
-#         )
-#         empty_row += 2
-#
-#         self.add_list_of_lists(
-#             [["container_order"]], sheet_name, startrow=empty_row, startcol=1
-#         )
-#         empty_row += 1
-#
-#         self.add_list_of_lists(
-#             [[f"T{idx}", _] for idx, _ in enumerate(self.container_order, start=1)],
-#             sheet_name,
-#             startrow=empty_row,
-#             startcol=1,
-#         )
-#         empty_row += len(self.container_order) + 1
-#
-#         # process container info....
-#         for idx, container_id in enumerate(self.container_order, start=1):
-#             for container in self.containers:
-#                 if container.container_id == container_id:
-#                     if int(container.imx_version.split(".")[0]) >= 12:
-#                         self.add_dataframe(
-#                             create_container_imx_info(
-#                                 container.container_id,
-#                                 f"{container.path.name}",
-#                                 "todo: make 12 methode",
-#                                 container.imx_version,
-#                                 prefix=f"T{idx}_",
-#                             ),
-#                             sheet_name,
-#                             startrow=empty_row,
-#                             startcol=1,
-#                         )
-#                         empty_row = empty_row + 6
-#                     else:
-#                         self.add_dataframe(
-#                             create_single_imx_info(
-#                                 container_id=container.container_id,
-#                                 file_path=f"{container.path}",
-#                                 situation_type=container.situation_type.name,
-#                                 calculated_file_hash=hash_sha256(self.file_path),
-#                                 imx_version=container.imx_version,
-#                                 prefix=f"T{idx}_",
-#                             ),
-#                             sheet_name,
-#                             startrow=empty_row,
-#                             startcol=1,
-#                         )
-#                         empty_row = empty_row + 6
-#                     break
-#
-#         self.auto_fit_columns(sheet_name)
-#
-#     @staticmethod
-#     def create_excel(
-#         pandas_df_dict: dict[str, pd.DataFrame],
-#         containers: list[ImxSituation],
-#         container_order: tuple[str, ...],
-#         file_path: str
-#         | Path = f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx',
-#         add_log: bool = False,
-#     ):
-#         self = ExcelImxDiffReport(
-#             pandas_df_dict, containers, container_order, file_path
-#         )
-#         self._create_info_sheet()
-#
-#         self._create_diff_sheets()
-#
-#         if add_log:
-#             self.log_history()
-#         self.save()
-#
-#     def _create_diff_sheets(self):
-#         pass
-#
-#
-# # ExcelImxDiffReport.create_excel("tester.xlsx", add_log=True)
-# #
+from __future__ import annotations
+
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import pandas as pd
+from loguru import logger
+from tqdm import tqdm
+
+from imxInsights.report.excelGenerator import ExcelReport
+from imxInsights.utils.excel_helpers import shorten_sheet_name
+
+if TYPE_CHECKING:
+    from imxInsights import ImxContainer
+    from imxInsights.file.singleFileImx.imxSituation import ImxSituation
+
+
+class DiffExcel(ExcelReport):
+    def __init__(
+        self,
+        file_path: str | Path,
+        diff_df_dict: dict[str, pd.DataFrame],
+        container_order: tuple[str, ...],
+        containers: list[ImxSituation | ImxContainer],
+    ):
+        super().__init__(file_path)
+        self.diff_df_dict = diff_df_dict
+        self.container_order = container_order
+        self.containers = containers
+
+        self.create_info_sheet()
+        self.index_sheet = self.get_or_create_worksheet("index")
+        self.create_metadata_overview()
+        self.create_object_sheets()
+
+        self.auto_fit_columns()
+
+    def create_info_sheet(self):
+        next_row = self.add_list_of_lists(
+            [
+                ["Comparison report"],
+                [f"ImxInsights ({"aaaa"})"],
+                ["https://open-imx.nl/"],
+            ],
+            sheet_name="info",
+            start_row=1,
+            start_col=1,
+            header=False,
+            index=False,
+            cell_format="h1",
+            cell_format_range=[1, 1, 1, 1],
+        )
+        self.format_row("info", 2, "h3")
+
+        cell_hover = {  # for row hover use <tr> instead of <td>
+            "selector": "td:hover",
+            "props": [("background-color", "#ffffb3")],
+        }
+
+        index = {  # for row hover use <tr> instead of <td>
+            "selector": "th",
+            "props": [
+                ("background-color", "#000066"),
+                ("color", "green"),
+                ("text-align", "left"),
+            ],
+        }
+
+        sorted_objects = sorted(
+            self.containers,
+            key=lambda obj: self.container_order.index(obj.container_id)
+            if obj.container_id in self.container_order
+            else float("inf"),
+        )
+
+        for idx, item in enumerate(sorted_objects, start=1):
+            self.write_cell("info", next_row + 1, 1, f"IMX T{idx}", "h2")
+            imx_info_df = item.dataframes.combined_info_df(pivot_df=True)
+
+            styled_imx_info_df = imx_info_df.style.set_properties(
+                subset=None, **{"background-color": "#ECE3FF", "color": "black"}
+            ).map(lambda x: "border: 1px solid;")  # type: ignore
+            styled_imx_info_df = styled_imx_info_df.set_table_styles(
+                [cell_hover, index]
+            )
+
+            next_row = self.add_dataframe(
+                styled_imx_info_df,
+                "info",
+                start_row=next_row + 2,
+                start_col=1,
+                header=False,
+            )
+
+    def create_metadata_overview(self):
+        # TODO: create metadata overview for diff report
+        pass
+
+    def create_object_sheets(self):
+        with tqdm(total=len(self.diff_df_dict.keys()), file=sys.stdout) as pbar:  # type: ignore
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            pbar.set_description(
+                f"{current_time} | {logger.level('INFO').name}     | Writing Excel File"
+            )
+            for key, value in self.diff_df_dict.items():
+                sheet_name = shorten_sheet_name(key)
+                next_row = self.add_dataframe(
+                    value, sheet_name, start_row=0, start_col=0, header=True
+                )
+                worksheet = self.get_or_create_worksheet(sheet_name)
+                worksheet.freeze_panes(1, 0)
+                worksheet.autofilter(0, 0, 0, next_row)
+
+                # todo: check if all not changed, then we should make the sheet gray
+
+                pbar.update(1)

@@ -1,59 +1,45 @@
-from pathlib import Path
-
 import pandas as pd
 from pandas import DataFrame, Series
 
-from imxInsights.file.containerizedImx.imxContainerFiles import ImxContainerFiles
-from imxInsights.file.containerizedImx.imxContainerMetadata import ImxContainerMetadata
-from imxInsights.repo.tree.buildExceptions import BuildExceptions
+from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.utils.flatten_unflatten import hash_sha256
 
 
 class ContainerImxPandasGenerator:
-    def __init__(
-        self,
-        container_id: str,
-        input_file_path: Path,
-        files: ImxContainerFiles,
-        project_metadata: ImxContainerMetadata | None,
-        build_exceptions: BuildExceptions,
-    ) -> None:
-        self._container_id: str = container_id
-        self._input_file_path: Path = input_file_path
-        self._files: ImxContainerFiles = files
-        self._project_metadata: ImxContainerMetadata | None = project_metadata
-        self._build_exceptions: BuildExceptions = build_exceptions
+    def __init__(self, container: ImxContainerProtocol) -> None:
+        self._container = container
+
+    def _create_metadata_df(
+        self, metadata: dict[str, str | None], metadata_type: str
+    ) -> DataFrame:
+        """Helper method to create a DataFrame from metadata."""
+        df: DataFrame = pd.DataFrame(list(metadata.items()), columns=["Key", "Value"])
+        df["Type"] = metadata_type
+        df["Key_1"] = df["Key"]
+        df["Key_2"] = ""  # No specific suffix for keys
+        return df
 
     def imx_info_df(self) -> DataFrame:
         """Generate DataFrame containing general IMX info."""
-        imx_info: dict[str, str | Path | None] = {
-            "container_id": self._container_id,
-            "file_path": self._input_file_path,
-            "calculated_file_hash": hash_sha256(self._input_file_path),
-            "imx_version": self._files.signaling_design.imx_version
-            if self._files.signaling_design
+        imx_info: dict[str, str | None] = {
+            "container_id": self._container.container_id,
+            "file_path": f"{self._container.path}",
+            "calculated_file_hash": hash_sha256(self._container.path),
+            "imx_version": self._container.files.signaling_design.imx_version
+            if self._container.files.signaling_design
             else None,
         }
-        df_imx_info: DataFrame = pd.DataFrame(
-            list(imx_info.items()), columns=["Key", "Value"]
-        )
-        df_imx_info["Type"] = "General Info"
-        df_imx_info["Key_1"] = df_imx_info["Key"]
-        df_imx_info["Key_2"] = ""  # No specific suffix for general info keys
-        return df_imx_info
+        return self._create_metadata_df(imx_info, "General Info")
 
     def project_metadata_df(self) -> DataFrame:
         """Get project metadata as a DataFrame."""
-        if self._project_metadata is None:
+        if self._container.project_metadata is None:
             return DataFrame()
 
-        metadata = self._project_metadata
-
+        metadata = self._container.project_metadata
         metadata_info: dict[str, str | None] = {
-            "project_name": metadata.project_name if metadata.project_name else "NONE",
-            "external_project_reference": metadata.external_project_reference
-            if metadata.external_project_reference
-            else "NONE",
+            "project_name": metadata.project_name or "NONE",
+            "external_project_reference": metadata.external_project_reference or "NONE",
             "exchange_phase": metadata.data_exchange_phase.value
             if metadata.data_exchange_phase
             else "NONE",
@@ -64,19 +50,12 @@ class ContainerImxPandasGenerator:
             if metadata.planned_delivery_date
             else "NONE",
         }
+        return self._create_metadata_df(metadata_info, "Imx Metadata")
 
-        metadata_df: DataFrame = pd.DataFrame(
-            list(metadata_info.items()), columns=["Key", "Value"]
-        )
-        metadata_df["Type"] = "Imx Metadata"
-        metadata_df["Key_1"] = metadata_df["Key"]
-        metadata_df["Key_2"] = ""  # No specific suffix for general info keys
-        return metadata_df
-
-    def files_info_df(self) -> DataFrame:
-        """Generate DataFrame containing file information."""
+    def _generate_file_data(self) -> list[tuple[str, str | None, str, str]]:
+        """Helper method to gather file information for DataFrame."""
         file_data: list[tuple[str, str | None, str, str]] = []
-        for file in self._files:
+        for file in self._container.files:
             if file is not None:
                 file_data.append(
                     (f"{file.path.name}_hash", file.file_hash, file.path.name, "hash")
@@ -108,16 +87,22 @@ class ContainerImxPandasGenerator:
                         )
                     )
 
+        return file_data
+
+    def files_info_df(self) -> DataFrame:
+        """Generate DataFrame containing file information."""
+        file_data = self._generate_file_data()
         df_files: DataFrame = pd.DataFrame(
             file_data, columns=["Key", "Value", "Key_1", "Key_2"]
         )
-        df_files["Type"] = "Files Info"  # Add a type column for classification
+        df_files["Type"] = "Files Info"
         return df_files
 
     def build_errors_df(self) -> DataFrame:
         """Generate DataFrame containing build errors."""
         error_data: list[tuple[str, str, str, str]] = []
-        for key, value in self._build_exceptions.exceptions.items():
+        build_exceptions = self._container.get_build_exceptions()
+        for key, value in build_exceptions.items():
             for item in value:
                 error_data.append((f"{item.msg}", f"{item.msg}", key, item.level.name))
 
@@ -143,7 +128,6 @@ class ContainerImxPandasGenerator:
             else pd.DataFrame(columns=["Key", "Value", "Key_1", "Key_2", "Type"])
         )
 
-        # Create output DataFrame
         df_merged: DataFrame = pd.concat(
             [df_imx_info, self.project_metadata_df(), df_files, df_errors],
             ignore_index=True,
@@ -167,5 +151,4 @@ class ContainerImxPandasGenerator:
             pivot.set_index(["Type", "Key_1", "Key_2"], inplace=True)
             return pivot
 
-        df_merged = df_merged.drop(columns=["Key"])
-        return df_merged
+        return df_merged.drop(columns=["Key"])

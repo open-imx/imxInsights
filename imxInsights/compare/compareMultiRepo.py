@@ -9,7 +9,6 @@ from loguru import logger
 from tqdm import tqdm
 
 from imxInsights.compare.changes import Change, ChangeStatus, get_object_changes
-from imxInsights.compare.excelReportGenerator import ExcelReportGenerator
 from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.compare.helpers import (
     merge_dict_keep_first_key,
@@ -17,8 +16,7 @@ from imxInsights.compare.helpers import (
     remove_empty_dicts,
     transform_dict,
 )
-
-# from imxInsights.report.diffExcel import ExcelImxDiffReport
+from imxInsights.report.diffExcel import DiffExcel
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     df_sort_by_list,
@@ -88,7 +86,7 @@ class ImxCompareMultiRepo:
 
     def __init__(self):
         self._data: dict[str, Any] = {}
-        self.container_order: Any = ()
+        self.container_order: tuple[str, ...] = ()
         self.diff: dict[str, list[ChangedImxObject]] = {}
         self._containers: list[Any] = []
 
@@ -350,21 +348,15 @@ class ImxCompareMultiRepo:
             if file_path is not None
             else f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         )
-
-        # ExcelImxDiffReport.create_excel(
-        #     self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
-        #     self._containers,
-        #     self.container_order,
-        #     file_path=Path(file_path),
-        #     add_log=True,
-        # )
-        # print()
-        report_generator = ExcelReportGenerator(
-            self.get_pandas(styled_df=styled_df, add_analyse=add_analyse),
-            self._containers,
-            self.container_order,
-        )
-        report_generator.create_excel(f"{file_path}")
+        df_dict = self.get_pandas(styled_df=styled_df, add_analyse=add_analyse)
+        if isinstance(df_dict, dict):
+            diff_excel = DiffExcel(
+                file_path,
+                df_dict,
+                self.container_order,
+                self._containers,
+            )
+            diff_excel.save()
 
     def get_geojson(
         self,
@@ -438,3 +430,5 @@ class ImxCompareMultiRepo:
         _._set_diff_dict(tree)
         _._set_diff(container_order[0], container_order[1])
         return _
+
+    # TODO: implement metadata diff overview like normal repo has
