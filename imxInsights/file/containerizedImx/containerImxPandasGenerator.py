@@ -127,6 +127,13 @@ class ContainerImxPandasGenerator:
             if build_errors
             else pd.DataFrame(columns=["Key", "Value", "Key_1", "Key_2", "Type"])
         )
+        df_errors["Key"] = df_errors.groupby(["Key_1", "Key_2"]).cumcount() + 1
+
+        # todo: build errors are not pivoting course of duplicated indexes
+        # df_errors[['Key_2', 'Value']] = df_errors[['Value', 'Key_2']]
+        df_errors[["Type", "Key", "Key_1", "Key_2"]] = df_errors[
+            ["Key_2", "Value", "Key_1", "Key"]
+        ]
 
         df_merged: DataFrame = pd.concat(
             [df_imx_info, self.project_metadata_df(), df_files, df_errors],
@@ -137,7 +144,8 @@ class ContainerImxPandasGenerator:
             "General Info",
             "Project Metadata",
             "Files Info",
-            "Build Errors",
+            "ERROR",
+            "WARNING",
         ]
         df_merged["Type"] = pd.Categorical(
             df_merged["Type"], categories=type_order, ordered=True

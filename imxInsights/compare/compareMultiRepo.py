@@ -348,15 +348,10 @@ class ImxCompareMultiRepo:
             if file_path is not None
             else f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         )
-        df_dict = self.get_pandas(styled_df=styled_df, add_analyse=add_analyse)
-        if isinstance(df_dict, dict):
-            diff_excel = DiffExcel(
-                file_path,
-                df_dict,
-                self.container_order,
-                self._containers,
-            )
-            diff_excel.save()
+        diff_excel = DiffExcel(
+            self, file_path, add_analyse=add_analyse, styled_df=styled_df
+        )
+        diff_excel.save()
 
     def get_geojson(
         self,

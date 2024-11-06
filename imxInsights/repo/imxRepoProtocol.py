@@ -1,7 +1,7 @@
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 import pandas as pd
 
@@ -11,6 +11,7 @@ from imxInsights.repo.tree.imxObjectTree import ObjectTree
 from imxInsights.utils.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
+@runtime_checkable
 class ImxRepoProtocol(Protocol):
     container_id: str
     imx_version: str | None
