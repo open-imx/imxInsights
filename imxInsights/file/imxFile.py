@@ -27,18 +27,15 @@ class ImxFile:
     def __init__(self, imx_file_path: Path, file_id: str = str(uuid.uuid4())):
         # todo: should handle strings aswel, make sure file exist else raise error.
         # todo: check if valid UUID if string is given else raise error.
-        self._xml_file: XmlFile = XmlFile(imx_file_path)
+        self.input_path: str | Path = imx_file_path
+        self._xml_file: XmlFile = XmlFile(self.input_path)
         self.container_id: str = file_id
 
-        # Check if the root is not None
         if self._xml_file.root is None:
             raise ValueError("Root of the XML file is None")  # noqa: TRY003
 
-        # Find the element with the imxVersion attribute
-
         imx_version_element: Element | None = self._xml_file.root.find("[@imxVersion]")
 
-        # Check if the element and the attribute exist
         if (
             imx_version_element is None
             or "imxVersion" not in imx_version_element.attrib

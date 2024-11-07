@@ -5,6 +5,7 @@ from loguru import logger
 from imxInsights.file.imxFile import ImxFile
 from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
 from imxInsights.file.singleFileImx.imxSituation import ImxSituation
+from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 
 
 class ImxSingleFile:
@@ -27,9 +28,9 @@ class ImxSingleFile:
         logger.info(f"processing {imx_file_path.name}")
 
         self.file: ImxFile = ImxFile(imx_file_path=imx_file_path)
-        self.situation: ImxSituation | None = None
-        self.new_situation: ImxSituation | None = None
-        self.initial_situation: ImxSituation | None = None
+        self.situation: ImxSituationProtocol | None = None
+        self.new_situation: ImxSituationProtocol | None = None
+        self.initial_situation: ImxSituationProtocol | None = None
         self.project_metadata: SingleImxMetadata | None = None
         self._populate_project_metadata()
 

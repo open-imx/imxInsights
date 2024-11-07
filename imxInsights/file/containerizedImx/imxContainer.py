@@ -2,12 +2,10 @@ from pathlib import Path
 
 from loguru import logger
 
-from imxInsights.file.containerizedImx.containerImxPandasGenerator import (
-    ContainerImxPandasGenerator,
-)
 from imxInsights.file.containerizedImx.imxContainerFiles import ImxContainerFiles
 from imxInsights.file.containerizedImx.imxContainerMetadata import ImxContainerMetadata
 from imxInsights.repo.imxRepo import ImxRepo
+from imxInsights.report.containerImxPandasGenerator import ContainerImxPandasGenerator
 
 
 class ImxContainer(ImxRepo):

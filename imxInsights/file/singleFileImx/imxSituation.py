@@ -8,10 +8,8 @@ from lxml.etree import _Element as Element
 from imxInsights.file.imxFile import ImxFile
 from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
 from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
-from imxInsights.file.singleFileImx.singleImxPandasGenerator import (
-    SingleImxPandasGenerator,
-)
 from imxInsights.repo.imxRepo import ImxRepo
+from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
 from imxInsights.utils.xml_helpers import parse_date
 
 

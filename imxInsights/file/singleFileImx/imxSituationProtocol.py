@@ -12,9 +12,7 @@ if TYPE_CHECKING:
     from imxInsights.file.imxFile import ImxFile
     from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
     from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
-    from imxInsights.file.singleFileImx.singleImxPandasGenerator import (
-        SingleImxPandasGenerator,
-    )
+    from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
 
 
 class ImxSituationProtocol(ImxRepoProtocol, Protocol):

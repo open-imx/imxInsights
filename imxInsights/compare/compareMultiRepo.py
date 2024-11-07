@@ -77,6 +77,8 @@ class ImxCompareMultiRepo:
     """
     A class for comparing IMX objects across multiple repositories.
 
+    TODO: THIS SHOULD ACT MORE LIKE A NORMAL IMX REPO
+
     Attributes:
         _data (dict[str, Any]): Internal data dictionary for storing comparison results.
         container_order (Any): Order of containers to consider in the comparison.

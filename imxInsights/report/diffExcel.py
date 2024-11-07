@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib.metadata
+# import importlib.metadata
 import sys
 import uuid
 from datetime import datetime
@@ -48,7 +48,7 @@ class DiffExcel(ExcelReport):
         next_row = self.add_list_of_lists(
             [
                 ["IMX diff Excel"],
-                [f"ImxInsights ({importlib.metadata.version("imxInsights")})"],
+                # [f"ImxInsights ({importlib.metadata.version("imxInsights")})"],
                 ["https://open-imx.nl/"],
             ],
             sheet_name="info",
@@ -108,18 +108,15 @@ class DiffExcel(ExcelReport):
         while current:
             path.insert(0, current.path)
             path.insert(1, current.puic)
-            # path.insert(1, )
             current = current.parent
         return path
 
     @staticmethod
     def is_uuid(s):
         try:
-            # Validate if the string is a UUID
             uuid.UUID(s)
             return True  # NOQA TRY300
-        except ValueError as e:
-            print(e)
+        except ValueError as e:  # NOQA F841
             return False
 
     def create_metadata_overview(self):
