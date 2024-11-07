@@ -7,20 +7,45 @@ from imxInsights.utils.shapely_gml import GmlShapleyFactory
 
 
 @dataclass
-class Areas:
+class Area:
     name: str
     coordinates: str
     shapely: Polygon
 
     @staticmethod
-    def from_element(element: Element) -> "Areas":
+    def from_element(element: Element, name: str | None = None) -> "Area":
         coordinates_element = element.find(".//{http://www.opengis.net/gml}coordinates")
         if coordinates_element is None or coordinates_element.text is None:
             raise ValueError("Coordinates element or its text content is missing.")  # noqa: TRY003
 
         coordinates = coordinates_element.text
-        return Areas(
-            name=element.tag,
+        return Area(
+            name=element.tag.split("}")[1] if not name else name,
             coordinates=coordinates,
             shapely=GmlShapleyFactory.gml_polygon_to_shapely(coordinates),
         )
+
+
+@dataclass
+class ImxAreas:
+    user_area: Area | None = None
+    work_area: Area | None = None
+    context_area: Area | None = None
+
+    @staticmethod
+    def from_element(element: Element) -> "ImxAreas":
+        self = ImxAreas()
+
+        user_area = element.find(".//{http://www.prorail.nl/IMSpoor}UserArea")
+        if user_area is not None:
+            self.user_area = Area.from_element(user_area)
+
+        work_area = element.find(".//{http://www.prorail.nl/IMSpoor}WorkArea")
+        if work_area is not None:
+            self.work_area = Area.from_element(work_area)
+
+        context_area = element.find(".//{http://www.prorail.nl/IMSpoor}ContextArea")
+        if context_area is not None:
+            self.context_area = Area.from_element(context_area)
+
+        return self

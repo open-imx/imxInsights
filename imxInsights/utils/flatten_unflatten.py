@@ -26,7 +26,18 @@ def hash_sha256(path: Path):
         appropriately when using this function.
 
     """
-    return f"{hashlib.sha256(path.read_bytes()).hexdigest()}"
+    try:
+        # Try reading the file and computing the hash
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except PermissionError:
+        # Return a default message or error hash if permission is denied
+        return "PermissionError: Cannot access file"
+    except FileNotFoundError:
+        # Handle if the file doesn't exist
+        return "FileNotFoundError: File not found"
+    except Exception as e:
+        # Handle any other exceptions and log or return as needed
+        return f"Error: {str(e)}"
 
 
 def hash_dict_ignor_nested(dictionary: dict) -> str:

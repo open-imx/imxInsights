@@ -1,4 +1,13 @@
+from datetime import datetime
+
+import dateparser
 from lxml.etree import _Element as Element
+
+
+def parse_date(date_string: str | None) -> datetime | None:
+    if date_string:
+        return dateparser.parse(date_string)
+    return None
 
 
 def trim_tag(tag: Element | str) -> str:

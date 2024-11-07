@@ -31,23 +31,28 @@ class ImxRepo:
         path: Path of the IMX container or IMX File.
     """
 
-    # todo: maybe we should inheritance from the tree so we do not need to duplicated the methods or use protocol
-
     def __init__(self, imx_file_path: Path | str):
         # todo: imx_file_path should be only Path
-        self.container_id: str = str(uuid.uuid4())
         self._tree: ObjectTree = ObjectTree()
+        self.container_id: str = str(uuid.uuid4())
         self.imx_version: str | None = None
+        self.path: Path = self._get_file_path(imx_file_path=imx_file_path)
+
+    def _get_file_path(self, imx_file_path: Path | str) -> Path:
+        """
+        Get Path of temp zip folder of to directory containing imx files.
+
+        Args:
+            imx_file_path: The path to the Imx files directory or zip.
+
+        """
         if zipfile.is_zipfile(imx_file_path):
-            imx_file_path = self._parse_zip_container(imx_file_path)
-        elif isinstance(imx_file_path, str):
-            imx_file_path = Path(imx_file_path)
-        self.path: Path = (
-            imx_file_path if isinstance(imx_file_path, Path) else Path(imx_file_path)
-        )
+            return self._parse_zip_container(imx_file_path)
+        else:
+            return Path(imx_file_path)
 
     @staticmethod
-    def _parse_zip_container(imx_container_as_zip: str | Path):
+    def _parse_zip_container(imx_container_as_zip: str | Path) -> Path:
         """
         Parse the IMX container if it's a zip file.
 
@@ -61,7 +66,7 @@ class ImxRepo:
             temp_path = Path(temp_dir)
             with zipfile.ZipFile(imx_container_as_zip, "r") as zip_ref:
                 zip_ref.extractall(temp_path)
-            return temp_path
+            return Path(temp_path)
 
     def get_all(self) -> Iterable[ImxObject]:
         """
@@ -148,7 +153,7 @@ class ImxRepo:
         Returns:
             A dictionary where the keys represent the build processes step, and the values are lists of `ImxException` that were raised.
         """
-        return self._tree.build_extensions.exceptions
+        return self._tree.build_exceptions.exceptions
 
     def get_pandas_df(
         self, object_type_or_path: str | None = None, puic_as_index: bool = True
@@ -235,6 +240,41 @@ class ImxRepo:
 
         return out_dict
 
+    def get_pandas_df_overview(self) -> pd.DataFrame:
+        nodes = list(self.get_all())
+        paths = [self._get_full_path(node) for node in nodes]
+
+        list_of_columns = [
+            "tag",
+            "parentRef",
+            "@puic",
+            "@name",
+            "status",
+            "Metadata.@isInService",
+            "Metadata.@lifeCycleStatus",
+            "Metadata.@originType",
+            "Metadata.@registrationTime",
+            "Metadata.@source",
+        ]
+
+        properties = [
+            {key: prop[key] for key in list_of_columns if key in prop}
+            for prop in [node.properties for node in nodes]
+        ]
+
+        max_depth = max(len(path) for path in paths)
+        padded_paths = [
+            path[:-1] + [""] * (max_depth - len(path)) + [path[-1]] for path in paths
+        ]
+
+        df = pd.DataFrame(properties)
+
+        index = pd.MultiIndex.from_tuples(
+            padded_paths, names=[f"Level{i + 1}" for i in range(max_depth)]
+        )
+        df.index = index
+        return df
+
     def get_geojson(
         self,
         object_path: list[str],
@@ -300,3 +340,15 @@ class ImxRepo:
             geojson_file_path = dir_path / f"{path}.geojson"
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
+
+    @staticmethod
+    def _get_full_path(node):
+        """Recursively get the path from a node to the top ancestor."""
+        path: list[str] = []
+        current = node
+        while current:
+            path.insert(0, current.puic)
+            current = current.parent
+        path.insert(0, node.path.split(".")[0])
+        path.append(node.path)
+        return path

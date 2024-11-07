@@ -5,7 +5,6 @@ from imxInsights import ImxSingleFile, ImxContainer
 # TODO: add get GEOJSON and GEOJSON WRITE TO FILES
 
 
-@pytest.mark.slow
 def test_imx_parse_project_v124(imx_v124_project_instance: ImxSingleFile):
     imx = imx_v124_project_instance
     assert imx.file.imx_version == "1.2.4", "imx version should be 1.2.4"
@@ -23,7 +22,6 @@ def test_imx_parse_project_v124(imx_v124_project_instance: ImxSingleFile):
     ), "should not have no exceptions"
 
 
-@pytest.mark.slow
 def test_imx_multiple_same_extension_objects_v124(
     imx_v124_project_instance: ImxSingleFile,
 ):
@@ -33,7 +31,6 @@ def test_imx_multiple_same_extension_objects_v124(
     assert len(switch_mech.extension_properties) == 8, "Should have x extensions props"
 
 
-@pytest.mark.slow
 def test_imx_repo_queries_v124(imx_v124_project_instance: ImxSingleFile):
     imx = imx_v124_project_instance
     assert len(list(imx.initial_situation.get_all())) == 5600, "Should have x objects"
@@ -56,7 +53,6 @@ def test_imx_repo_queries_v124(imx_v124_project_instance: ImxSingleFile):
     assert len(imx.initial_situation.get_pandas_df_dict()) == 73, "Should be x Objects"
 
 
-@pytest.mark.slow
 def test_imx_parse_project_v500(imx_v500_project_instance: ImxSingleFile):
     imx = imx_v500_project_instance
     assert imx.file.imx_version == "5.0.0", "imx version should be 5.0.0"
@@ -69,7 +65,6 @@ def test_imx_parse_project_v500(imx_v500_project_instance: ImxSingleFile):
     assert imx.new_situation is None, "does not have a new situation"
 
 
-@pytest.mark.slow
 def test_imx_parse_v1200_zip(imx_v1200_zip_instance: ImxContainer):
     imx = imx_v1200_zip_instance
     assert (
@@ -79,7 +74,6 @@ def test_imx_parse_v1200_zip(imx_v1200_zip_instance: ImxContainer):
     assert len(imx.get_build_exceptions()) == 6, "should have x exceptions"
 
 
-@pytest.mark.slow
 def test_imx_parse_v1200_dir(imx_v1200_dir_instance: ImxContainer):
     imx = imx_v1200_dir_instance
     assert (

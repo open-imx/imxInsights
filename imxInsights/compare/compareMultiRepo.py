@@ -1,5 +1,4 @@
 import sys
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -8,8 +7,8 @@ import pandas as pd
 from loguru import logger
 from tqdm import tqdm
 
-from imxInsights.compare.changes import Change, ChangeStatus, get_object_changes
-from imxInsights.compare.excelReportGenerator import ExcelReportGenerator
+from imxInsights.compare.changedImxObject import ChangedImxObject
+from imxInsights.compare.changes import ChangeStatus, get_object_changes
 from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.compare.helpers import (
     merge_dict_keep_first_key,
@@ -17,6 +16,7 @@ from imxInsights.compare.helpers import (
     remove_empty_dicts,
     transform_dict,
 )
+from imxInsights.report.diffExcel import DiffExcel
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     df_sort_by_list,
@@ -30,63 +30,22 @@ from imxInsights.utils.shapely_geojson import (
 from imxInsights.utils.shapely_transform import ShapelyTransform
 
 
-@dataclass
-class ChangedImxObject:
-    """
-    Represents a changed IMX object with its change status and details.
-
-    Attributes:
-        puic (str): The unique identifier of the IMX object.
-        status (ChangeStatus): The change status of the IMX object.
-        changes (dict[str, Change]): A dictionary of changes for the IMX object.
-    """
-
-    puic: str
-    status: ChangeStatus
-    changes: dict[str, Change]
-    geometry: GeometryChange | None
-
-    def get_change_dict(self, add_analyse: bool) -> dict[str, str]:
-        """
-        Get a dictionary representation of the changes.
-
-        Args:
-            add_analyse (bool): Whether to include the analyse details in the result.
-
-        Returns:
-            A dictionary with change details and status.
-        """
-        analyse = (
-            {
-                f"{key}_analyse": value.analyse["display"]
-                for key, value in self.changes.items()
-                if value.analyse is not None
-            }
-            if add_analyse
-            else {}
-        )
-
-        return (
-            {key: value.diff_string for key, value in self.changes.items()}
-            | analyse
-            | {"status": self.status.value}
-        )
-
-
 class ImxCompareMultiRepo:
     """
     A class for comparing IMX objects across multiple repositories.
 
+    TODO: THIS SHOULD ACT MORE LIKE A NORMAL IMX REPO
+
     Attributes:
         _data (dict[str, Any]): Internal data dictionary for storing comparison results.
         container_order (Any): Order of containers to consider in the comparison.
-        diff (dict[str, list[ChangedImxObject]]): Dictionary holding the differences.
+        diff (dict[str, list[imxInsights.compare.changedImxObject.ChangedImxObject]]): Dictionary holding the differences.
         _containers (list): List of containers involved in the comparison.
     """
 
     def __init__(self):
         self._data: dict[str, Any] = {}
-        self.container_order: Any = ()
+        self.container_order: tuple[str, ...] = ()
         self.diff: dict[str, list[ChangedImxObject]] = {}
         self._containers: list[Any] = []
 
@@ -246,14 +205,14 @@ class ImxCompareMultiRepo:
 
                 diff_dict = get_object_changes(dict_1_flat, dict_2_flat)
 
-                self.diff[tag].append(
-                    ChangedImxObject(
-                        puic=key,
-                        status=self._determine_object_overall_status(diff_dict),
-                        changes=diff_dict,
-                        geometry=GeometryChange(t1=geometry_1, t2=geometry_2),
-                    )
+                change_obj = ChangedImxObject(
+                    puic=key,
+                    status=self._determine_object_overall_status(diff_dict),
+                    changes=diff_dict,
+                    geometry=GeometryChange(t1=geometry_1, t2=geometry_2),
                 )
+
+                self.diff[tag].append(change_obj)
                 pbar.update(1)
         logger.success("Compair done")
 
@@ -344,14 +303,14 @@ class ImxCompareMultiRepo:
         styled_df: bool = True,
     ):
         file_path = (
-            file_path or f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            file_path
+            if file_path is not None
+            else f'diff_excel_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
         )
-        report_generator = ExcelReportGenerator(
-            self.get_pandas(styled_df=add_analyse, add_analyse=styled_df),
-            self._containers,
-            self.container_order,
+        diff_excel = DiffExcel(
+            self, file_path, add_analyse=add_analyse, styled_df=styled_df
         )
-        report_generator.create_excel(file_path)
+        diff_excel.save()
 
     def get_geojson(
         self,
@@ -417,7 +376,9 @@ class ImxCompareMultiRepo:
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
     @classmethod
-    def from_multi_repo(cls, tree, container_order, containers):
+    def from_multi_repo(
+        cls, tree, container_order, containers
+    ) -> "ImxCompareMultiRepo":
         logger.info("Compair containers")
         _ = cls()
         _._containers = containers
@@ -425,3 +386,5 @@ class ImxCompareMultiRepo:
         _._set_diff_dict(tree)
         _._set_diff(container_order[0], container_order[1])
         return _
+
+    # TODO: implement metadata diff overview like normal repo has

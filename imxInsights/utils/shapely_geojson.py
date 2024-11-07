@@ -271,5 +271,5 @@ class FeatureCollection(GeoJsonFeatureCollection):
         if "crs" in extra:
             self["crs"] = {
                 "type": "name",
-                "properties": {"name": f"urn:ogc:def:crs:EPSG::{extra['crs']}"},
+                "properties": {"name": f"urn:ogc:def:crs:EPSG::{extra['crs'].value}"},
             }

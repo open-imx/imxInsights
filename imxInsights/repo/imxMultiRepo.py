@@ -1,7 +1,8 @@
 from copy import deepcopy
 
 from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
-from imxInsights.repo.imxRepo import ImxRepo
+from imxInsights.compare.compareMultiRepoProtocol import ImxCompareMultiRepoProtocol
+from imxInsights.repo.imxRepoProtocol import ImxRepoProtocol
 from imxInsights.repo.tree.imxMultiObjectTree import MultiObjectTree
 
 
@@ -20,7 +21,7 @@ class ImxMultiRepo:
         ValueError: If version_safe is True and containers have different IMX versions.
     """
 
-    def __init__(self, containers: list[ImxRepo], version_safe: bool = True):
+    def __init__(self, containers: list[ImxRepoProtocol], version_safe: bool = True):
         if version_safe:
             versions = [item.imx_version for item in containers]
             if not all(x == versions[0] for x in versions):
@@ -31,7 +32,7 @@ class ImxMultiRepo:
 
         # this will copy the element not the references
         containers = deepcopy(containers)
-        self.containers: list[ImxRepo] = [item for item in containers]
+        self.containers: list[ImxRepoProtocol] = [item for item in containers]
         self.container_order: tuple[str, ...] = tuple(
             [item.container_id for item in self.containers]
         )
@@ -68,7 +69,7 @@ class ImxMultiRepo:
                     item for item in destination_tree[key] if item not in value
                 ]
 
-    def _merge_containers(self, containers: list[ImxRepo]):
+    def _merge_containers(self, containers: list[ImxRepoProtocol]):
         """
         Merge the tree structures of multiple containers.
 
@@ -78,12 +79,12 @@ class ImxMultiRepo:
         for container in containers:
             self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
             self._merge_tree(
-                container._tree.build_extensions.exceptions,
-                self._tree.build_extensions.exceptions,
+                container._tree.build_exceptions.exceptions,
+                self._tree.build_exceptions.exceptions,
             )
         self._tree.update_keys()
 
-    def add_container(self, container: ImxRepo):
+    def add_container(self, container: ImxRepoProtocol):
         """
         Add an ImxContainer to the MultiContainer.
 
@@ -94,11 +95,11 @@ class ImxMultiRepo:
         self.containers.append(container)
         self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
         self._merge_tree(
-            container._tree.build_extensions.exceptions,
-            self._tree.build_extensions.exceptions,
+            container._tree.build_exceptions.exceptions,
+            self._tree.build_exceptions.exceptions,
         )
 
-    def remove_container(self, container: ImxRepo):
+    def remove_container(self, container: ImxRepoProtocol):
         """
         Remove an ImxContainer from the MultiContainer.
 
@@ -108,11 +109,11 @@ class ImxMultiRepo:
         self.containers.remove(container)
         self._remove_tree(container._tree.tree_dict, self._tree.tree_dict)
         self._remove_tree(
-            container._tree.build_extensions.exceptions,
-            self._tree.build_extensions.exceptions,
+            container._tree.build_exceptions.exceptions,
+            self._tree.build_exceptions.exceptions,
         )
 
-    def compare(self) -> ImxCompareMultiRepo:
+    def compare(self) -> ImxCompareMultiRepoProtocol:
         """Returns the compair of the repository
 
         returns:
