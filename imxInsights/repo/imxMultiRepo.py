@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
+from imxInsights.compare.compareMultiRepoProtocol import ImxCompareMultiRepoProtocol
 from imxInsights.repo.imxRepoProtocol import ImxRepoProtocol
 from imxInsights.repo.tree.imxMultiObjectTree import MultiObjectTree
 
@@ -112,7 +113,7 @@ class ImxMultiRepo:
             self._tree.build_exceptions.exceptions,
         )
 
-    def compare(self) -> ImxCompareMultiRepo:
+    def compare(self) -> ImxCompareMultiRepoProtocol:
         """Returns the compair of the repository
 
         returns:

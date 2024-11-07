@@ -15,10 +15,8 @@ from imxInsights.report.excelGenerator import ExcelReport
 from imxInsights.utils.excel_helpers import shorten_sheet_name
 
 if TYPE_CHECKING:
-    from imxInsights.compare.compareMultiRepo import (
-        ChangedImxObject,
-        ImxCompareMultiRepo,
-    )
+    from imxInsights.compare.changedImxObject import ChangedImxObject
+    from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
 
 
 class DiffExcel(ExcelReport):
@@ -39,6 +37,7 @@ class DiffExcel(ExcelReport):
 
         self.create_info_sheet()
         self.index_sheet = self.get_or_create_worksheet("index")
+        self.index_sheet_last_row = 0
         self.create_metadata_overview()
         self.create_object_sheets()
 
@@ -219,11 +218,21 @@ class DiffExcel(ExcelReport):
             pbar.set_description(
                 f"{current_time} | {logger.level('INFO').name}     | Writing Excel Sheet"
             )
-            for key, value in self.diff_df_dict.items():
+            for key, imx_object_df in self.diff_df_dict.items():
                 sheet_name = shorten_sheet_name(f"{key}")
-                if not isinstance(value, dict):
+
+                self.index_sheet.write(self.index_sheet_last_row, 0, key)
+                self.index_sheet.write_url(
+                    self.index_sheet_last_row,
+                    1,
+                    f"internal:{sheet_name}!A1",
+                    string=sheet_name,
+                )
+                self.index_sheet_last_row = self.index_sheet_last_row + 1
+
+                if not isinstance(imx_object_df, dict):
                     next_row = self.add_dataframe(
-                        value,  # type: ignore
+                        imx_object_df,  # type: ignore
                         sheet_name,
                         start_row=0,
                         start_col=0,
@@ -233,6 +242,7 @@ class DiffExcel(ExcelReport):
                     worksheet.freeze_panes(1, 0)
                     worksheet.autofilter(0, 0, 0, next_row)
 
-                # todo: check if all not changed, then we should make the sheet gray
+                    if (imx_object_df.data["status"] == "unchanged").all():
+                        worksheet.set_tab_color("gray")
 
                 pbar.update(1)
