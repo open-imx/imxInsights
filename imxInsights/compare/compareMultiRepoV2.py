@@ -32,7 +32,7 @@ class ChangedImxObjectV2:
         elif self.t2 and hasattr(self.t2, "puic"):
             return self.t2.puic
         else:
-            raise AttributeError("Neither t1 nor t2 has a 'puic' attribute.")
+            raise AttributeError("Neither t1 nor t2 has a 'puic' attribute.")  # NOQA TRY003
 
     def _prepare_properties(self) -> tuple[dict, dict]:
         t1_props = self.t1.get_imx_property_dict() if self.t1 else {}
@@ -94,7 +94,7 @@ class MultiRepoImxObjectV2:
     def get_by_container_id(self, container_id: str) -> ImxObject | None:
         """Retrieve the ImxObject for a specific container."""
         if container_id not in self.container_order:
-            raise ValueError(f"container_id: {container_id} not present")
+            raise ValueError(f"container_id: {container_id} not present")  # NOQA TRY003
 
         container_index = self.container_order.index(container_id)
         return (
@@ -109,7 +109,8 @@ class MultiRepoImxObjectV2:
 
     def __iter__(self):
         for item in self.imx_objects:
-            yield item
+            if item is not None:
+                yield item
 
     def __repr__(self):
         return f"<MultiRepoImxObject {self.imx_objects} >"
@@ -156,13 +157,13 @@ class ImxCompareMultiRepoV2:
             container: ImxContainerProtocol | ImxSituationProtocol,
         ) -> None:
             if container.container_id in seen_container_ids:
-                raise ValueError(
+                raise ValueError(  # NOQA TRY003
                     f"Duplicate container_id '{container.container_id}' detected"
                 )
             seen_container_ids.add(container.container_id)
 
             if version_safe and container.imx_version != first_version:
-                raise ValueError(
+                raise ValueError(  # NOQA TRY003
                     f"Container '{container.container_id}' has a different imx_version. Expected '{first_version}', got '{container.imx_version}'."
                 )
 
@@ -192,7 +193,7 @@ class ImxCompareMultiRepoV2:
     def _get_objects_by_key(self, key: str | None = None) -> MultiRepoImxObjectV2:
         """Helper to retrieve ImxObjects by key or return default None values if the key is missing."""
         if key and key not in self._keys:
-            raise ValueError(f"key:{key} not in tree.")
+            raise ValueError(f"key:{key} not in tree.")  # NOQA TRY003
 
         imx_object = self.tree_dict.get(key or "", None)
 
@@ -312,59 +313,61 @@ class ImxCompareMultiRepoV2:
         }
 
 
-from imxInsights import ImxContainer, ImxSingleFile
-
-imx_a = ImxSingleFile(
-    r"C:\Users\marti\OneDrive - ProRail BV\ENL\TVP4\tvp4a_10-24\RVTO Swd-Dz P03\IMX levering ENL Perceel 4A 04-10-2024\O_D_003122_ENL_TVP04a_000__RVTO_20241001.xml"
-)
-imx_container = ImxContainer(r"C:\repos\imxInsights\sample_data\compare\NewSituation")
-
-multi = ImxCompareMultiRepoV2(
-    [
-        situation
-        for situation in [imx_a.initial_situation, imx_a.new_situation, imx_container]
-        if situation is not None
-    ],
-    version_safe=False,
-)
-tester_0 = multi.get_all()
-
-tester_1_a = multi.find("3a813351-5b73-4cb2-9882-90fbedafeb97")
-tester_1_a_compare = tester_1_a.compare(
-    container_id_t1=tester_1_a.container_order[0],
-    container_id_t2=tester_1_a.container_order[1],
-)
-
-
-tester_1_b = multi.find("f1e5f05f-deae-48b5-82f4-1746607b1ed4")
-tester_1_b_compare = tester_1_b.compare(
-    container_id_t1=tester_1_a.container_order[0],
-    container_id_t2=tester_1_a.container_order[1],
-)
-
-
-tester_2 = multi.get_all_types()
-tester_2_query = multi.get_by_types(["ReflectorPost"])
-
-tester_3 = multi.get_all_paths()
-tester_3_query = multi.get_by_paths(["SingleSwitch.SwitchMechanism.Lock"])
-
-
-df_ = multi.get_pandas_df(paths=["CivilConstruction"], pivot_df=True)
-df_.to_excel("tester.xlsx", merge_cells=False)
-
-
-df_a = multi.get_pandas_df(paths=["AtbVvInstallation"])
-
-
-df_b = multi.get_pandas_df(
-    types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"]
-)
-
-df_pivot = multi.get_pandas_df(
-    types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"], pivot_df=True
-)
-
-
-# tester = multi.get_pandas_df_dict()
-print()
+#
+#
+# from imxInsights import ImxContainer, ImxSingleFile
+#
+# imx_a = ImxSingleFile(
+#     r"C:\Users\marti\OneDrive - ProRail BV\ENL\TVP4\tvp4a_10-24\RVTO Swd-Dz P03\IMX levering ENL Perceel 4A 04-10-2024\O_D_003122_ENL_TVP04a_000__RVTO_20241001.xml"
+# )
+# imx_container = ImxContainer(r"C:\repos\imxInsights\sample_data\compare\NewSituation")
+#
+# multi = ImxCompareMultiRepoV2(
+#     [
+#         situation
+#         for situation in [imx_a.initial_situation, imx_a.new_situation, imx_container]
+#         if situation is not None
+#     ],
+#     version_safe=False,
+# )
+# tester_0 = multi.get_all()
+#
+# tester_1_a = multi.find("3a813351-5b73-4cb2-9882-90fbedafeb97")
+# tester_1_a_compare = tester_1_a.compare(
+#     container_id_t1=tester_1_a.container_order[0],
+#     container_id_t2=tester_1_a.container_order[1],
+# )
+#
+#
+# tester_1_b = multi.find("f1e5f05f-deae-48b5-82f4-1746607b1ed4")
+# tester_1_b_compare = tester_1_b.compare(
+#     container_id_t1=tester_1_a.container_order[0],
+#     container_id_t2=tester_1_a.container_order[1],
+# )
+#
+#
+# tester_2 = multi.get_all_types()
+# tester_2_query = multi.get_by_types(["ReflectorPost"])
+#
+# tester_3 = multi.get_all_paths()
+# tester_3_query = multi.get_by_paths(["SingleSwitch.SwitchMechanism.Lock"])
+#
+#
+# df_ = multi.get_pandas_df(paths=["CivilConstruction"], pivot_df=True)
+# df_.to_excel("tester.xlsx", merge_cells=False)
+#
+#
+# df_a = multi.get_pandas_df(paths=["AtbVvInstallation"])
+#
+#
+# df_b = multi.get_pandas_df(
+#     types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"]
+# )
+#
+# df_pivot = multi.get_pandas_df(
+#     types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"], pivot_df=True
+# )
+#
+#
+# # tester = multi.get_pandas_df_dict()
+# print()
