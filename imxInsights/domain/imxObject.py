@@ -72,6 +72,7 @@ class ImxObject:
             | MultiPolygon
             | GeometryCollection
         ) = GeometryCollection()
+        # TODO: make get properties methode that combines (optional imx_extensions, optional _geometry)
         self.properties: dict[str, str] = flatten_dict(
             lxml_element_to_dict(self._element)
         )
@@ -154,6 +155,40 @@ class ImxObject:
             extensions_dict[f"extension.{item.tag}"].append(item.properties)
         # todo: make flatten_dict also handle defaultdict
         return flatten_dict(dict(extensions_dict))
+
+    def get_imx_property_dict(
+        self,
+        add_extension_properties: bool = True,
+        add_parent: bool = True,
+        add_children: bool = True,
+        add_geometry: bool = False,
+    ) -> dict[str, str]:
+        """
+        Retrieve a dictionary containing IMX properties, including the tag, path,
+        properties, and optionally extension properties and geometry.
+
+        Args:
+            add_extension_properties : A dictionary of additional extension properties to include in the result.
+            add_parent: Includes the parent puic in the result.
+            add_children: Includes all puics of children in the result.
+            add_geometry: Includes string representing geometry data in the result.
+
+        Returns:
+            A dictionary with 'keys' 'values' of all interesting imx properties
+        """
+        result = {"tag": self.tag, "path": self.path} | self.properties
+        if add_extension_properties:
+            result |= self.extension_properties
+        if add_parent:
+            result["parent"] = self.parent.puic if self.parent is not None else ""
+        if add_children:
+            result["children"] = " ".join(
+                [item.puic for item in self.children if item is not None]
+            )
+        if add_geometry:
+            result["geometry"] = self.geometry.wkt
+
+        return result
 
     def extend_imx_object(self, imx_extension_object: "ImxObject") -> None:
         """
