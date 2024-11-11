@@ -127,8 +127,9 @@ class DiffExcel(ExcelReport):
         paths_a = [self._get_full_path(node) for node in nodes[0]]
         paths_b = [self._get_full_path(node) for node in nodes[1]]
 
+        puics_in_a = [_[-1] for _ in paths_a]
         for item in paths_b:
-            if item not in paths_a:
+            if item[-1] not in puics_in_a:
                 paths_a.append(item)
 
         list_of_columns = [

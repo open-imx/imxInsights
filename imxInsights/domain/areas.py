@@ -19,8 +19,11 @@ class Area:
             raise ValueError("Coordinates element or its text content is missing.")  # noqa: TRY003
 
         coordinates = coordinates_element.text
+        tag_str = str(element.tag)  # Ensuring element.tag is a string
+        name_value = tag_str.split("}")[1] if not name else name
+
         return Area(
-            name=element.tag.split("}")[1] if not name else name,
+            name=name_value,
             coordinates=coordinates,
             shapely=GmlShapleyFactory.gml_polygon_to_shapely(coordinates),
         )
