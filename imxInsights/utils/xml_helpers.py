@@ -1,4 +1,5 @@
 from datetime import datetime
+from xml.etree.ElementTree import QName
 
 import dateparser
 from lxml.etree import _Element as Element
@@ -31,7 +32,15 @@ def find_parent_entity(elem: Element) -> Element | None:
     except ValueError:
         return None
 
-    return parent if trim_tag(parent.tag) != "Project" else None
+    tag = parent.tag
+    if isinstance(tag, bytes):
+        tag = tag.decode("utf-8")
+    elif isinstance(tag, QName):
+        tag = str(tag)
+    else:
+        tag = str(tag)
+
+    return parent if trim_tag(tag) != "Project" else None
 
 
 def lxml_element_to_dict(

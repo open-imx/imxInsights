@@ -93,7 +93,11 @@ class ImxObject:
 
     @property
     def tag(self) -> str:
-        return trim_tag(self._element.tag)
+        return trim_tag(
+            f"{self._element.tag.decode('utf-8')}"
+            if isinstance(self._element.tag, bytes)
+            else f"{self._element.tag}"
+        )
 
     @property
     def path(self) -> str:
@@ -174,7 +178,9 @@ class ImxObject:
         ]
         parent_element = find_parent_with_tag(self._element, tags)
         if parent_element is not None:
-            return parent_element.tag.removeprefix(namespace)
+            tag = parent_element.tag
+            if isinstance(tag, str):
+                return tag.removeprefix(namespace)
         return None
 
     def _parents_generator(self) -> Iterable["ImxObject"]:
@@ -237,8 +243,6 @@ class ImxObject:
             if parent_element is not None:
                 if parent_element in lookup:
                     parent = lookup[parent_element]
-                else:
-                    warnings.warn("Parent entity not found in lookup")
 
             obj = ImxObject(parent=parent, element=entity, imx_file=imx_file)
             lookup[entity] = obj

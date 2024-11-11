@@ -93,5 +93,5 @@ class GmlShapleyFactory:
                 return cls.gml_polygon_to_shapely(coordinates_element.text)
 
         raise NotImplementedError(
-            f"gml shapley generation for {gml_element.tag} not supported"
+            f"gml shapley generation for {gml_element.tag!r} not supported"
         )

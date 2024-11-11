@@ -47,7 +47,10 @@ class ImxSituation(ImxRepo):
 
     def _determine_situation_type(self) -> ImxSituationEnum:
         """Determine the situation type from the element tag."""
-        return ImxSituationEnum[self._element.tag.split("}")[-1]]
+        tag = self._element.tag
+        if isinstance(tag, str):
+            return ImxSituationEnum[tag.split("}")[-1]]
+        raise NotImplementedError("bytes, bytearray or QName not supported")
 
     def _populate_tree(self, element: Element):
         self._tree.add_imx_element(element, self._imx_file, self.container_id)
