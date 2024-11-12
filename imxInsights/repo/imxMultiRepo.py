@@ -1,11 +1,22 @@
+import sys
 from collections import OrderedDict
+from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
+from loguru import logger
+from tqdm import tqdm
 
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
+from imxInsights.utils.shapely_geojson import (
+    CrsEnum,
+    ShapelyGeoJsonFeature,
+    ShapelyGeoJsonFeatureCollection,
+)
+from imxInsights.utils.shapely_transform import ShapelyTransform
 
 
 class ImxMultiRepo:
@@ -23,7 +34,6 @@ class ImxMultiRepo:
             OrderedDict()
         )
         self._keys: frozenset[str] = frozenset()
-
         self._process_container_objects()
         self._update_keys()
 
@@ -93,7 +103,10 @@ class ImxMultiRepo:
         )
         return ImxMultiRepoObject(tester, self.container_order)
 
-    def find(self, key: str, return_none=True) -> ImxMultiRepoObject:
+    def find(
+        self,
+        key: str,
+    ) -> ImxMultiRepoObject:
         """Returns all ImxObject instances for a given key (puic), maintaining container order."""
         return self._get_objects_by_key(key)
 
@@ -147,7 +160,7 @@ class ImxMultiRepo:
         data = []
         for obj_tuple in imx_objects:
             for idx, imx_obj in enumerate(obj_tuple):
-                if imx_obj:
+                if isinstance(imx_obj, ImxObject):
                     properties = {
                         "container_id": imx_obj.container_id,
                         "imx_situation": imx_obj.imx_situation or None,
@@ -156,7 +169,6 @@ class ImxMultiRepo:
                     data.append(properties)
                 else:
                     data.append({"container_id": self.container_order[idx]})
-
         df = pd.DataFrame(data)
         df = self._prepare_dataframe(df, pivot_df)
         return df
@@ -195,3 +207,118 @@ class ImxMultiRepo:
             path: self.get_pandas_df(paths=[path], pivot_df=pivot_df)
             for path in self.get_all_paths()
         }
+
+    def get_geojson(
+        self,
+        object_path: list[str],
+        container_id: str,
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ) -> ShapelyGeoJsonFeatureCollection:
+        """Generate a GeoJSON feature collection from a list of object types or paths."""
+        features: list[ShapelyGeoJsonFeature] = []
+
+        for item in self.get_by_paths(object_path):
+            for imx_object in item.imx_objects:
+                if not imx_object:
+                    break
+
+                if imx_object.container_id != container_id:
+                    break
+
+                location = None
+                if imx_object.geometry is not None:
+                    location = imx_object.geometry
+                if imx_object.geographic_location is not None and hasattr(
+                    imx_object.geographic_location, "shapely"
+                ):
+                    location = imx_object.geographic_location.shapely
+
+                if location:
+                    geometry = (
+                        ShapelyTransform.rd_to_wgs(location) if to_wgs else location
+                    )
+                    features.append(
+                        ShapelyGeoJsonFeature(
+                            geometry_list=[geometry],
+                            properties=imx_object.properties
+                            | (
+                                imx_object.extension_properties
+                                if extension_properties
+                                else {}
+                            ),
+                        )
+                    )
+        return ShapelyGeoJsonFeatureCollection(
+            features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
+        )
+
+    def create_geojson_files(
+        self,
+        directory_path: str | Path,
+        container_id: str,
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ) -> None:
+        """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
+        for path in self.get_all_paths():
+            dir_path = Path(directory_path)
+            dir_path.mkdir(parents=True, exist_ok=True)
+            geojson_feature_collection = self.get_geojson(
+                [path],
+                container_id,
+                to_wgs=to_wgs,
+                extension_properties=extension_properties,
+            )
+            geojson_file_path = dir_path / f"{path}.geojson"
+            geojson_feature_collection.to_geojson_file(geojson_file_path)
+            logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
+
+    def get_container(self, container_id: str):
+        container = [
+            container
+            for container in self.containers
+            if container.container_id == container_id
+        ]
+        if len(container) == 1:
+            return container[0]
+        raise ValueError("Container not present")
+
+    def compare(self, container_id_1: str, container_id_2: str):
+        return ComparedMultiRepo(
+            self.get_container(container_id_1),
+            self.get_container(container_id_2),
+            self.get_all(),
+        )
+
+
+class ComparedMultiRepo:
+    def __init__(
+        self,
+        container_1: ImxContainerProtocol,
+        container_2: ImxContainerProtocol,
+        compared_objects: list[ImxMultiRepoObject],
+    ):
+        self.container_1 = container_1
+        self.container_2 = container_2
+        self.compared_objects = []
+
+        with tqdm(total=len(compared_objects), file=sys.stdout) as pbar:  # type: ignore
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            pbar.set_description(
+                f"{current_time} | {logger.level('INFO').name}     | Comparing objects"
+            )
+            for item in compared_objects:
+                self.compared_objects.append(
+                    item.compare(container_1.container_id, container_2.container_id)
+                )
+                pbar.update(1)
+        logger.success(f"Compared all objects.")
+
+        print()
+
+    # todo: get dataframe
+
+    # todo: get dataframe dict
+
+    # todo: get excel

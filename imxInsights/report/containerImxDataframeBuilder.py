@@ -5,7 +5,7 @@ from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerP
 from imxInsights.utils.flatten_unflatten import hash_sha256
 
 
-class ContainerImxPandasGenerator:
+class ContainerImxDataframeBuilder:
     def __init__(self, container: ImxContainerProtocol) -> None:
         self._container = container
 

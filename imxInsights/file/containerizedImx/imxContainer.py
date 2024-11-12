@@ -5,7 +5,7 @@ from loguru import logger
 from imxInsights.file.containerizedImx.imxContainerFiles import ImxContainerFiles
 from imxInsights.file.containerizedImx.imxContainerMetadata import ImxContainerMetadata
 from imxInsights.repo.imxRepo import ImxRepo
-from imxInsights.report.containerImxPandasGenerator import ContainerImxPandasGenerator
+from imxInsights.report.containerImxDataframeBuilder import ContainerImxDataframeBuilder
 
 
 class ImxContainer(ImxRepo):
@@ -33,7 +33,7 @@ class ImxContainer(ImxRepo):
         self._populate_tree()
 
         logger.success(f"Finished processing {self._input_file_path.name}")
-        self.dataframes = ContainerImxPandasGenerator(self)
+        self.dataframes = ContainerImxDataframeBuilder(self)
 
     @staticmethod
     def _initialize_file_path(imx_file_path: Path | str) -> Path:

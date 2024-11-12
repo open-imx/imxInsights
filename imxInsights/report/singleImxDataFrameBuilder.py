@@ -5,7 +5,7 @@ from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProt
 from imxInsights.utils.flatten_unflatten import hash_sha256
 
 
-class SingleImxPandasGenerator:
+class SingleImxDataFrameBuilder:
     def __init__(self, situation: ImxSituationProtocol):
         self._situation = situation
 

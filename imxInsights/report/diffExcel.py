@@ -16,25 +16,32 @@
 #
 # if TYPE_CHECKING:
 #     from imxInsights.compare.changedImxObject import ChangedImxObject
-#
-#     # from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
+#     from imxInsights.repo.imxMultiRepo import ComparedMultiRepo
 #
 #
 # class DiffExcel(ExcelReport):
 #     def __init__(
 #         self,
-#         imx_multi_container: ImxCompareMultiRepo,
+#         imx_multi_container: ComparedMultiRepo,
 #         file_path: str | Path,
 #         styled_df: bool = False,
 #         add_analyse: bool = False,
 #     ):
 #         super().__init__(file_path)
 #         self.repo = imx_multi_container
-#         self.diff_df_dict = imx_multi_container.get_pandas(
-#             styled_df=styled_df, add_analyse=add_analyse
+#         self.container_order = (
+#             imx_multi_container.container_1.container_id,
+#             imx_multi_container.container_2.container_id,
 #         )
-#         self.container_order = imx_multi_container.container_order
-#         self._containers = imx_multi_container.containers
+#         self._containers = (
+#             imx_multi_container.container_1,
+#             imx_multi_container.container_2,
+#         )
+#
+#         # todo: below, should return dataframe dict!
+#         # self.diff_df_dict = imx_multi_container.get_pandas(
+#         #     styled_df=styled_df, add_analyse=add_analyse
+#         # )
 #
 #         self.create_info_sheet()
 #         self.index_sheet = self.get_or_create_worksheet("index")

@@ -12,7 +12,7 @@ from imxInsights.file.singleFileImx.imxSingleFile import ImxSingleFile
 #     with tempfile.NamedTemporaryFile(delete=False, suffix=f".xlsx") as temp_file:
 #         compared_imx.create_excel(temp_file.name, styled_df=True, add_analyse=True)
 
-@pytest.mark.slow
+# @pytest.mark.slow
 def test_v124_v500(
     imx_v124_project_instance: ImxSingleFile,
     imx_v500_project_instance: ImxSingleFile,
@@ -20,11 +20,15 @@ def test_v124_v500(
     multi_repo = ImxMultiRepo(
         [
             imx_v124_project_instance.initial_situation,
-            imx_v500_project_instance.initial_situation,
+            imx_v124_project_instance.new_situation,
         ],
         version_safe=False,
     )
-    # compared_imx = multi_repo.compare()
+    compared_imx = multi_repo.compare(
+        imx_v124_project_instance.initial_situation.container_id,
+        imx_v124_project_instance.new_situation.container_id
+    )
+    print()
     # compared_imx.create_excel("v124-v500.xlsx", styled_df=True, add_analyse=True)
     # create_excel(compared_imx)
 

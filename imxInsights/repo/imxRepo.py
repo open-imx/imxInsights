@@ -10,7 +10,7 @@ from loguru import logger
 
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
-from imxInsights.repo.tree.imxObjectTree import ObjectTree
+from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
@@ -76,7 +76,6 @@ class ImxRepo:
             Iterable[ImxObject]: An iterable of all ImxObjects.
 
         """
-
         return self._tree.get_all()
 
     def find(self, key: str | ImxObject) -> ImxObject | None:

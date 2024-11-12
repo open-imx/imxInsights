@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 
 from imxInsights import ImxSingleFile, ImxContainer
@@ -124,15 +125,24 @@ def test_multi_repo(imx_v500_project_instance: ImxSingleFile, imx_v1200_zip_inst
     assert len(list(multi_repo.get_by_paths(["Signal.IlluminatedSign"]))) == 19, "Should have x imx paths items"
     assert len(list(multi_repo.get_by_paths(["Signal", "Signal.IlluminatedSign"]))) == 153, "Should have x imx paths items"
 
-    # df = multi_repo.get_pandas_df(paths=["CivilConstruction"], pivot_df=True)
-    # df_a = multi_repo.get_pandas_df(paths=["AtbVvInstallation"])
-    #
-    # df_b = multi_repo.get_pandas_df(
-    #     types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"]
-    # )
-    #
-    # df_pivot = multi_repo.get_pandas_df(
-    #     types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"], pivot_df=True
-    # )
-    #
-    # tester = multi_repo.get_pandas_df_dict()
+    df = multi_repo.get_pandas_df(paths=["CivilConstruction"], pivot_df=True)
+    assert df.shape == (4, 25), "Dataframe should be x, x"
+
+    df_a = multi_repo.get_pandas_df(paths=["AtbVvInstallation"])
+    assert df_a.shape == (27, 17), "Dataframe should be x, x"
+
+    df_b = multi_repo.get_pandas_df(
+        types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"]
+    )
+    assert df_b.shape == (393, 45), "Dataframe should be x, x"
+
+    df_pivot = multi_repo.get_pandas_df(
+        types=["Signal", "Sign"], paths=["SingleSwitch.SwitchMechanism.Lock"], pivot_df=True
+    )
+    assert df_pivot.shape == (393, 42), "Dataframe should be x, x"
+    assert len(df_pivot.index.names) == 3, "Dataframe should have 3 index columns"
+
+    df_dict = multi_repo.get_pandas_df_dict()
+    assert len(df_dict.keys()) == 252, "Dataframe dict should contain x object types"
+    for value in df_dict.values():
+        assert isinstance(value, pd.DataFrame)

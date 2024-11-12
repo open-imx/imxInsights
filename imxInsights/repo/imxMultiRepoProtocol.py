@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from pathlib import Path
 
 # from pathlib import Path
 from typing import Protocol, runtime_checkable
@@ -9,6 +10,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
+from imxInsights.utils.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 # from imxInsights.utils.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
@@ -69,21 +71,22 @@ class ImxMultiRepoProtocol(Protocol):
         """Generates a DataFrame with specific population properties."""
         ...
 
-    # TODO: Implement
-    # def get_geojson(
-    #     self,
-    #     object_path: list[str],
-    #     to_wgs: bool = True,
-    #     extension_properties: bool = False,
-    # ) -> ShapelyGeoJsonFeatureCollection:
-    #     """Generate a GeoJSON feature collection from a list of object types or paths."""
-    #     ...
-    #
-    # def create_geojson_files(
-    #     self,
-    #     directory_path: str | Path,
-    #     to_wgs: bool = True,
-    #     extension_properties: bool = False,
-    # ) -> None:
-    #     """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
-    #     ...
+    def get_geojson(
+        self,
+        object_path: list[str],
+        container_id: str,
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ) -> ShapelyGeoJsonFeatureCollection:
+        """Generate a GeoJSON feature collection from a list of object types or paths."""
+        ...
+
+    def create_geojson_files(
+        self,
+        directory_path: str | Path,
+        container_id: str,
+        to_wgs: bool = True,
+        extension_properties: bool = False,
+    ) -> None:
+        """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
+        ...
