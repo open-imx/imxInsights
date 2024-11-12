@@ -95,7 +95,7 @@ class ShapelyGeoJsonFeature:
         if props is None:
             self._properties = {}
         elif not isinstance(props, dict):
-            raise ValueError("Properties must be a dictionary.")  # NOQA TRY003
+            raise ValueError("Properties must be a dictionary.")
         else:
             self._properties = props
 

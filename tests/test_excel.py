@@ -2,16 +2,15 @@ import tempfile
 
 import pytest
 
-from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
 from imxInsights.file.containerizedImx.imxContainer import ImxContainer
 from imxInsights.repo.imxMultiRepo import ImxMultiRepo
 from imxInsights.file.singleFileImx.imxSingleFile import ImxSingleFile
 
 
-@pytest.mark.slow
-def create_excel(compared_imx: ImxCompareMultiRepo):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".xlsx") as temp_file:
-        compared_imx.create_excel(temp_file.name, styled_df=True, add_analyse=True)
+# @pytest.mark.slow
+# def create_excel(compared_imx: ImxCompareMultiRepo):
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=f".xlsx") as temp_file:
+#         compared_imx.create_excel(temp_file.name, styled_df=True, add_analyse=True)
 
 @pytest.mark.slow
 def test_v124_v500(
@@ -25,8 +24,8 @@ def test_v124_v500(
         ],
         version_safe=False,
     )
-    compared_imx = multi_repo.compare()
-    compared_imx.create_excel("v124-v500.xlsx", styled_df=True, add_analyse=True)
+    # compared_imx = multi_repo.compare()
+    # compared_imx.create_excel("v124-v500.xlsx", styled_df=True, add_analyse=True)
     # create_excel(compared_imx)
 
 
@@ -41,8 +40,8 @@ def test_v124_v1200_zip(
         ],
         version_safe=False,
     )
-    compared_imx = multi_repo.compare()
-    compared_imx.create_excel("v1200_zip.xlsx", styled_df=True, add_analyse=True)
+    # compared_imx = multi_repo.compare()
+    # compared_imx.create_excel("v1200_zip.xlsx", styled_df=True, add_analyse=True)
     # create_excel(compared_imx)
 
 
@@ -57,6 +56,6 @@ def test_v124_v1200_folder(
         ],
         version_safe=False,
     )
-    compared_imx = multi_repo.compare()
-    compared_imx.create_excel("v1200_folder.xlsx", styled_df=True, add_analyse=True)
+    # compared_imx = multi_repo.compare()
+    # compared_imx.create_excel("v1200_folder.xlsx", styled_df=True, add_analyse=True)
     # create_excel(compared_imx)

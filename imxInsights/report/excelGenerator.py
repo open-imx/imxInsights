@@ -41,11 +41,11 @@ class ExcelReport:
     def _validate_format_keys(self, keys: list[str]):
         for key in keys:
             if key not in self.formats:
-                raise ValueError(f"No format matches '{key}'")  # NOQA TRY003
+                raise ValueError(f"No format matches '{key}'")
 
     def _get_single_format(self, key: str):
         if key not in self.formats:
-            raise ValueError(f"No format matches '{key}'")  # NOQA TRY003
+            raise ValueError(f"No format matches '{key}'")
         return self.formats[key]
 
     def add_dataframe(

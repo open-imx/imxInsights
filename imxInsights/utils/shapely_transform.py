@@ -122,7 +122,7 @@ class ShapelyTransform:
             return cls._transform_geometrycollection(geometry, transformer)
 
         else:
-            raise TypeError(f"Unsupported geometry type: {type(geometry).__name__}")  # NOQA TRY003
+            raise TypeError(f"Unsupported geometry type: {type(geometry).__name__}")
 
     @classmethod
     def _transform_coords(cls, coords, transformer):
@@ -135,7 +135,7 @@ class ShapelyTransform:
                 x, y, z = coord
                 transformed_coord = transformer.transform(x, y) + (z,)
             else:
-                raise ValueError(  # NOQA TRY003
+                raise ValueError(
                     "Coordinate must have either 2 (x, y) or 3 (x, y, z) elements"
                 )
             transformed_coords.append(transformed_coord)

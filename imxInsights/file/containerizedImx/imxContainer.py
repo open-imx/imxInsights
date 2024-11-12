@@ -27,7 +27,7 @@ class ImxContainer(ImxRepo):
         super().__init__(self._input_file_path)
 
         self._validate_container_path()
-        self.files = self._load_imx_files()
+        self.files: ImxContainerFiles = self._load_imx_files()
         self.imx_version = self._get_imx_version()
         self.project_metadata = self._populate_project_metadata()
         self._populate_tree()
@@ -35,7 +35,8 @@ class ImxContainer(ImxRepo):
         logger.success(f"Finished processing {self._input_file_path.name}")
         self.dataframes = ContainerImxPandasGenerator(self)
 
-    def _initialize_file_path(self, imx_file_path: Path | str) -> Path:
+    @staticmethod
+    def _initialize_file_path(imx_file_path: Path | str) -> Path:
         """Initialize and return a Path object from the input file path."""
         logger.info(f"Processing {Path(imx_file_path).name}")
         return Path(imx_file_path) if isinstance(imx_file_path, str) else imx_file_path
@@ -43,7 +44,7 @@ class ImxContainer(ImxRepo):
     def _validate_container_path(self):
         """Validate that the given path is a valid directory or file."""
         if not self.path.is_dir():
-            raise ValueError("Container is not a valid directory, zip, or path string")  # NOQA TRY003
+            raise ValueError("Container is not a valid directory, zip, or path string")
 
     def _load_imx_files(self) -> ImxContainerFiles:
         """Load IMX files from the container path."""

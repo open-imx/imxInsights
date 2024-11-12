@@ -1,124 +1,197 @@
-from copy import deepcopy
+from collections import OrderedDict
 
-from imxInsights.compare.compareMultiRepo import ImxCompareMultiRepo
-from imxInsights.compare.compareMultiRepoProtocol import ImxCompareMultiRepoProtocol
-from imxInsights.repo.imxRepoProtocol import ImxRepoProtocol
-from imxInsights.repo.tree.imxMultiObjectTree import MultiObjectTree
+import pandas as pd
+
+from imxInsights.domain.imxObject import ImxObject
+from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
+from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
+from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
 
 
 class ImxMultiRepo:
-    """
-    Represents a collection of ImxContainers.
+    def __init__(
+        self,
+        containers: list[ImxContainerProtocol | ImxSituationProtocol],
+        version_safe: bool = True,
+    ):
+        self._validate_containers(containers, version_safe)
+        self.containers: list[ImxContainerProtocol | ImxSituationProtocol] = containers
+        self.container_order: list[str] = [
+            container.container_id for container in self.containers
+        ]
+        self.tree_dict: OrderedDict[str, OrderedDict[str, list[ImxObject]]] = (
+            OrderedDict()
+        )
+        self._keys: frozenset[str] = frozenset()
 
-    Attributes:
-        containers: A list of ImxContainers.
+        self._process_container_objects()
+        self._update_keys()
 
-    Args:
-        containers: A list of ImxContainers.
-        version_safe: If True, ensures all containers have the same IMX version.
+    @staticmethod
+    def _validate_containers(
+        containers: list[ImxContainerProtocol | ImxSituationProtocol],
+        version_safe: bool,
+    ) -> None:
+        """Ensure containers have unique IDs and the same imx_version if version safe."""
 
-    Raises:
-        ValueError: If version_safe is True and containers have different IMX versions.
-    """
+        seen_container_ids: set[str] = set()
+        first_version = containers[0].imx_version if containers else None
 
-    def __init__(self, containers: list[ImxRepoProtocol], version_safe: bool = True):
-        if version_safe:
-            versions = [item.imx_version for item in containers]
-            if not all(x == versions[0] for x in versions):
-                # todo: make IMX error
-                raise ValueError(  # noqa TRY003
-                    "Containers should have same imx version, use version_safe to explicit ignore versions"
+        def _validate_container(
+            container: ImxContainerProtocol | ImxSituationProtocol,
+        ) -> None:
+            if container.container_id in seen_container_ids:
+                raise ValueError(
+                    f"Duplicate container_id '{container.container_id}' detected"
+                )
+            seen_container_ids.add(container.container_id)
+
+            if version_safe and container.imx_version != first_version:
+                raise ValueError(
+                    f"Container '{container.container_id}' has a different imx_version. Expected '{first_version}', got '{container.imx_version}'."
                 )
 
-        # this will copy the element not the references
-        containers = deepcopy(containers)
-        self.containers: list[ImxRepoProtocol] = [item for item in containers]
-        self.container_order: tuple[str, ...] = tuple(
-            [item.container_id for item in self.containers]
-        )
-        self._tree: MultiObjectTree = MultiObjectTree()
-        self._merge_containers(self.containers)
-
-    @staticmethod
-    def _merge_tree(source_tree, destination_tree):
-        """
-        Merge two tree structures.
-
-        Args:
-            source_tree: The source tree to merge.
-            destination_tree: The destination tree to merge into.
-        """
-        for key, value in source_tree.items():
-            if key in destination_tree:
-                destination_tree[key].extend(value)
-            else:
-                destination_tree[key] = list(value)
-
-    @staticmethod
-    def _remove_tree(source_tree, destination_tree):
-        """
-        Remove items from a tree structure.
-
-        Args:
-            source_tree: The source tree containing items to remove.
-            destination_tree: The destination tree to remove items from.
-        """
-        for key, value in source_tree.items():
-            if key in destination_tree:
-                destination_tree[key] = [
-                    item for item in destination_tree[key] if item not in value
-                ]
-
-    def _merge_containers(self, containers: list[ImxRepoProtocol]):
-        """
-        Merge the tree structures of multiple containers.
-
-        Args:
-            containers (list[ImxRepo]): The list of containers to merge.
-        """
         for container in containers:
-            self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
-            self._merge_tree(
-                container._tree.build_exceptions.exceptions,
-                self._tree.build_exceptions.exceptions,
+            _validate_container(container)
+
+    def _process_container_objects(self):
+        """Process the objects within each container and organize them in a dictionary."""
+        for container in self.containers:
+            container_id = container.container_id
+            for imx_object in container.get_all():
+                puic = imx_object.puic
+                if puic not in self.tree_dict:
+                    self.tree_dict[puic] = OrderedDict(
+                        (cid, []) for cid in self.container_order
+                    )
+                self.tree_dict[puic][container_id].append(imx_object)
+
+    def _update_keys(self) -> None:
+        """Update the unique keys (puics) of the tree_dict."""
+        self._keys = frozenset(self.tree_dict.keys())
+
+    def get_keys(self) -> frozenset[str]:
+        """Returns all unique keys (puics) in the tree_dict."""
+        return self._keys
+
+    def _get_objects_by_key(self, key: str | None = None) -> ImxMultiRepoObject:
+        """Helper to retrieve ImxObjects by key or return default None values if the key is missing."""
+        if key and key not in self._keys:
+            raise ValueError(f"key:{key} not in tree.")
+
+        imx_object = self.tree_dict.get(key or "", None)
+
+        tester = (
+            tuple(
+                imx_object[container_id][0]
+                if imx_object and len(imx_object[container_id]) > 0
+                else None
+                for container_id in self.container_order
             )
-        self._tree.update_keys()
-
-    def add_container(self, container: ImxRepoProtocol):
-        """
-        Add an ImxContainer to the MultiContainer.
-
-        Args:
-            container (ImxRepo): The container to add.
-        """
-        container = deepcopy(container)
-        self.containers.append(container)
-        self._merge_tree(container._tree.tree_dict, self._tree.tree_dict)
-        self._merge_tree(
-            container._tree.build_exceptions.exceptions,
-            self._tree.build_exceptions.exceptions,
+            if imx_object
+            else tuple([None] * len(self.container_order))
         )
+        return ImxMultiRepoObject(tester, self.container_order)
 
-    def remove_container(self, container: ImxRepoProtocol):
-        """
-        Remove an ImxContainer from the MultiContainer.
+    def find(self, key: str, return_none=True) -> ImxMultiRepoObject:
+        """Returns all ImxObject instances for a given key (puic), maintaining container order."""
+        return self._get_objects_by_key(key)
 
-        Args:
-            container (ImxRepo): The container to remove.
-        """
-        self.containers.remove(container)
-        self._remove_tree(container._tree.tree_dict, self._tree.tree_dict)
-        self._remove_tree(
-            container._tree.build_exceptions.exceptions,
-            self._tree.build_exceptions.exceptions,
-        )
+    def get_all(self) -> list[ImxMultiRepoObject]:
+        """Returns a list of tuples for each ImxObject, maintaining container order."""
+        return [self._get_objects_by_key(key) for key in self.tree_dict]
 
-    def compare(self) -> ImxCompareMultiRepoProtocol:
-        """Returns the compair of the repository
+    def get_all_types(self) -> set[str]:
+        """Returns all unique types (tags) of ImxObject instances."""
+        return {
+            obj.tag
+            for group in self.get_all() or []
+            for obj in (group or [])
+            if obj is not None
+        }
 
-        returns:
-            A ImxCompareMultiRepo object
-        """
-        return ImxCompareMultiRepo.from_multi_repo(
-            self._tree, self.container_order, self.containers
-        )
+    def get_by_types(self, object_types: list[str]) -> list[ImxMultiRepoObject]:
+        """Returns all items by given types, will check first type of object."""
+        return [
+            item
+            for item in self.get_all()
+            if any(obj and obj.tag in object_types for obj in item)
+        ]
+
+    def get_all_paths(self) -> set[str]:
+        """Returns all unique paths of ImxObject instances."""
+        return {
+            obj.path
+            for group in self.get_all() or []
+            for obj in (group or [])
+            if obj and obj.path
+        }
+
+    def get_by_paths(self, object_paths: list[str]) -> list[ImxMultiRepoObject]:
+        """Returns all items by given paths, ensuring at least one item matches the paths."""
+        return [
+            item
+            for item in self.get_all()
+            if any(obj and obj.path in object_paths for obj in item)
+        ]
+
+    def get_pandas_df(
+        self,
+        types: list[str] | None = None,
+        paths: list[str] | None = None,
+        pivot_df: bool = False,
+    ) -> pd.DataFrame:
+        """Returns a Pandas DataFrame of the filtered objects based on type and path."""
+        imx_objects = self._filter_objects(types, paths)
+
+        data = []
+        for obj_tuple in imx_objects:
+            for idx, imx_obj in enumerate(obj_tuple):
+                if imx_obj:
+                    properties = {
+                        "container_id": imx_obj.container_id,
+                        "imx_situation": imx_obj.imx_situation or None,
+                        "path": imx_obj.path,
+                    } | imx_obj.properties
+                    data.append(properties)
+                else:
+                    data.append({"container_id": self.container_order[idx]})
+
+        df = pd.DataFrame(data)
+        df = self._prepare_dataframe(df, pivot_df)
+        return df
+
+    def _filter_objects(
+        self, types: list[str] | None, paths: list[str] | None
+    ) -> list[ImxMultiRepoObject]:
+        """Filter objects by types or paths."""
+        imx_objects = []
+        if types:
+            imx_objects.extend(self.get_by_types(types))
+        if paths:
+            imx_objects.extend(self.get_by_paths(paths))
+        if not types and not paths:
+            imx_objects.extend(self.get_all())
+        return imx_objects
+
+    def _prepare_dataframe(self, df: pd.DataFrame, pivot_df: bool) -> pd.DataFrame:
+        """Prepare and format the DataFrame."""
+        df.set_index(["@puic", "path", "container_id"], inplace=True)
+        container_order_mapping = {
+            container_id: idx for idx, container_id in enumerate(self.container_order)
+        }
+        df = df.reset_index()
+        df["T"] = df["container_id"].map(container_order_mapping)
+        df.set_index(["@puic", "path", "T"], inplace=True)
+
+        if not pivot_df:
+            df.reset_index(inplace=True)
+
+        return df
+
+    def get_pandas_df_dict(self, pivot_df: bool = False) -> dict[str, pd.DataFrame]:
+        """Returns a dictionary of DataFrames, one for each unique path."""
+        return {
+            path: self.get_pandas_df(paths=[path], pivot_df=pivot_df)
+            for path in self.get_all_paths()
+        }

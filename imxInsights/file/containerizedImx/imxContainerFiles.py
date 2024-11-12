@@ -102,6 +102,6 @@ class ImxContainerFiles:
                 self.additional_files.append(file_path)
 
         if not self.signaling_design:
-            raise ValueError("No signaling design present in container")  # NOQA TRY003
+            raise ValueError("No signaling design present in container")
 
         return self

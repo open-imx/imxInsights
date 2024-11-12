@@ -3,6 +3,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 extend-select = ["I", "TRY", "UP"]
+ignore = ["TRY003"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=imxInsights --cov-report=term-missing --ignore=test_build.py"
