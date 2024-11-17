@@ -35,7 +35,8 @@ class ImxContainer(ImxRepo):
         logger.success(f"Finished processing {self._input_file_path.name}")
         self.dataframes = ContainerImxPandasGenerator(self)
 
-    def _initialize_file_path(self, imx_file_path: Path | str) -> Path:
+    @staticmethod
+    def _initialize_file_path(imx_file_path: Path | str) -> Path:
         """Initialize and return a Path object from the input file path."""
         logger.info(f"Processing {Path(imx_file_path).name}")
         return Path(imx_file_path) if isinstance(imx_file_path, str) else imx_file_path
