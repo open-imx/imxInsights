@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import patch
 
 from imxInsights.exceptions import ErrorLevelEnum, ImxException, exception_handler
@@ -41,18 +42,18 @@ def test_exceptions(mock_exception_handler):
         )
     except CustomException as e:
         exception_handler.handle_exception(e)
-    #
-    # with pytest.raises(CustomException):
-    #     try:
-    #         raise CustomException(
-    #             "This is a CRITICAL level exception, and should be logged and will raise",
-    #             level=ErrorLevelEnum.CRITICAL,
-    #         )
-    #     except CustomException as e:
-    #         exception_handler.handle_exception(e)
-    # exception_handler.handle_exception(
-    #     CustomException("ownee toch niet", level=ErrorLevelEnum.INFO)
-    # )
+
+    with pytest.raises(CustomException):
+        try:
+            raise CustomException(
+                "This is a CRITICAL level exception, and should be logged and will raise",
+                level=ErrorLevelEnum.CRITICAL,
+            )
+        except CustomException as e:
+            exception_handler.handle_exception(e)
+    exception_handler.handle_exception(
+        CustomException("ownee toch niet", level=ErrorLevelEnum.INFO)
+    )
 
     try:
         raise ImxException()

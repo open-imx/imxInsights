@@ -6,8 +6,6 @@ import pytest
 from imxInsights import ImxSingleFile, ImxContainer
 from pandas import MultiIndex
 
-# TODO: add get GEOJSON and GEOJSON WRITE TO FILES
-
 
 def test_imx_parse_project_v124(imx_v124_project_instance: ImxSingleFile):
     imx = imx_v124_project_instance
@@ -131,6 +129,9 @@ def test_imx_repo_dataframes_v1200(imx_v1200_zip_instance: ImxContainer):
     assert isinstance(df_overview.index, MultiIndex), "Overview should be multi index."
     assert df_overview.index.nlevels == 5, "Index should have x levels"
     assert len(df_overview) == 302, "Should contain x objects"
+
+
+# TODO: IMX v1200 add get GEOJSON and GEOJSON WRITE TO FILES
 
 
 def test_imx_parse_v1200_dir(imx_v1200_dir_instance: ImxContainer):
