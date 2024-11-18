@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Protocol
 
-from imxInsights.utils.shapely_geojson import ShapelyGeoJsonFeatureCollection
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
 class ImxCompareMultiRepoProtocol(Protocol):

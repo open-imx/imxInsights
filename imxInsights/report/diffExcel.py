@@ -141,6 +141,7 @@ class DiffExcel(ExcelReport):
             "Metadata.@registrationTime",
             "Metadata.@source",
         ]
+        # TODO: below will break we object type is not present in t2 container, should be fixed in refactor :-)
         status_list = [
             [item2 for item2 in self.repo.diff[item[-2]] if item2.puic == item[-1]][0]
             for item in paths_a

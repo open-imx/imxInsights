@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import DataFrame, Series
 
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
-from imxInsights.utils.flatten_unflatten import hash_sha256
+from imxInsights.utils.hash import hash_sha256
 
 
 class ContainerImxPandasGenerator:

@@ -22,12 +22,12 @@ from imxInsights.utils.pandas_helpers import (
     df_sort_by_list,
     styler_highlight_changes,
 )
-from imxInsights.utils.shapely_geojson import (
+from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
 class ImxCompareMultiRepo:

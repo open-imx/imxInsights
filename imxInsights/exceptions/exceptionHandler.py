@@ -59,37 +59,38 @@ class ExceptionHandler:
         log_msg = f"{exception.__class__.__name__}: {exception.msg}"
 
         if isinstance(exception.data, ImxObject):
-            log_msg += f" - data: {exception.data.properties}"
+            log_msg += f" - object: {exception.data.puic}"  # pragma: no cover
         elif exception.data is not None:
-            log_msg += f" - data: {exception.data}"
+            log_msg += f" - data: {exception.data}"  # pragma: no cover
 
         logger.opt(depth=1).log(log_level, log_msg)
 
         if exception.level in [ErrorLevelEnum.CRITICAL]:
-            raise exception
+            raise exception  # pragma: no cover
 
         if return_log_as_str:
             return f"{log_level} {log_msg}"
 
         return None
 
-    @classmethod
-    def create_new_log(cls, log_file: str, lvl: ErrorLevelEnum = ErrorLevelEnum.DEBUG):
-        """
-        Creates a new log file.
-
-        ??? info
-            This method removes any existing loggers and sets up a new log file with
-            the specified rotation size and logging level.
-
-        Args:
-            log_file: The file where logs should be written.
-            lvl: The default logging level.
-        """
-        logger.remove()
-        logger.add(log_file, rotation=cls.LOG_ROTATION_SIZE, level=lvl.value)
+    # @classmethod
+    # def create_new_log(cls, log_file: str, lvl: ErrorLevelEnum = ErrorLevelEnum.DEBUG):
+    #     """
+    #     Creates a new log file.
+    #
+    #     ??? info
+    #         This method removes any existing loggers and sets up a new log file with
+    #         the specified rotation size and logging level.
+    #
+    #     Args:
+    #         log_file: The file where logs should be written.
+    #         lvl: The default logging level.
+    #     """
+    #     logger.remove()
+    #     logger.add(log_file, rotation=cls.LOG_ROTATION_SIZE, level=lvl.value)
 
 
 timestamp = datetime.datetime.now().isoformat()
 safe_timestamp = re.sub(r"[:]", "-", timestamp)
-exception_handler = ExceptionHandler(f"imx_log_{safe_timestamp}.log")
+# exception_handler = ExceptionHandler(f"imx_log_{safe_timestamp}.log")
+exception_handler = ExceptionHandler("imxInsights.log")

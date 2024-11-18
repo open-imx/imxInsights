@@ -11,12 +11,12 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.tree.imxObjectTree import ObjectTree
-from imxInsights.utils.shapely_geojson import (
+from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
 class ImxRepo:
@@ -155,8 +155,22 @@ class ImxRepo:
         """
         return self._tree.build_exceptions.exceptions
 
+    @staticmethod
+    def _extract_overview_properties(item, input_props=None):
+        props = (
+            item.get_imx_property_dict()
+            if input_props is None
+            else {
+                key: value
+                for key, value in item.get_imx_property_dict().items()
+                if key in input_props
+            }
+        )
+
+        return props
+
     def get_pandas_df(
-        self, object_type_or_path: str | None = None, puic_as_index: bool = True
+        self, object_type_or_path: list[str] | None = None, puic_as_index: bool = True
     ) -> pd.DataFrame:
         """
         Get Pandas dataframe of one value object type or limited view of all objects.
@@ -172,26 +186,12 @@ class ImxRepo:
         Returns:
             pd.DataFrame: pandas dataframe of the object properties
         """
-
-        def extract_overview_properties(item, input_props=None):
-            props = (
-                item.properties
-                if input_props is None
-                else {
-                    key: value
-                    for key, value in item.properties.items()
-                    if key in input_props
-                }
-            )
-            return {
-                "puic": item.puic,
-                "path": item.path,
-                "parent": item.parent.puic if item.parent is not None else "",
-                "name": item.name,
-            } | props
-
         if object_type_or_path is None:
             props_in_overview = [
+                "@puic",
+                "tag",
+                "path",
+                "@name",
                 "Location.GeographicLocation.@accuracy",
                 "Location.GeographicLocation.@dataAcquisitionMethod",
                 "Metadata.@isInService",
@@ -199,23 +199,25 @@ class ImxRepo:
                 "Metadata.@source",
             ]
             records = [
-                extract_overview_properties(item, props_in_overview)
+                self._extract_overview_properties(item, props_in_overview)
                 for item in self.get_all()
             ]
-
         else:
-            if "." in object_type_or_path:
-                value_objects = self.get_by_paths([object_type_or_path])
-            else:
-                value_objects = self.get_by_types([object_type_or_path])
+            value_objects = []
+            for item in object_type_or_path:
+                if "." in item:
+                    value_objects.extend(self.get_by_paths([item]))
+                else:
+                    value_objects.extend(self.get_by_types([item]))
 
-            records = [extract_overview_properties(item) for item in value_objects]
+            records = [
+                self._extract_overview_properties(item) for item in value_objects
+            ]
 
         df = pd.DataFrame.from_records(records)
         if not df.empty and puic_as_index:
-            df.set_index("puic", inplace=True)
+            df.set_index("@puic", inplace=False)
             df.fillna("", inplace=True)
-
         return df
 
     def get_pandas_df_dict(
@@ -233,10 +235,10 @@ class ImxRepo:
         out_dict = {}
         if key_based_on_type:
             for imx_type in self.get_types():
-                out_dict[imx_type] = self.get_pandas_df(imx_type)
+                out_dict[imx_type] = self.get_pandas_df([imx_type])
 
         for imx_path in self.get_all_paths():
-            out_dict[imx_path] = self.get_pandas_df(imx_path)
+            out_dict[imx_path] = self.get_pandas_df([imx_path])
 
         return out_dict
 
@@ -256,10 +258,8 @@ class ImxRepo:
             "Metadata.@registrationTime",
             "Metadata.@source",
         ]
-
         properties = [
-            {key: prop[key] for key in list_of_columns if key in prop}
-            for prop in [node.properties for node in nodes]
+            self._extract_overview_properties(node, list_of_columns) for node in nodes
         ]
 
         max_depth = max(len(path) for path in paths)
@@ -268,7 +268,6 @@ class ImxRepo:
         ]
 
         df = pd.DataFrame(properties)
-
         index = pd.MultiIndex.from_tuples(
             padded_paths, names=[f"Level{i + 1}" for i in range(max_depth)]
         )

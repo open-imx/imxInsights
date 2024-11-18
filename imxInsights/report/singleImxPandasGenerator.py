@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
-from imxInsights.utils.flatten_unflatten import hash_sha256
+from imxInsights.utils.hash import hash_sha256
 
 
 class SingleImxPandasGenerator:

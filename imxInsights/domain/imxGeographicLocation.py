@@ -4,7 +4,7 @@ from typing import Optional
 from lxml.etree import _Element
 from shapely import LineString, Point, Polygon
 
-from imxInsights.utils.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
 
 
 @dataclass
@@ -49,7 +49,7 @@ class ImxGeographicLocation:
             ".//{http://www.prorail.nl/IMSpoor}GeographicLocation"
         )
         if element.tag == "{http://www.prorail.nl/IMSpoor}ObservedLocation":
-            location_node = element
+            location_node = element  # pragma: no cover
 
         elif location_node is None:
             return None

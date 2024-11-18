@@ -8,7 +8,7 @@ import pandas as pd
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.tree.imxObjectTree import ObjectTree
-from imxInsights.utils.shapely_geojson import ShapelyGeoJsonFeatureCollection
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
 @runtime_checkable
@@ -51,7 +51,7 @@ class ImxRepoProtocol(Protocol):
         ...
 
     def get_pandas_df(
-        self, object_type_or_path: str | None = None, puic_as_index: bool = True
+        self, object_type_or_path: list[str] | None = None, puic_as_index: bool = True
     ) -> pd.DataFrame:
         """Get Pandas dataframe of one value object type or limited view of all objects."""
         ...

@@ -7,7 +7,7 @@ from imxInsights.exceptions.customException import CustomException
 @patch("imxInsights.exceptions.exceptionHandler.exception_handler")
 def test_exceptions(mock_exception_handler):
     try:
-        raise CustomException(  # noqa: TRY301, TRY003
+        raise CustomException(  # noqa: TRY301
             "This is a DEBUG level exception, and should be logged",
             level=ErrorLevelEnum.DEBUG,
         )
@@ -19,7 +19,7 @@ def test_exceptions(mock_exception_handler):
         )
 
     try:
-        raise CustomException(  # noqa: TRY301, TRY003
+        raise CustomException(  # noqa: TRY301
             "This is an INFO level exception, and should be logged",  # noqa: TRY301
             level=ErrorLevelEnum.INFO,
         )
@@ -27,7 +27,7 @@ def test_exceptions(mock_exception_handler):
         exception_handler.handle_exception(e)
 
     try:
-        raise CustomException(  # noqa: TRY301, TRY003
+        raise CustomException(  # noqa: TRY301
             "This is a WARNING level exception, and should be logged",  # noqa: TRY301
             level=ErrorLevelEnum.WARNING,
         )
@@ -35,7 +35,7 @@ def test_exceptions(mock_exception_handler):
         exception_handler.handle_exception(e)
 
     try:
-        raise CustomException(  # noqa: TRY301, TRY003
+        raise CustomException(  # noqa: TRY301
             "This is an ERROR level exception, and should be logged",
             level=ErrorLevelEnum.ERROR,
         )

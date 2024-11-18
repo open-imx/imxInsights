@@ -81,10 +81,10 @@ class ImxObject:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
 
     @property
-    def get_parent_path(self):
+    def parent_path(self):
         if self.parent is None:
             return self.puic
-        return self.parent.get_parent_path + "." + self.puic
+        return self.parent.parent_path + "." + self.puic
 
     @property
     def element(self) -> Element:
@@ -151,7 +151,6 @@ class ImxObject:
         extensions_dict = defaultdict(list)
         for item in self.imx_extensions:
             extensions_dict[f"extension.{item.tag}"].append(item.properties)
-        # todo: make flatten_dict also handle defaultdict
         return flatten_dict(dict(extensions_dict))
 
     def get_imx_property_dict(
@@ -173,16 +172,16 @@ class ImxObject:
             A dictionary with 'keys' 'values' of all interesting imx properties
         """
         # TODO!: find all property getters / merges for (dataframe) exports
-
-        result = {"tag": self.tag, "path": self.path} | self.properties
-        if add_extension_properties:
-            result |= self.extension_properties
+        result = {"tag": self.tag, "path": self.path}
         if add_parent:
             result["parent"] = self.parent.puic if self.parent is not None else ""
         if add_children:
             result["children"] = " ".join(
                 [item.puic for item in self.children if item is not None]
             )
+        result = result | self.properties
+        if add_extension_properties:
+            result |= self.extension_properties
         if add_geometry:
             result["geometry"] = self.geometry.wkt
         return result
