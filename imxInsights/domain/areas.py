@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
 from lxml.etree import _Element as Element
-from shapely.geometry import Polygon
+from shapely import Polygon
 
-from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely_utils.shapely_gml import GmlShapleyFactory
 
 
 @dataclass

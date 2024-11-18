@@ -11,12 +11,12 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
-from imxInsights.utils.shapely.shapely_geojson import (
+from imxInsights.utils.shapely_utils.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely_utils.shapely_transform import ShapelyTransform
 
 
 class ImxRepo:
@@ -303,14 +303,19 @@ class ImxRepo:
                 location = item.geographic_location.shapely
 
             if location:
-                geometry = ShapelyTransform.rd_to_wgs(location) if to_wgs else location
-                features.append(
-                    ShapelyGeoJsonFeature(
-                        [geometry],
-                        item.properties
-                        | (item.extension_properties if extension_properties else {}),
-                    )
+                geometry = (
+                    [ShapelyTransform.rd_to_wgs(location)] if to_wgs else [location]
                 )
+            else:
+                geometry = []
+            features.append(
+                ShapelyGeoJsonFeature(
+                    geometry,
+                    item.properties
+                    | (item.extension_properties if extension_properties else {}),
+                )
+            )
+
         return ShapelyGeoJsonFeatureCollection(
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
         )

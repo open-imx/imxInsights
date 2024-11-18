@@ -4,7 +4,7 @@ from imxInsights.utils.hash import hash_dict_ignor_nested
 
 
 def flatten_dict(
-    data_dict: dict[str, dict | str | list],
+    data_dict: dict[str, dict[Any, Any] | str | list[Any]],
     skip_key: str | None = "@puic",
     prefix="",
     sep=".",

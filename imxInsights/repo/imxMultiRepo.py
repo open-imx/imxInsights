@@ -9,12 +9,12 @@ from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerP
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.shapely.shapely_geojson import (
+from imxInsights.utils.shapely_utils.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely_utils.shapely_transform import ShapelyTransform
 
 
 class ImxMultiRepo:
@@ -219,10 +219,9 @@ class ImxMultiRepo:
         for item in self.get_by_paths(object_path):
             for imx_object in item.imx_objects:
                 if not imx_object:
-                    break
-
+                    continue
                 if imx_object.container_id != container_id:
-                    break
+                    continue
 
                 location = None
                 if imx_object.geometry is not None:
