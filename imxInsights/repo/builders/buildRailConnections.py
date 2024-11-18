@@ -5,7 +5,7 @@ from shapely.ops import linemerge
 
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions.imxExceptions import ImxRailConnectionRefNotPresent
-from imxInsights.repo.tree.buildExceptions import BuildExceptions
+from imxInsights.repo.builders.buildExceptions import BuildExceptions
 from imxInsights.utils.shapely.shapley_helpers import reverse_line
 
 

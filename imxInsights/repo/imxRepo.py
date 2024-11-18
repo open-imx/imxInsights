@@ -10,7 +10,7 @@ from loguru import logger
 
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
-from imxInsights.repo.tree.imxObjectTree import ObjectTree
+from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
