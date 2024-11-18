@@ -70,16 +70,16 @@ def test_imx_repo_dataframes_v124(imx_v124_project_instance: ImxSingleFile):
 
 def test_imx_repo_geojson_v124(imx_v124_project_instance: ImxSingleFile):
     imx = imx_v124_project_instance
-    wgs_geojson = imx = imx_v124_project_instance.initial_situation.get_geojson(["Signal", "Signal.IlluminatedSign"])
+    wgs_geojson = imx.initial_situation.get_geojson(["Signal", "Signal.IlluminatedSign"])
     assert wgs_geojson.crs.name == "WGS84", "should have crs x"
     assert len(wgs_geojson.features) == 200, "should have x features"
 
-    rd_geojson = imx = imx_v124_project_instance.initial_situation.get_geojson(["Signal", "Signal.IlluminatedSign"], to_wgs=False)
+    rd_geojson = imx.initial_situation.get_geojson(["Signal", "Signal.IlluminatedSign"], to_wgs=False)
     assert rd_geojson.crs.name == "RD_NEW_NAP", "should have crs x"
     assert len(rd_geojson.features) == 200, "should have x features"
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        imx_v124_project_instance.initial_situation.create_geojson_files(temp_dir)
+        imx.initial_situation.create_geojson_files(temp_dir)
         file_count = len([f for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
         assert file_count == 73, "Should have x geojson files"
 
@@ -132,6 +132,20 @@ def test_imx_repo_dataframes_v1200(imx_v1200_zip_instance: ImxContainer):
 
 
 # TODO: IMX v1200 add get GEOJSON and GEOJSON WRITE TO FILES
+def test_imx_repo_geojson_v1200(imx_v1200_zip_instance: ImxContainer):
+    imx = imx_v1200_zip_instance
+    wgs_geojson = imx.get_geojson(["Signal", "Signal.IlluminatedSign"])
+    assert wgs_geojson.crs.name == "WGS84", "should have crs x"
+    assert len(wgs_geojson.features) == 2, "should have x features"
+
+    rd_geojson = imx.get_geojson(["Signal", "Signal.IlluminatedSign"], to_wgs=False)
+    assert rd_geojson.crs.name == "RD_NEW_NAP", "should have crs x"
+    assert len(rd_geojson.features) == 2, "should have x features"
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        imx.create_geojson_files(temp_dir)
+        file_count = len([f for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
+        assert file_count == 247, "Should have x geojson files"
 
 
 def test_imx_parse_v1200_dir(imx_v1200_dir_instance: ImxContainer):
