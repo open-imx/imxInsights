@@ -10,13 +10,16 @@ if TYPE_CHECKING:
     from imxInsights.file.containerizedImx.imxContainerMetadata import (
         ImxContainerMetadata,
     )
-    from imxInsights.report.containerImxPandasGenerator import (
-        ContainerImxPandasGenerator,
-    )
+
+    # from imxInsights.report.containerImxPandasGenerator import (
+    #     ContainerImxPandasGenerator,
+    # )
 
 
 class ImxContainerProtocol(ImxRepoProtocol, Protocol):
     _input_file_path: Path
     files: ImxContainerFiles
     project_metadata: ImxContainerMetadata | None
-    dataframes: ContainerImxPandasGenerator
+
+
+#    dataframes: ContainerImxPandasGenerator

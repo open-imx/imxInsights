@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from imxInsights.file.imxFile import ImxFile
     from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
     from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
-    from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
+#    from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
 
 
 class ImxSituationProtocol(ImxRepoProtocol, Protocol):
@@ -22,4 +22,6 @@ class ImxSituationProtocol(ImxRepoProtocol, Protocol):
     perspective_date: datetime | None
     situation_type: ImxSituationEnum
     project_metadata: SingleImxMetadata | None
-    dataframes: SingleImxPandasGenerator
+
+
+#    dataframes: SingleImxPandasGenerator

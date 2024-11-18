@@ -9,7 +9,8 @@ from imxInsights.file.imxFile import ImxFile
 from imxInsights.file.singleFileImx.imxSingleFileMetadata import SingleImxMetadata
 from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 from imxInsights.repo.imxRepo import ImxRepo
-from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
+
+# from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
 from imxInsights.utils.xml_helpers import parse_date
 
 
@@ -39,7 +40,7 @@ class ImxSituation(ImxRepo):
         self._populate_tree(self._element)
         self._tree.build_exceptions.handle_all()
 
-        self.dataframes = SingleImxPandasGenerator(self)
+        # self.dataframes = SingleImxPandasGenerator(self)
 
     def _parse_date(self, date_type: str) -> datetime | None:
         """Helper method to parse dates from element attributes."""
