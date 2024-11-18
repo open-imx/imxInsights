@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 from loguru import logger
@@ -24,6 +25,11 @@ class ImxSingleFile:
     """
 
     def __init__(self, imx_file_path: Path | str):
+        warnings.warn(
+            "⚠️ WARNING: For single IMX files, we recommend using imxInsights version 0.1.0.dev1 for optimal performance and compatibility.",
+            UserWarning,
+        )
+
         imx_file_path = Path(imx_file_path)
         logger.info(f"processing {imx_file_path.name}")
 
