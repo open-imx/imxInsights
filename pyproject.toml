@@ -126,6 +126,7 @@ ignore_missing_imports = true
 
 [tool.coverage.run]
 omit = [
+    "*/custom_operators/*",
     "*/utils/version_check.py",
     "*/*Protocol.py",
 ]

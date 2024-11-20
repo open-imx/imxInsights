@@ -7,7 +7,8 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
-from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
+
+# from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
 from imxInsights.utils.shapely_utils.shapely_geojson import (
     CrsEnum,
@@ -77,6 +78,16 @@ class ImxMultiRepo:
     def _update_keys(self) -> None:
         """Update the unique keys (puics) of the tree_dict."""
         self._keys = frozenset(self.tree_dict.keys())
+
+    def get_container(self, container_id: str):
+        container = [
+            container
+            for container in self.containers
+            if container.container_id == container_id
+        ]
+        if len(container) == 1:
+            return container[0]
+        raise ValueError("Container not present")
 
     def get_keys(self) -> frozenset[str]:
         """Returns all unique keys (puics) in the tree_dict."""
@@ -156,17 +167,24 @@ class ImxMultiRepo:
         imx_objects = self._filter_objects(types, paths)
 
         data = []
-        for obj_tuple in imx_objects:
-            for idx, imx_obj in enumerate(obj_tuple):
+        for mult_repo_object in imx_objects:
+            for idx, imx_obj in enumerate(mult_repo_object.imx_objects):
                 if isinstance(imx_obj, ImxObject):
                     properties = {
                         "container_id": imx_obj.container_id,
                         "imx_situation": imx_obj.imx_situation or None,
                         "path": imx_obj.path,
-                    } | imx_obj.properties
+                    } | imx_obj.get_imx_property_dict()
                     data.append(properties)
                 else:
-                    data.append({"container_id": self.container_order[idx]})
+                    data.append(
+                        {
+                            "@puic": mult_repo_object.puic,
+                            "container_id": self.container_order[idx],
+                            "path": "<NotPresent>",
+                        }
+                    )
+
         df = pd.DataFrame(data)
         df = self._prepare_dataframe(df, pivot_df)
         return df
@@ -182,7 +200,7 @@ class ImxMultiRepo:
             imx_objects.extend(self.get_by_paths(paths))
         if not types and not paths:
             imx_objects.extend(self.get_all())
-        return imx_objects
+        return list(set(imx_objects))
 
     def _prepare_dataframe(self, df: pd.DataFrame, pivot_df: bool) -> pd.DataFrame:
         """Prepare and format the DataFrame."""
@@ -271,19 +289,9 @@ class ImxMultiRepo:
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
-    def get_container(self, container_id: str):
-        container = [
-            container
-            for container in self.containers
-            if container.container_id == container_id
-        ]
-        if len(container) == 1:
-            return container[0]
-        raise ValueError("Container not present")
-
-    def compare(self, container_id_1: str, container_id_2: str):
-        return ComparedMultiRepo(
-            self.get_container(container_id_1),
-            self.get_container(container_id_2),
-            self.get_all(),
-        )
+    # def compare(self, container_id_1: str, container_id_2: str) -> ComparedMultiRepo:
+    #     return ComparedMultiRepo(
+    #         self.get_container(container_id_1),
+    #         self.get_container(container_id_2),
+    #         self.get_all(),
+    #     )
