@@ -27,8 +27,7 @@ class ChangedImxObject:
             return self.t1.puic
         elif self.t2 and hasattr(self.t2, "puic"):
             return self.t2.puic
-        else:
-            return ""
+        raise ValueError("PUIC is required but not found in t1 or t2.")
 
     def _prepare_properties(self) -> tuple[dict, dict]:
         t1_props = self.t1.get_imx_property_dict() if self.t1 else {}
