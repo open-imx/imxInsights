@@ -8,9 +8,7 @@ import pandas as pd
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
-from imxInsights.utils.shapely.shapely_geojson import (
-    ShapelyGeoJsonFeatureCollection,
-)
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
 @runtime_checkable

@@ -1,7 +1,15 @@
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Sequence
 
+from shapely.geometry import (
+    GeometryCollection,
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+)
 from shapely.geometry.base import BaseGeometry
 
 from imxInsights.compare.changes import Change, get_object_changes
@@ -10,7 +18,6 @@ from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeature
 from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
-from imxInsights.utils.shapely.shapley_helpers import compute_geometry_movement
 
 
 @dataclass
@@ -115,16 +122,39 @@ class ChangedImxObject:
         geometry = []
 
         if self.geometry:
-            geometry.append(
+            selected_geometry = (
                 self.geometry.t2 if self.geometry.t2 is not None else self.geometry.t1
             )
+            if selected_geometry:
+                geometry.append(selected_geometry)
 
         geometry = [
-            item for item in geometry if item and item.wkt != "GEOMETRYCOLLECTION EMPTY"
+            item
+            for item in geometry
+            if item is not None and item.wkt != "GEOMETRYCOLLECTION EMPTY"
         ]
 
         if as_wgs:
-            geometry = [ShapelyTransform.rd_to_wgs(_) for _ in geometry]
+            geometry = [
+                ShapelyTransform.rd_to_wgs(_) for _ in geometry if _ is not None
+            ]
+
+        geometry = [
+            g
+            for g in geometry
+            if isinstance(
+                g,
+                (
+                    Point,
+                    LineString,
+                    Polygon,
+                    MultiPoint,
+                    MultiLineString,
+                    MultiPolygon,
+                    GeometryCollection,
+                ),
+            )
+        ]
 
         return ShapelyGeoJsonFeature(
             geometry, properties=dict(sorted(self.get_change_dict(add_analyse).items()))

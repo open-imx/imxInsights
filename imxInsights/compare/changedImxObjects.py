@@ -1,6 +1,6 @@
 from pathlib import Path
-import pandas as pd
 
+import pandas as pd
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.utils.shapely.shapely_geojson import (

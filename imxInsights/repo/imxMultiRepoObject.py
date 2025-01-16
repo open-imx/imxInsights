@@ -47,3 +47,4 @@ class ImxMultiRepoObject:
                 t1=t1,
                 t2=t2,
             )
+        return ChangedImxObject(t1=None, t2=None)

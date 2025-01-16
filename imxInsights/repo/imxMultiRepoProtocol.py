@@ -8,9 +8,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.shapely.shapely_geojson import (
-    ShapelyGeoJsonFeatureCollection,
-)
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
 @runtime_checkable

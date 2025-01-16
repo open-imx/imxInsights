@@ -25,38 +25,21 @@ def reverse_line(shapely_polyline: LineString) -> LineString:
     return LineString(list(shapely_polyline.coords)[::-1])
 
 
-from typing import Union
-
-from shapely.geometry import (
-    GeometryCollection,
-    LineString,
-    MultiLineString,
-    MultiPoint,
-    MultiPolygon,
-    Point,
-    Polygon,
-)
-
-
 def compute_geometry_movement(
-    geom1: Union[
-        Point,
-        LineString,
-        Polygon,
-        MultiPoint,
-        MultiLineString,
-        MultiPolygon,
-        GeometryCollection,
-    ],
-    geom2: Union[
-        Point,
-        LineString,
-        Polygon,
-        MultiPoint,
-        MultiLineString,
-        MultiPolygon,
-        GeometryCollection,
-    ],
+    geom1: Point
+    | LineString
+    | Polygon
+    | MultiPoint
+    | MultiLineString
+    | MultiPolygon
+    | GeometryCollection,
+    geom2: Point
+    | LineString
+    | Polygon
+    | MultiPoint
+    | MultiLineString
+    | MultiPolygon
+    | GeometryCollection,
 ) -> BaseGeometry:
     """
     Compute a Shapely geometry representing the movement or difference between two geometries.
