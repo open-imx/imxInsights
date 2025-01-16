@@ -8,8 +8,8 @@ def hash_sha256(path: Path):
     Calculate the SHA-256 hash sum of a file located at the specified path.
 
     This function takes a `Path` object representing the path to a file and
-    calculates the SHA-256 hash sum of the file's contents. It returns the
-    hash sum as a hexadecimal string.
+    calculates the SHA-256 hash sum of the file's contents. It reads the file
+    in chunks to avoid high memory usage with large files.
 
     Args:
         path (Path): The path to the file for which the SHA-256 hash sum
@@ -19,24 +19,21 @@ def hash_sha256(path: Path):
         str: A hexadecimal string representing the SHA-256 hash sum of the file.
 
     Note:
-        This function reads the entire contents of the file into memory
-        to calculate the hash sum. For large files, this may consume a
-        significant amount of memory. Make sure to handle large files
-        appropriately when using this function.
+        This function processes the file in chunks to handle large files efficiently.
 
     """
     try:
-        # Try reading the file and computing the hash
-        return hashlib.sha256(path.read_bytes()).hexdigest()
+        sha256 = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                sha256.update(chunk)
+        return sha256.hexdigest()
     except PermissionError:
-        # Return a default message or error hash if permission is denied
-        return "PermissionError: Cannot access file"
+        raise ValueError("PermissionError: Cannot access file")
     except FileNotFoundError:
-        # Handle if the file doesn't exist
-        return "FileNotFoundError: File not found"
+        raise ValueError("FileNotFoundError: File not found")
     except Exception as e:
-        # Handle any other exceptions and log or return as needed
-        return f"Error: {str(e)}"
+        raise ValueError(f"Error: {str(e)}")
 
 
 def hash_dict_ignor_nested(dictionary: dict) -> str:

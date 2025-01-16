@@ -5,8 +5,8 @@ from deepdiff import DeepDiff  # type: ignore
 from shapely import LineString, Point
 
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
-from imxInsights.compare.custom_operators.refs_diff_operator import UUIDListOperator
-from imxInsights.compare.custom_operators.shapely_diff_operator import (
+from imxInsights.compare.custom_operators.diff_refs import UUIDListOperator
+from imxInsights.compare.custom_operators.diff_shapely import (
     ShapelyLineDiffer,
     ShapelyPointDiffer,
 )

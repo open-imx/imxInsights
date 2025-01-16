@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from imxInsights.repo.imxRepoProtocol import ImxRepoProtocol
 
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     # )
 
 
+@runtime_checkable
 class ImxContainerProtocol(ImxRepoProtocol, Protocol):
     _input_file_path: Path
     files: ImxContainerFiles

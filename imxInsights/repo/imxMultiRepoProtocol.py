@@ -8,7 +8,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.shapely_utils.shapely_geojson import (
+from imxInsights.utils.shapely.shapely_geojson import (
     ShapelyGeoJsonFeatureCollection,
 )
 

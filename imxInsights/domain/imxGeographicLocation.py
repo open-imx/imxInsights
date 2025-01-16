@@ -4,7 +4,7 @@ from typing import Optional
 from lxml.etree import _Element
 from shapely import LineString, Point, Polygon
 
-from imxInsights.utils.shapely_utils.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
 
 
 @dataclass

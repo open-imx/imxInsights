@@ -42,7 +42,8 @@ class ImxMultiRepoObject:
     def compare(self, container_id_t1: str, container_id_t2: str) -> ChangedImxObject:
         t1 = self.get_by_container_id(container_id_t1)
         t2 = self.get_by_container_id(container_id_t2)
-        return ChangedImxObject(
-            t1=t1,
-            t2=t2,
-        )
+        if t1 or t2:
+            return ChangedImxObject(
+                t1=t1,
+                t2=t2,
+            )

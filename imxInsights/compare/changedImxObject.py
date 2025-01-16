@@ -1,9 +1,16 @@
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Sequence
+
+from shapely.geometry.base import BaseGeometry
 
 from imxInsights.compare.changes import Change, get_object_changes
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.domain.imxObject import ImxObject
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeature
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely.shapley_helpers import compute_geometry_movement
 
 
 @dataclass
@@ -61,7 +68,7 @@ class ChangedImxObject:
             t2=self.t2.geometry if self.t2 else None,
         )
 
-    def get_change_dict(self, add_analyse: bool) -> dict[str, str]:
+    def get_change_dict(self, add_analyse: bool = False) -> dict[str, str]:
         analyse = (
             {
                 f"{key}_analyse": value.analyse["display"]
@@ -76,4 +83,49 @@ class ChangedImxObject:
             {key: value.diff_string for key, value in self.changes.items()}
             | analyse
             | {"status": self.status.value}
+        )
+
+    def movement(
+        self, include_source_geometry: bool = False, as_wgs: bool = True
+    ) -> Sequence[BaseGeometry]:
+        # todo: add this to the GeometryChange?
+        geometry = []
+
+        if include_source_geometry:
+            if self.t1 is not None and self.t1.geometry is not None:
+                geometry.append(self.t1.geometry)
+            if self.geometry is not None:
+                geometry.append(self.geometry.geometry_movement())
+            if self.geometry is not None and self.geometry.t2 is not None:
+                geometry.append(self.geometry.t2)
+        else:
+            if self.geometry is not None:
+                geometry.append(self.geometry.geometry_movement())
+
+        if as_wgs:
+            geometry = [
+                ShapelyTransform.rd_to_wgs(_) for _ in geometry if _ is not None
+            ]
+
+        return geometry
+
+    def as_geojson_feature(
+        self, add_analyse: bool = False, as_wgs: bool = True
+    ) -> ShapelyGeoJsonFeature:
+        geometry = []
+
+        if self.geometry:
+            geometry.append(
+                self.geometry.t2 if self.geometry.t2 is not None else self.geometry.t1
+            )
+
+        geometry = [
+            item for item in geometry if item and item.wkt != "GEOMETRYCOLLECTION EMPTY"
+        ]
+
+        if as_wgs:
+            geometry = [ShapelyTransform.rd_to_wgs(_) for _ in geometry]
+
+        return ShapelyGeoJsonFeature(
+            geometry, properties=dict(sorted(self.get_change_dict(add_analyse).items()))
         )

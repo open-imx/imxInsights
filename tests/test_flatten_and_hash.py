@@ -16,7 +16,8 @@ def test_hash_sha256_valid_file(tmp_path):
 
 def test_hash_sha256_file_not_found():
     non_existent_file = Path("non_existent_file.txt")
-    assert hash_sha256(non_existent_file) == "FileNotFoundError: File not found"
+    with pytest.raises(ValueError, match="FileNotFoundError: File not found"):
+        hash_sha256(non_existent_file)
 
 
 def test_hash_dict_ignor_nested():

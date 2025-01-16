@@ -12,6 +12,8 @@ from shapely import (
 )
 from shapely.geometry.base import BaseGeometry
 
+from imxInsights.utils.shapely.shapley_helpers import compute_geometry_movement
+
 
 class GeometryChangeStatus(Enum):
     """
@@ -117,3 +119,8 @@ class GeometryChange:
                     return True
 
         return False
+
+    def geometry_movement(self):
+        # todo: add return type, ad default return value
+        if self.t1 and self.t2:
+            return compute_geometry_movement(self.t1, self.t2)

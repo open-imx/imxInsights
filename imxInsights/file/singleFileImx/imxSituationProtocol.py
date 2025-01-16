@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from imxInsights.repo.imxRepoProtocol import ImxRepoProtocol
 
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 #    from imxInsights.report.singleImxPandasGenerator import SingleImxPandasGenerator
 
 
+@runtime_checkable
 class ImxSituationProtocol(ImxRepoProtocol, Protocol):
     _imx_file: ImxFile
     _element: Element

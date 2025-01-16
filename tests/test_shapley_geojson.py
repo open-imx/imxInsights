@@ -1,6 +1,6 @@
 import pytest
 
-from imxInsights.utils.shapely_utils.shapely_geojson import ShapelyGeoJsonFeature, ShapelyGeoJsonFeatureCollection, CrsEnum
+from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeature, ShapelyGeoJsonFeatureCollection, CrsEnum
 from shapely import Point, LineString, Polygon
 
 

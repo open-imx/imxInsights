@@ -1,54 +1,54 @@
 import re
 from typing import Any
 
-from imxInsights.utils.shapely_utils.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
 
-
-def transform_dict(d: dict[str, Any]) -> dict[str, Any]:
-    """
-    Transforms a dictionary by grouping list items based on their indexed keys.
-
-    This function processes a dictionary where keys may contain indexed parts
-    indicating list items (e.g., 'key.0.subkey'). It transforms the dictionary
-    by consolidating these list items into structured lists under their base paths.
-
-    Args:
-        d : A dictionary with keys that may represent nested structures with indexed list items.
-
-    Returns:
-        A transformed dictionary where indexed list items are grouped under their respective base paths.
-    """
-    result: dict[str, Any] = {}
-    temp_dict: dict[str, list[dict[str, Any]]] = {}
-
-    for key, value in d.items():
-        parts = key.split(".")
-
-        # Check if the second last part is a digit (indicating list index)
-        if len(parts) > 1 and parts[-2].isdigit():
-            list_index = int(parts[-2])
-            # Get the path up to the list
-            base_path = ".".join(parts[:-2])
-
-            if base_path not in temp_dict:
-                temp_dict[base_path] = []
-
-            # Ensure the list is long enough
-            while len(temp_dict[base_path]) <= list_index:
-                temp_dict[base_path].append({})
-
-            # Remove the list index from the key for the list item
-            item_key = ".".join(parts[-1:])  # Keep the key name without the index
-            temp_dict[base_path][list_index][item_key] = value
-        else:
-            result[key] = value
-
-    # Merge list items into the result dictionary
-    for path, items in temp_dict.items():
-        if items:
-            result[path] = items
-
-    return result
+#
+# def transform_dict(d: dict[str, Any]) -> dict[str, Any]:
+#     """
+#     Transforms a dictionary by grouping list items based on their indexed keys.
+#
+#     This function processes a dictionary where keys may contain indexed parts
+#     indicating list items (e.g., 'key.0.subkey'). It transforms the dictionary
+#     by consolidating these list items into structured lists under their base paths.
+#
+#     Args:
+#         d : A dictionary with keys that may represent nested structures with indexed list items.
+#
+#     Returns:
+#         A transformed dictionary where indexed list items are grouped under their respective base paths.
+#     """
+#     result: dict[str, Any] = {}
+#     temp_dict: dict[str, list[dict[str, Any]]] = {}
+#
+#     for key, value in d.items():
+#         parts = key.split(".")
+#
+#         # Check if the second last part is a digit (indicating list index)
+#         if len(parts) > 1 and parts[-2].isdigit():
+#             list_index = int(parts[-2])
+#             # Get the path up to the list
+#             base_path = ".".join(parts[:-2])
+#
+#             if base_path not in temp_dict:
+#                 temp_dict[base_path] = []
+#
+#             # Ensure the list is long enough
+#             while len(temp_dict[base_path]) <= list_index:
+#                 temp_dict[base_path].append({})
+#
+#             # Remove the list index from the key for the list item
+#             item_key = ".".join(parts[-1:])  # Keep the key name without the index
+#             temp_dict[base_path][list_index][item_key] = value
+#         else:
+#             result[key] = value
+#
+#     # Merge list items into the result dictionary
+#     for path, items in temp_dict.items():
+#         if items:
+#             result[path] = items
+#
+#     return result
 
 
 def remove_empty_dicts(data: dict | list | Any) -> dict | Any:
@@ -86,51 +86,52 @@ def remove_empty_dicts(data: dict | list | Any) -> dict | Any:
     return data
 
 
-def parse_dict_to_value_objects(input_dict: dict[str, Any]) -> dict[str, Any]:
-    """
-    Parses GML elements in the input dictionary to Shapely objects or converts
-    string representations of numbers to their respective types.
-
-    This function processes each key-value pair in the input dictionary,
-    converting string representations of coordinates into Shapely geometry
-    objects and strings containing numeric values to their respective numeric types.
-
-    Args:
-        input_dict: A dictionary where keys are strings and values can be GML elements,
-                    numeric strings, or any other types.
-
-    Returns:
-        A dictionary with GML elements converted to Shapely objects and numeric strings
-        converted to their respective types (int or float).
-    """
-    for key, value in input_dict.items():
-        if isinstance(value, str):
-            if "." in value:
-                try:
-                    input_dict[key] = float(value)
-                    continue
-                except ValueError:
-                    pass
-            else:
-                try:
-                    input_dict[key] = int(value)
-                    continue
-                except ValueError:
-                    pass
-
-        if "Point.coordinates" in key and isinstance(value, str):
-            shapley_point = GmlShapleyFactory.gml_point_to_shapely(value)
-            input_dict[key] = shapley_point
-
-        elif "LineString.coordinates" in key and isinstance(value, str):
-            shapley_line = GmlShapleyFactory.gml_linestring_to_shapely(value)
-            input_dict[key] = shapley_line
-
-        elif "Polygon.coordinates" in key and isinstance(value, str):
-            shapley_polygon = GmlShapleyFactory.gml_polygon_to_shapely(value)
-            input_dict[key] = shapley_polygon
-
-    return input_dict
+#
+# def parse_dict_to_value_objects(input_dict: dict[str, Any]) -> dict[str, Any]:
+#     """
+#     Parses GML elements in the input dictionary to Shapely objects or converts
+#     string representations of numbers to their respective types.
+#
+#     This function processes each key-value pair in the input dictionary,
+#     converting string representations of coordinates into Shapely geometry
+#     objects and strings containing numeric values to their respective numeric types.
+#
+#     Args:
+#         input_dict: A dictionary where keys are strings and values can be GML elements,
+#                     numeric strings, or any other types.
+#
+#     Returns:
+#         A dictionary with GML elements converted to Shapely objects and numeric strings
+#         converted to their respective types (int or float).
+#     """
+#     for key, value in input_dict.items():
+#         if isinstance(value, str):
+#             if "." in value:
+#                 try:
+#                     input_dict[key] = float(value)
+#                     continue
+#                 except ValueError:
+#                     pass
+#             else:
+#                 try:
+#                     input_dict[key] = int(value)
+#                     continue
+#                 except ValueError:
+#                     pass
+#
+#         if "Point.coordinates" in key and isinstance(value, str):
+#             shapley_point = GmlShapleyFactory.gml_point_to_shapely(value)
+#             input_dict[key] = shapley_point
+#
+#         elif "LineString.coordinates" in key and isinstance(value, str):
+#             shapley_line = GmlShapleyFactory.gml_linestring_to_shapely(value)
+#             input_dict[key] = shapley_line
+#
+#         elif "Polygon.coordinates" in key and isinstance(value, str):
+#             shapley_polygon = GmlShapleyFactory.gml_polygon_to_shapely(value)
+#             input_dict[key] = shapley_polygon
+#
+#     return input_dict
 
 
 def convert_deepdiff_path(deepdiff_path: str) -> str:

@@ -106,6 +106,26 @@ class ImxObject:
         return ".".join(tags)
 
     @property
+    def path_to_root(self) -> str:
+        def process_tag(tag):
+            if tag[0] == "{":
+                namespace, local_name = tag[1:].split("}", 1)
+                if namespace == "http://www.opengis.net/gml":
+                    return f"gml:{local_name}"
+                return local_name
+            return tag
+
+        path = []
+        element = self._element
+        while element is not None:
+            path.append(process_tag(element.tag))
+            parent = element.getparent()
+            if parent is None:
+                break
+            element = parent
+        return ".".join(reversed(path))
+
+    @property
     def name(self) -> str:
         return self._element.get("name", "")
 

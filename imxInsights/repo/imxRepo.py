@@ -11,12 +11,12 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
-from imxInsights.utils.shapely_utils.shapely_geojson import (
+from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely_utils.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
 class ImxRepo:

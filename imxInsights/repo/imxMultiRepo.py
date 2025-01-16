@@ -4,31 +4,34 @@ from pathlib import Path
 import pandas as pd
 from loguru import logger
 
+from imxInsights.compare.changedImxObjects import ChangedImxObjects
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
 
 # from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.shapely_utils.shapely_geojson import (
+from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.utils.shapely_utils.shapely_transform import ShapelyTransform
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
 class ImxMultiRepo:
     def __init__(
         self,
         containers: list[ImxContainerProtocol | ImxSituationProtocol],
+        container_aliases: list[str] | None = None,
         version_safe: bool = True,
     ):
-        self._validate_containers(containers, version_safe)
+        self._validate_containers(containers, version_safe, container_aliases)
         self.containers: list[ImxContainerProtocol | ImxSituationProtocol] = containers
         self.container_order: list[str] = [
             container.container_id for container in self.containers
         ]
+        self.container_aliases = container_aliases
         self.tree_dict: OrderedDict[str, OrderedDict[str, list[ImxObject]]] = (
             OrderedDict()
         )
@@ -36,12 +39,30 @@ class ImxMultiRepo:
         self._process_container_objects()
         self._update_keys()
 
+    def get_keys(self) -> list[str]:
+        """
+        Returns the set of keys currently in the tree dictionary.
+
+        Returns:
+            The set of keys in the tree dictionary.
+        """
+        return list(self._keys)
+
     @staticmethod
     def _validate_containers(
         containers: list[ImxContainerProtocol | ImxSituationProtocol],
         version_safe: bool,
+        container_aliases: list[str] | None = None,
     ) -> None:
         """Ensure containers have unique IDs and the same imx_version if version safe."""
+
+        # for container in containers:
+        #     if not isinstance(container, ImxContainerProtocol) or not isinstance(container, ImxSituationProtocol):
+        #         raise TypeError(f"{container.__name__} does not meet the required protocol {ImxSituationProtocol.__name__} | {ImxContainerProtocol.__name__}.")
+
+        if container_aliases:
+            if len(container_aliases) != len(containers):
+                raise ValueError("Count of aliases and container does not match.")
 
         seen_container_ids: set[str] = set()
         first_version = containers[0].imx_version if containers else None
@@ -88,10 +109,6 @@ class ImxMultiRepo:
         if len(container) == 1:
             return container[0]
         raise ValueError("Container not present")
-
-    def get_keys(self) -> frozenset[str]:
-        """Returns all unique keys (puics) in the tree_dict."""
-        return self._keys
 
     def _get_objects_by_key(self, key: str | None = None) -> ImxMultiRepoObject:
         """Helper to retrieve ImxObjects by key or return default None values if the key is missing."""
@@ -289,9 +306,24 @@ class ImxMultiRepo:
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
-    # def compare(self, container_id_1: str, container_id_2: str) -> ComparedMultiRepo:
-    #     return ComparedMultiRepo(
-    #         self.get_container(container_id_1),
-    #         self.get_container(container_id_2),
-    #         self.get_all(),
-    #     )
+    def compare(
+        self,
+        container_id_1: str,
+        container_id_2: str,
+        object_path: list[str] | None = None,
+    ) -> ChangedImxObjects:
+        # todo: make repoCompare object containing ChangedObjects, should be queryable and as geojson string and file.
+
+        out = []
+        if object_path:
+            for multi_object in self.get_by_paths(object_path):
+                compare = multi_object.compare(container_id_1, container_id_2)
+                if compare:
+                    out.append(compare)
+        else:
+            for multi_object in self.get_all():
+                compare = multi_object.compare(container_id_1, container_id_2)
+                if compare:
+                    out.append(compare)
+
+        return ChangedImxObjects(out)
