@@ -1,0 +1,3 @@
+[submodule "remote_sample_data"]
+	path = remote_sample_data
+	url = https://github.com/open-imx/imx-test-data
