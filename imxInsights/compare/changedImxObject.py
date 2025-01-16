@@ -145,13 +145,13 @@ class ChangedImxObject:
             if isinstance(
                 g,
                 (
-                    Point,
-                    LineString,
-                    Polygon,
-                    MultiPoint,
-                    MultiLineString,
-                    MultiPolygon,
-                    GeometryCollection,
+                    Point
+                    | LineString
+                    | Polygon
+                    | MultiPoint
+                    | MultiLineString
+                    | MultiPolygon
+                    | GeometryCollection
                 ),
             )
         ]
