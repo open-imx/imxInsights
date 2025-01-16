@@ -1,4 +1,7 @@
 import zipfile
+import tempfile
+import os
+from pathlib import Path
 
 import pytest
 from unittest.mock import patch
@@ -6,21 +9,30 @@ from imxInsights.utils.imx.manifestBuilder import ManifestBuilder
 
 
 @pytest.fixture
-def temp_folder(tmp_path):
+def temp_folder():
     """Create a temporary folder with some files for testing."""
-    folder = tmp_path / "test_folder"
-    folder.mkdir()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        folder = Path(temp_dir) / "test_folder"
+        folder.mkdir()  # Create the directory
 
-    imx_file = folder / "SignalingDesign.xml"
-    imx_file.write_text("<root/>")
+        # Create files inside the temporary folder
+        imx_file = folder / "SignalingDesign.xml"
+        with open(imx_file, "w") as f:
+            f.write("<root/>")
 
-    media_file = folder / "image.png"
-    media_file.write_text("binary data")
+        media_file = folder / "image.png"
+        with open(media_file, "w") as f:
+            f.write("binary data")
 
-    other_file = folder / "other_file.txt"
-    other_file.write_text("text data")
+        other_file = folder / "other_file.txt"
+        with open(other_file, "w") as f:
+            f.write("text data")
 
-    return folder
+        # Log folder creation for debugging purposes
+        print(f"Temp folder created at: {folder}")
+        print(f"Temp folder contents: {os.listdir(folder)}")
+
+        yield folder  # This will be returned as the fixture result
 
 
 @patch('imxInsights.utils.hash.hash_sha256')
@@ -30,6 +42,7 @@ def test_manifest_builder(mock_zip, mock_get_media, mock_hash, temp_folder):
     mock_hash.return_value = "mocked_hash"
     mock_get_media.return_value = "image/png"
 
+    # Ensure we pass Path, not string
     output_zip = temp_folder / "output.zip"
     builder = ManifestBuilder(folder_path=temp_folder, output_zip=output_zip)
 
@@ -56,16 +69,15 @@ def test_manifest_builder(mock_zip, mock_get_media, mock_hash, temp_folder):
     required_files = ["SignalingDesign.xml", "image.png", "other_file.txt", "output.zip"]
     assert all((temp_folder / file).exists() for file in required_files)
 
-
 def test_save_manifest(temp_folder):
-    output_zip = temp_folder / "output.zip"
+    output_zip = os.path.join(temp_folder, "output.zip")
     builder = ManifestBuilder(folder_path=temp_folder, output_zip=output_zip)
     builder.build_manifest()
 
     builder.save_manifest()
 
-    manifest_file = temp_folder / "manifest.xml"
-    assert manifest_file.exists()
+    manifest_file = os.path.join(temp_folder, "manifest.xml")
+    assert os.path.exists(manifest_file)
 
     with open(manifest_file, "rb") as f:
         content = f.read()
@@ -73,12 +85,12 @@ def test_save_manifest(temp_folder):
 
 
 def test_zip_folder(temp_folder):
-    output_zip = temp_folder / "output.zip"
+    output_zip = os.path.join(temp_folder, "output.zip")
     builder = ManifestBuilder(folder_path=temp_folder, output_zip=output_zip)
 
     builder.zip_folder()
 
-    assert output_zip.exists()
+    assert os.path.exists(output_zip)
 
     with zipfile.ZipFile(output_zip, 'r') as zip_file:
         zip_contents = zip_file.namelist()
