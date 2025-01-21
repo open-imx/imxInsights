@@ -35,11 +35,19 @@ class ImxMultiRepoObject:
 
     def compare_list(self) -> list[ChangedImxObject]:
         return [
-            self.compare(self.container_order[idx - 1], self.container_order[idx])
+            result
             for idx in range(1, len(self.container_order))
+            if (
+                result := self.compare(
+                    self.container_order[idx - 1], self.container_order[idx]
+                )
+            )
+            is not None
         ]
 
-    def compare(self, container_id_t1: str, container_id_t2: str) -> ChangedImxObject:
+    def compare(
+        self, container_id_t1: str, container_id_t2: str
+    ) -> ChangedImxObject | None:
         t1 = self.get_by_container_id(container_id_t1)
         t2 = self.get_by_container_id(container_id_t2)
         if t1 or t2:
@@ -47,4 +55,4 @@ class ImxMultiRepoObject:
                 t1=t1,
                 t2=t2,
             )
-        return ChangedImxObject(t1=None, t2=None)
+        return None
