@@ -4,7 +4,7 @@ from pathlib import Path
 from lxml.etree import _Element as Element
 from lxml.etree import _ElementTree as ElementTree
 
-from imxInsights.utils.xmlFile import XmlFile
+from imxInsights.file.xmlFile import XmlFile
 
 
 class ImxFile:

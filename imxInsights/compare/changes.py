@@ -1,29 +1,17 @@
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any
 
 from deepdiff import DeepDiff  # type: ignore
 from shapely import LineString, Point
 
-from imxInsights.compare.custom_operators.refs_diff_operator import UUIDListOperator
-from imxInsights.compare.custom_operators.shapely_diff_operator import (
+from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
+from imxInsights.compare.custom_operators.diff_refs import UUIDListOperator
+from imxInsights.compare.custom_operators.diff_shapely import (
     ShapelyLineDiffer,
     ShapelyPointDiffer,
 )
 from imxInsights.compare.helpers import convert_deepdiff_path
 from imxInsights.utils.flatten_unflatten import flatten_dict
-
-
-class ChangeStatus(Enum):
-    """
-    Enum for representing different types of changes.
-    """
-
-    ADDED = "added"
-    REMOVED = "removed"
-    UNCHANGED = "unchanged"
-    CHANGED = "changed"
-    TYPE_CHANGE = "type_change"
 
 
 @dataclass
@@ -32,7 +20,7 @@ class Change:
     Dataclass for representing any type of change between two dictionaries.
     """
 
-    status: ChangeStatus
+    status: ChangeStatusEnum
     t1: Any | None = None
     t2: Any | None = None
     diff_string: str = ""
@@ -45,7 +33,7 @@ def process_deep_diff(dd: DeepDiff):
     if "dictionary_item_added" in dd.keys():
         for key, value in dd["dictionary_item_added"].items():
             changes[convert_deepdiff_path(key)] = Change(
-                status=ChangeStatus.ADDED,
+                status=ChangeStatusEnum.ADDED,
                 t1=None,
                 t2=value,
                 diff_string=f"++{value}",
@@ -56,7 +44,7 @@ def process_deep_diff(dd: DeepDiff):
         for key, value in dd["dictionary_item_removed"].items():
             if isinstance(value, dict):
                 changes[convert_deepdiff_path(key)] = Change(
-                    status=ChangeStatus.REMOVED,
+                    status=ChangeStatusEnum.REMOVED,
                     t1=value,
                     t2=None,
                     diff_string=f"--{value}",
@@ -70,7 +58,7 @@ def process_deep_diff(dd: DeepDiff):
             if isinstance(value, dict):
                 for key_2, value_2 in value.items():
                     changes[f"{convert_deepdiff_path(key)}.{key_2}"] = Change(
-                        status=ChangeStatus.REMOVED,
+                        status=ChangeStatusEnum.REMOVED,
                         t1=value_2,
                         t2=None,
                         diff_string=f"--{value_2}",
@@ -84,7 +72,7 @@ def process_deep_diff(dd: DeepDiff):
             if isinstance(value, dict):
                 for key_2, value_2 in value.items():
                     changes[f"{convert_deepdiff_path(key)}.{key_2}"] = Change(
-                        status=ChangeStatus.ADDED,
+                        status=ChangeStatusEnum.ADDED,
                         t1=None,
                         t2=value_2,
                         diff_string=f"++{value_2}",
@@ -92,7 +80,7 @@ def process_deep_diff(dd: DeepDiff):
                     )
             elif isinstance(value, str):
                 changes[f"{convert_deepdiff_path(key)}.{key}"] = Change(
-                    status=ChangeStatus.ADDED,
+                    status=ChangeStatusEnum.ADDED,
                     t1=None,
                     t2=value,
                     diff_string=f"++{value}",
@@ -105,7 +93,7 @@ def process_deep_diff(dd: DeepDiff):
         for key, value in dd["type_changes"].items():
             if value["old_value"] is None:
                 changes[convert_deepdiff_path(key)] = Change(
-                    status=ChangeStatus.ADDED,
+                    status=ChangeStatusEnum.ADDED,
                     t1=None,
                     t2=value["new_value"],
                     diff_string=f"++{value['new_value']}",
@@ -115,7 +103,7 @@ def process_deep_diff(dd: DeepDiff):
 
             elif value["new_value"] is None:
                 changes[convert_deepdiff_path(key)] = Change(
-                    status=ChangeStatus.REMOVED,
+                    status=ChangeStatusEnum.REMOVED,
                     t1=value["old_value"],
                     t2=None,
                     diff_string=f"--{value['old_value']}",
@@ -125,7 +113,7 @@ def process_deep_diff(dd: DeepDiff):
 
             else:
                 changes[convert_deepdiff_path(key)] = Change(
-                    status=ChangeStatus.TYPE_CHANGE,
+                    status=ChangeStatusEnum.TYPE_CHANGE,
                     t1=value["old_value"],
                     t2=value["new_value"],
                     diff_string=f"{value['old_value']} -> {value['new_value']}",
@@ -141,7 +129,7 @@ def process_deep_diff(dd: DeepDiff):
                     analyse = dd["diff_analyse"][key]
 
             changes[convert_deepdiff_path(key)] = Change(
-                status=ChangeStatus.CHANGED,
+                status=ChangeStatusEnum.CHANGED,
                 t1=value["old_value"],
                 t2=value["new_value"],
                 diff_string=f"{value['old_value']} -> {value['new_value']}",
@@ -193,7 +181,7 @@ def get_object_changes(
     for key, value in flatten_dict_1.items():
         if key not in changes:
             changes[key] = Change(
-                status=ChangeStatus.UNCHANGED,
+                status=ChangeStatusEnum.UNCHANGED,
                 t1=value,
                 t2=value,
                 diff_string=f"{value}",

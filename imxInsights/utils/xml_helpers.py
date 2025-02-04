@@ -14,7 +14,10 @@ def parse_date(date_string: str | None) -> datetime | None:
 def trim_tag(tag: Element | str) -> str:
     if isinstance(tag, Element):
         tag = str(tag.tag)
-    return tag.split("}")[1] if "}" in tag else tag
+    if "gml" in tag:
+        return "gml:" + tag.split("}")[1] if "}" in tag else tag
+    else:
+        return tag.split("}")[1] if "}" in tag else tag
 
 
 def find_base_entity(elem: Element | None) -> Element:

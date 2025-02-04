@@ -1,7 +1,7 @@
 import pytest
 from shapely.geometry import Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
-from imxInsights.utils.shapely_transform import ShapelyTransform  # Adjust the import to the actual module name
-from imxInsights.utils.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_transform import ShapelyTransform  # Adjust the import to the actual module name
+from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
 
 
 def test_rs_wgs_point_no_z():

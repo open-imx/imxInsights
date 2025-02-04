@@ -4,7 +4,7 @@ from pathlib import Path
 from lxml import etree
 from lxml.etree import _ElementTree as ElementTree
 
-from imxInsights.utils.flatten_unflatten import hash_sha256
+from imxInsights.utils.hash import hash_sha256
 
 
 @dataclass(frozen=True)

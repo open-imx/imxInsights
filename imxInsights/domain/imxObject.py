@@ -1,4 +1,3 @@
-import warnings
 from collections import defaultdict
 from collections.abc import Iterable
 from typing import Optional
@@ -82,10 +81,10 @@ class ImxObject:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
 
     @property
-    def get_parent_path(self):
+    def parent_path(self):
         if self.parent is None:
             return self.puic
-        return self.parent.get_parent_path + "." + self.puic
+        return self.parent.parent_path + "." + self.puic
 
     @property
     def element(self) -> Element:
@@ -105,6 +104,26 @@ class ImxObject:
         tags.reverse()
         tags.append(self.tag)
         return ".".join(tags)
+
+    @property
+    def path_to_root(self) -> str:
+        def process_tag(tag):
+            if tag[0] == "{":
+                namespace, local_name = tag[1:].split("}", 1)
+                if namespace == "http://www.opengis.net/gml":
+                    return f"gml:{local_name}"
+                return local_name
+            return tag
+
+        path = []
+        element = self._element
+        while element is not None:
+            path.append(process_tag(element.tag))
+            parent = element.getparent()
+            if parent is None:
+                break
+            element = parent
+        return ".".join(reversed(path))
 
     @property
     def name(self) -> str:
@@ -152,8 +171,40 @@ class ImxObject:
         extensions_dict = defaultdict(list)
         for item in self.imx_extensions:
             extensions_dict[f"extension.{item.tag}"].append(item.properties)
-        # todo: make flatten_dict also handle defaultdict
         return flatten_dict(dict(extensions_dict))
+
+    def get_imx_property_dict(
+        self,
+        add_extension_properties: bool = True,
+        add_parent: bool = True,
+        add_children: bool = True,
+        add_geometry: bool = False,
+    ) -> dict[str, str]:
+        """
+        Retrieve a dictionary containing IMX properties, including the tag, path,
+        properties, and optionally extension properties and geometry.
+        Args:
+            add_extension_properties : A dictionary of additional extension properties to include in the result.
+            add_parent: Includes the parent puic in the result.
+            add_children: Includes all puics of children in the result.
+            add_geometry: Includes string representing geometry data in the result.
+        Returns:
+            A dictionary with 'keys' 'values' of all interesting imx properties
+        """
+        # TODO!: find all property getters / merges for (dataframe) exports
+        result = {"tag": self.tag, "path": self.path}
+        if add_parent:
+            result["parent"] = self.parent.puic if self.parent is not None else ""
+        if add_children:
+            result["children"] = " ".join(
+                [item.puic for item in self.children if item is not None]
+            )
+        result = result | self.properties
+        if add_extension_properties:
+            result |= self.extension_properties
+        if add_geometry:
+            result["geometry"] = self.geometry.wkt
+        return result
 
     def extend_imx_object(self, imx_extension_object: "ImxObject") -> None:
         """
@@ -194,30 +245,6 @@ class ImxObject:
         while parent is not None:
             yield parent
             parent = parent.parent
-
-    def can_compare(self, other: Optional["ImxObject"]) -> bool:
-        """
-        Checks if the object can be compared with another object.
-
-        Args:
-            other (ImxObject): The other ImxObject to compare with.
-
-        Returns:
-            bool: True if the objects can be compared, False otherwise.
-        """
-        if other is None:
-            return True
-
-        if other.puic != self.puic:
-            return False
-
-        if other.path != self.path:
-            warnings.warn(
-                f"Cannot compare {self.path} with {other.path}, tags do not match"
-            )
-            return False
-
-        return True
 
     @staticmethod
     def _get_lookup_tree_from_element(
@@ -261,14 +288,11 @@ class ImxObject:
         Returns:
             List[ImxObject]: The lookup tree generated from the IMX file.
         """
-        imx_key = "@puic"
-
         if imx_file.root is None:
             raise ValueError(  # noqa: TRY003
                 "IMX file root element is None. Cannot generate lookup tree."
             )
-
-        entities = imx_file.root.findall(f".//*[{imx_key}]")
+        entities = imx_file.root.findall(".//*[@puic]")
         return cls._get_lookup_tree_from_element(entities, imx_file)
 
     @classmethod
@@ -285,6 +309,5 @@ class ImxObject:
         Returns:
             List[ImxObject]: The lookup tree generated from the XML element.
         """
-        imx_key = "@puic"
-        entities = element.findall(f".//*[{imx_key}]")
+        entities = element.findall(".//*[@puic]")
         return cls._get_lookup_tree_from_element(entities, imx_file)
