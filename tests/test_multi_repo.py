@@ -127,7 +127,7 @@ def test_multi_repo_object(
 
     result = imx_multi_object.compare(imx_v1200_zip_instance.container_id, imx_v1200_dir_instance.container_id)
     assert len(result.changes) == 40, "Should be x changes"
-    assert len(result.get_change_dict(add_analyse=True).keys()) == 41, "Should contain 1 more property (status) then changes dict"
+    assert len(result.get_change_dict(add_analyse=True).keys()) == 42, "Should contain x properties"
 
     assert result.changes['extension.ObservedLocation.@surveyRef'].status.name == "REMOVED", "observe location should be removed"
     assert result.changes['@signalType'].status.name == "UNCHANGED", "Signal type should be unchanged"

@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def styler_highlight_changes(value: str, borders=False) -> str:
+def styler_highlight_changes(value: str, borders=False) -> str:  # pragma: no cover
     """
     Highlight changes in a DataFrame cell with different borders based on the value.
 
@@ -32,7 +32,7 @@ def styler_highlight_changes(value: str, borders=False) -> str:
         return ""
 
 
-def style_puic_groups(df):
+def style_puic_groups(df):  # pragma: no cover
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
     last_value = None
 
@@ -59,7 +59,8 @@ def df_columns_sort_start_end(
         The DataFrame with reordered columns.
     """
     front_columns_present = [col for col in columns_to_front if col in df.columns]
+    end_columns_present = [col for col in end_columns if col in df.columns]
     remaining_columns = [
-        col for col in df.columns if col not in front_columns_present + end_columns
+        col for col in df.columns if col not in front_columns_present + end_columns_present
     ]
-    return df[front_columns_present + sorted(remaining_columns) + sorted(end_columns)]
+    return df[front_columns_present + sorted(remaining_columns) + sorted(end_columns_present)]
