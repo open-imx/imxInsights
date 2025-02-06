@@ -2,9 +2,9 @@ import mimetypes
 import zipfile
 from pathlib import Path
 
+from loguru import logger
 from lxml import etree
 from lxml.etree import _Element as Element
-from loguru import logger
 
 from imxInsights.utils.hash import hash_sha256
 
@@ -140,7 +140,7 @@ class ManifestBuilder:  # pragma: no cover
         zip_folder(self.folder_path, self.output_zip_path)
 
 
-if __name__ == "__main__":   # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     folder = Path(input("input folder"))
     output = Path(input("output zip file"))
     builder = ManifestBuilder(

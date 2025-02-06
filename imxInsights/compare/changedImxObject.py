@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from shapely.geometry import (
@@ -10,7 +9,6 @@ from shapely.geometry import (
     Point,
     Polygon,
 )
-from shapely.geometry.base import BaseGeometry
 
 from imxInsights.compare.changes import Change, get_object_changes
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
@@ -91,7 +89,7 @@ class ChangedImxObject:
             | analyse
             | {
                 "status": self.status.value,
-                "geometry_status": self.geometry.status.value,
+                "geometry_status": self.geometry.status.value if self.geometry else "",
             }
         )
 

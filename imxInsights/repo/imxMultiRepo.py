@@ -339,8 +339,12 @@ class ImxMultiRepo:
         container_id_name_mapping: dict[str, str] | None = None,
     ) -> pd.DataFrame:
         if container_id_name_mapping:
-            container_id_keys = {val for cid in container_id_pairs for val in cid}  # Flatten both [0] and [1]
-            if not all(key in container_id_keys for key in container_id_name_mapping.keys()):
+            container_id_keys = {
+                val for cid in container_id_pairs for val in cid
+            }  # Flatten both [0] and [1]
+            if not all(
+                key in container_id_keys for key in container_id_name_mapping.keys()
+            ):
                 raise ValueError(
                     "container_id_name_mapping not matching the given container_ids"
                 )
@@ -348,7 +352,6 @@ class ImxMultiRepo:
         data = []
 
         for idx, (container_id_a, container_id_b) in enumerate(container_id_pairs):
-
             snapshot_name = {"snapshot_name": ""}
             if container_id_name_mapping:
                 snapshot_name["snapshot_name"] = (
@@ -403,7 +406,7 @@ class ImxMultiRepo:
                 df["status"], categories=custom_order, ordered=True
             )
 
-            df = df.style.map(styler_highlight_changes).apply(
+            df = df.style.map(styler_highlight_changes).apply(  # type: ignore[attr-defined]
                 style_puic_groups, axis=None
             )
 

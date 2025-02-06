@@ -88,7 +88,7 @@ class ChangedImxObjects:
         valid_columns = [col for col in columns_to_keep if col in df.columns]
         df = df[valid_columns]
         df = df.fillna("")
-        df = df.style.map(styler_highlight_changes)
+        df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
         return df
 
     def get_all_object_paths(self) -> list[str]:
@@ -136,6 +136,6 @@ class ChangedImxObjects:
             )
             df = df.sort_values(by=["path", "status"])
 
-            df = df.style.map(styler_highlight_changes)
+            df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
 
         return df
