@@ -1,3 +1,3 @@
 # Reference
 
-::: imxInsights.repo.tree.buildExceptions
+::: imxInsights.repo.builders.buildExceptions

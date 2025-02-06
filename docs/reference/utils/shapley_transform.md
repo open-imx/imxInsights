@@ -1,4 +1,4 @@
 # Reference
 
 
-::: imxInsights.utils.shapely_transform
+::: imxInsights.utils.shapely.shapely_transform
