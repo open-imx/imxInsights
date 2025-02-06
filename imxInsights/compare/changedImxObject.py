@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from shapely.geometry import (
@@ -10,7 +9,6 @@ from shapely.geometry import (
     Point,
     Polygon,
 )
-from shapely.geometry.base import BaseGeometry
 
 from imxInsights.compare.changes import Change, get_object_changes
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
@@ -89,32 +87,11 @@ class ChangedImxObject:
         return (
             {key: value.diff_string for key, value in self.changes.items()}
             | analyse
-            | {"status": self.status.value}
+            | {
+                "status": self.status.value,
+                "geometry_status": self.geometry.status.value if self.geometry else "",
+            }
         )
-
-    def movement(
-        self, include_source_geometry: bool = False, as_wgs: bool = True
-    ) -> Sequence[BaseGeometry]:
-        # todo: add this to the GeometryChange?
-        geometry = []
-
-        if include_source_geometry:
-            if self.t1 is not None and self.t1.geometry is not None:
-                geometry.append(self.t1.geometry)
-            if self.geometry is not None:
-                geometry.append(self.geometry.geometry_movement())
-            if self.geometry is not None and self.geometry.t2 is not None:
-                geometry.append(self.geometry.t2)
-        else:
-            if self.geometry is not None:
-                geometry.append(self.geometry.geometry_movement())
-
-        if as_wgs:
-            geometry = [
-                ShapelyTransform.rd_to_wgs(_) for _ in geometry if _ is not None
-            ]
-
-        return geometry
 
     def as_geojson_feature(
         self, add_analyse: bool = False, as_wgs: bool = True

@@ -77,14 +77,14 @@ def test_multi_repo_geojson(
     imx_v1200_multi_repo_instance: ImxMultiRepo
 ):
     multi_repo = imx_v1200_multi_repo_instance
-    result = multi_repo.get_geojson(["Signal"], imx_v1200_dir_instance.container_id, to_wgs=False)
+    result = multi_repo.get_geojson(["Signal"], imx_v1200_dir_instance.container_id, as_wgs=False)
     assert len(result.features) == 1, "Should be x features"
     assert len(result.features[0].properties) == 28, "Should have x properties"
 
-    result = multi_repo.get_geojson(["Signal"], imx_v1200_zip_instance.container_id, to_wgs=False)
+    result = multi_repo.get_geojson(["Signal"], imx_v1200_zip_instance.container_id, as_wgs=False)
     assert result.crs.name == "RD_NEW_NAP", "Should x crs"
 
-    result = multi_repo.get_geojson(["SingleSwitch"], imx_v1200_dir_instance.container_id, to_wgs=False, extension_properties=True)
+    result = multi_repo.get_geojson(["SingleSwitch"], imx_v1200_dir_instance.container_id, as_wgs=False, extension_properties=True)
     assert 'extension.MicroNode.@junctionRef' in result.features[0].properties.keys(), "Should have extension properties"
 
     for container_id in [imx_v1200_dir_instance.container_id, imx_v1200_zip_instance.container_id]:
@@ -127,7 +127,7 @@ def test_multi_repo_object(
 
     result = imx_multi_object.compare(imx_v1200_zip_instance.container_id, imx_v1200_dir_instance.container_id)
     assert len(result.changes) == 40, "Should be x changes"
-    assert len(result.get_change_dict(add_analyse=True).keys()) == 41, "Should contain 1 more property (status) then changes dict"
+    assert len(result.get_change_dict(add_analyse=True).keys()) == 42, "Should contain x properties"
 
     assert result.changes['extension.ObservedLocation.@surveyRef'].status.name == "REMOVED", "observe location should be removed"
     assert result.changes['@signalType'].status.name == "UNCHANGED", "Signal type should be unchanged"
