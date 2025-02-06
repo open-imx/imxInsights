@@ -1,4 +1,4 @@
 # Reference
 
 
-::: imxInsights.utils.shapely_geojson
+::: imxInsights.utils.shapely.shapely_geojson

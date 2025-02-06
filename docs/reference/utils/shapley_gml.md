@@ -1,4 +1,4 @@
 # Reference
 
 
-::: imxInsights.utils.shapely_gml
+::: imxInsights.utils.shapely.shapely_gml
