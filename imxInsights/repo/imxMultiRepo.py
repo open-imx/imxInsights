@@ -11,6 +11,12 @@ from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProt
 
 # from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
+from imxInsights.utils.excel_helpers import clean_diff_df
+from imxInsights.utils.pandas_helpers import (
+    df_columns_sort_start_end,
+    style_puic_groups,
+    styler_highlight_changes,
+)
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
@@ -245,7 +251,7 @@ class ImxMultiRepo:
         self,
         object_path: list[str],
         container_id: str,
-        to_wgs: bool = True,
+        as_wgs: bool = True,
         extension_properties: bool = False,
     ) -> ShapelyGeoJsonFeatureCollection:
         """Generate a GeoJSON feature collection from a list of object types or paths."""
@@ -268,7 +274,7 @@ class ImxMultiRepo:
 
                 if location:
                     geometry = (
-                        ShapelyTransform.rd_to_wgs(location) if to_wgs else location
+                        ShapelyTransform.rd_to_wgs(location) if as_wgs else location
                     )
                     features.append(
                         ShapelyGeoJsonFeature(
@@ -282,14 +288,14 @@ class ImxMultiRepo:
                         )
                     )
         return ShapelyGeoJsonFeatureCollection(
-            features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
+            features, crs=CrsEnum.WGS84 if as_wgs else CrsEnum.RD_NEW_NAP
         )
 
     def create_geojson_files(
         self,
         directory_path: str | Path,
         container_id: str,
-        to_wgs: bool = True,
+        as_wgs: bool = True,
         extension_properties: bool = False,
     ) -> None:
         """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
@@ -299,7 +305,7 @@ class ImxMultiRepo:
             geojson_feature_collection = self.get_geojson(
                 [path],
                 container_id,
-                to_wgs=to_wgs,
+                as_wgs=as_wgs,
                 extension_properties=extension_properties,
             )
             geojson_file_path = dir_path / f"{path}.geojson"
@@ -312,8 +318,6 @@ class ImxMultiRepo:
         container_id_2: str,
         object_path: list[str] | None = None,
     ) -> ChangedImxObjects:
-        # todo: make repoCompare object containing ChangedObjects, should be queryable and as geojson string and file.
-
         out = []
         if object_path:
             for multi_object in self.get_by_paths(object_path):
@@ -327,3 +331,80 @@ class ImxMultiRepo:
                     out.append(compare)
 
         return ChangedImxObjects(out)
+
+    def compare_timeline(
+        self,
+        container_id_pairs: list[tuple[str, str]],
+        object_path: list[str] | None = None,
+        container_id_name_mapping: dict[str, str] | None = None,
+    ) -> pd.DataFrame:
+        if container_id_name_mapping:
+            container_id_keys = {val for cid in container_id_pairs for val in cid}  # Flatten both [0] and [1]
+            if not all(key in container_id_keys for key in container_id_name_mapping.keys()):
+                raise ValueError(
+                    "container_id_name_mapping not matching the given container_ids"
+                )
+
+        data = []
+
+        for idx, (container_id_a, container_id_b) in enumerate(container_id_pairs):
+
+            snapshot_name = {"snapshot_name": ""}
+            if container_id_name_mapping:
+                snapshot_name["snapshot_name"] = (
+                    f"{container_id_name_mapping[container_id_a]} vs {container_id_name_mapping[container_id_b]}"
+                )
+
+            data.extend(
+                [
+                    item.get_change_dict()
+                    | snapshot_name
+                    | {
+                        "snapshot": idx,
+                        "container_id_1": container_id_a,
+                        "container_id_2": container_id_b,
+                    }
+                    for item in self.compare(
+                        container_id_a, container_id_b, object_path
+                    ).compared_objects
+                ]
+            )
+
+        df = pd.DataFrame(data)
+        if not df.empty:
+            df = clean_diff_df(df)
+
+            puic_values = df["@puic"].unique()
+            snapshot_values = df["snapshot"].unique()
+            all_combinations = pd.MultiIndex.from_product(
+                [puic_values, snapshot_values], names=["@puic", "snapshot"]
+            ).to_frame(index=False)
+            df = all_combinations.merge(df, on=["@puic", "snapshot"], how="left")
+
+            start_column = [
+                "container_id_1",
+                "container_id_2",
+                "snapshot",
+                "snapshot_name",
+                "parent",
+                "children",
+                "tag",
+                "path",
+                "@puic",
+                "status",
+                "geometry_status",
+                "@name",
+            ]
+            end = [item for item in df.columns if "extension" in item]
+            df = df_columns_sort_start_end(df, start_column, end)
+
+            custom_order = ["added", "changed", "unchanged", "type_change", "removed"]
+            df["status"] = pd.Categorical(
+                df["status"], categories=custom_order, ordered=True
+            )
+
+            df = df.style.map(styler_highlight_changes).apply(
+                style_puic_groups, axis=None
+            )
+
+        return df
