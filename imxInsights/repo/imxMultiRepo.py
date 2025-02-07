@@ -5,6 +5,7 @@ import pandas as pd
 from loguru import logger
 
 from imxInsights.compare.changedImxObjects import ChangedImxObjects
+from imxInsights.compare.changedImxObjectsChain import ChangedImxObjectsChain
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
@@ -180,7 +181,7 @@ class ImxMultiRepo:
             if any(obj and obj.path in object_paths for obj in item)
         ]
 
-    def get_pandas_df(
+    def get_pandas(
         self,
         types: list[str] | None = None,
         paths: list[str] | None = None,
@@ -240,10 +241,10 @@ class ImxMultiRepo:
 
         return df
 
-    def get_pandas_df_dict(self, pivot_df: bool = False) -> dict[str, pd.DataFrame]:
+    def get_pandas_dict(self, pivot_df: bool = False) -> dict[str, pd.DataFrame]:
         """Returns a dictionary of DataFrames, one for each unique path."""
         return {
-            path: self.get_pandas_df(paths=[path], pivot_df=pivot_df)
+            path: self.get_pandas(paths=[path], pivot_df=pivot_df)
             for path in self.get_all_paths()
         }
 
@@ -332,82 +333,96 @@ class ImxMultiRepo:
 
         return ChangedImxObjects(out)
 
-    def compare_timeline(
-        self,
-        container_id_pairs: list[tuple[str, str]],
-        object_path: list[str] | None = None,
-        container_id_name_mapping: dict[str, str] | None = None,
-    ) -> pd.DataFrame:
-        if container_id_name_mapping:
-            container_id_keys = {
-                val for cid in container_id_pairs for val in cid
-            }  # Flatten both [0] and [1]
-            if not all(
-                key in container_id_keys for key in container_id_name_mapping.keys()
-            ):
-                raise ValueError(
-                    "container_id_name_mapping not matching the given container_ids"
-                )
+    def compare_chain(
+            self,
+            container_id_pairs: list[tuple[str, str]],
+            object_path: list[str] | None = None,
+            container_id_name_mapping: dict[str, str] | None = None,
+    ) -> ChangedImxObjectsChain:
+        return ChangedImxObjectsChain(
+            self, container_id_pairs, object_path, container_id_name_mapping
+        )
 
-        data = []
 
-        for idx, (container_id_a, container_id_b) in enumerate(container_id_pairs):
-            snapshot_name = {"snapshot_name": ""}
-            if container_id_name_mapping:
-                snapshot_name["snapshot_name"] = (
-                    f"{container_id_name_mapping[container_id_a]} vs {container_id_name_mapping[container_id_b]}"
-                )
-
-            data.extend(
-                [
-                    item.get_change_dict()
-                    | snapshot_name
-                    | {
-                        "snapshot": idx,
-                        "container_id_1": container_id_a,
-                        "container_id_2": container_id_b,
-                    }
-                    for item in self.compare(
-                        container_id_a, container_id_b, object_path
-                    ).compared_objects
-                ]
-            )
-
-        df = pd.DataFrame(data)
-        if not df.empty:
-            df = clean_diff_df(df)
-
-            puic_values = df["@puic"].unique()
-            snapshot_values = df["snapshot"].unique()
-            all_combinations = pd.MultiIndex.from_product(
-                [puic_values, snapshot_values], names=["@puic", "snapshot"]
-            ).to_frame(index=False)
-            df = all_combinations.merge(df, on=["@puic", "snapshot"], how="left")
-
-            start_column = [
-                "container_id_1",
-                "container_id_2",
-                "snapshot",
-                "snapshot_name",
-                "parent",
-                "children",
-                "tag",
-                "path",
-                "@puic",
-                "status",
-                "geometry_status",
-                "@name",
-            ]
-            end = [item for item in df.columns if "extension" in item]
-            df = df_columns_sort_start_end(df, start_column, end)
-
-            custom_order = ["added", "changed", "unchanged", "type_change", "removed"]
-            df["status"] = pd.Categorical(
-                df["status"], categories=custom_order, ordered=True
-            )
-
-            df = df.style.map(styler_highlight_changes).apply(  # type: ignore[attr-defined]
-                style_puic_groups, axis=None
-            )
-
-        return df
+    # def compare_chain(
+    #     self,
+    #     container_id_pairs: list[tuple[str, str]],
+    #     object_path: list[str] | None = None,
+    #     container_id_name_mapping: dict[str, str] | None = None,
+    # ) -> ChangedImxObjectsChain:
+    #
+    #     if container_id_name_mapping:
+    #         container_id_keys = {
+    #             val for cid in container_id_pairs for val in cid
+    #         }  # Flatten both [0] and [1]
+    #         if not all(
+    #             key in container_id_keys for key in container_id_name_mapping.keys()
+    #         ):
+    #             raise ValueError(
+    #                 "container_id_name_mapping not matching the given container_ids"
+    #             )
+    #
+    #     # below should be done in ChangedImxObjectsChain a class
+    #
+    #     data = []
+    #
+    #     for idx, (container_id_a, container_id_b) in enumerate(container_id_pairs):
+    #         snapshot_name = {"snapshot_name": ""}
+    #         if container_id_name_mapping:
+    #             snapshot_name["snapshot_name"] = (
+    #                 f"{container_id_name_mapping[container_id_a]} vs {container_id_name_mapping[container_id_b]}"
+    #             )
+    #
+    #         data.extend(
+    #             [
+    #                 item.get_change_dict()
+    #                 | snapshot_name
+    #                 | {
+    #                     "snapshot": idx,
+    #                     "container_id_1": container_id_a,
+    #                     "container_id_2": container_id_b,
+    #                 }
+    #                 for item in self.compare(
+    #                     container_id_a, container_id_b, object_path
+    #                 ).compared_objects
+    #             ]
+    #         )
+    #
+    #     df = pd.DataFrame(data)
+    #     if not df.empty:
+    #         df = clean_diff_df(df)
+    #
+    #         puic_values = df["@puic"].unique()
+    #         snapshot_values = df["snapshot"].unique()
+    #         all_combinations = pd.MultiIndex.from_product(
+    #             [puic_values, snapshot_values], names=["@puic", "snapshot"]
+    #         ).to_frame(index=False)
+    #         df = all_combinations.merge(df, on=["@puic", "snapshot"], how="left")
+    #
+    #         start_column = [
+    #             "container_id_1",
+    #             "container_id_2",
+    #             "snapshot",
+    #             "snapshot_name",
+    #             "parent",
+    #             "children",
+    #             "tag",
+    #             "path",
+    #             "@puic",
+    #             "status",
+    #             "geometry_status",
+    #             "@name",
+    #         ]
+    #         end = [item for item in df.columns if "extension" in item]
+    #         df = df_columns_sort_start_end(df, start_column, end)
+    #
+    #         custom_order = ["added", "changed", "unchanged", "type_change", "removed"]
+    #         df["status"] = pd.Categorical(
+    #             df["status"], categories=custom_order, ordered=True
+    #         )
+    #
+    #         df = df.style.map(styler_highlight_changes).apply(  # type: ignore[attr-defined]
+    #             style_puic_groups, axis=None
+    #         )
+    #
+    #     return df
