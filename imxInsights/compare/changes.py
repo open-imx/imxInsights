@@ -50,7 +50,7 @@ def process_deep_diff(dd: DeepDiff):
                     diff_string=f"--{value}",
                     analyse=None,
                 )
-            elif isinstance(value, (str, int, float)):
+            elif isinstance(value, (str | int | float)):
                 changes[convert_deepdiff_path(key)] = Change(
                     status=ChangeStatusEnum.REMOVED,
                     t1=value,
