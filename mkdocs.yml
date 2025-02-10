@@ -98,7 +98,7 @@ nav:
     - Getting started:
         - Installation: context/installation.md
         - Basic use: examples/basic_use.md
-#        - Compare: examples/compare.md
+        - Compare: examples/compare.md
     - Reference:
         - Imx:
           - SingleFileImx: reference/single_file_imx.md

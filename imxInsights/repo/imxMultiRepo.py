@@ -12,12 +12,6 @@ from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProt
 
 # from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.excel_helpers import clean_diff_df
-from imxInsights.utils.pandas_helpers import (
-    df_columns_sort_start_end,
-    style_puic_groups,
-    styler_highlight_changes,
-)
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
@@ -319,6 +313,9 @@ class ImxMultiRepo:
         container_id_2: str,
         object_path: list[str] | None = None,
     ) -> ChangedImxObjects:
+        logger.info(
+            f"compare {container_id_1} vs {container_id_2} {object_path if object_path else ""}"
+        )
         out = []
         if object_path:
             for multi_object in self.get_by_paths(object_path):
@@ -334,15 +331,14 @@ class ImxMultiRepo:
         return ChangedImxObjects(out)
 
     def compare_chain(
-            self,
-            container_id_pairs: list[tuple[str, str]],
-            object_path: list[str] | None = None,
-            container_id_name_mapping: dict[str, str] | None = None,
+        self,
+        container_id_pairs: list[tuple[str, str]],
+        object_path: list[str] | None = None,
+        container_id_name_mapping: dict[str, str] | None = None,
     ) -> ChangedImxObjectsChain:
         return ChangedImxObjectsChain(
             self, container_id_pairs, object_path, container_id_name_mapping
         )
-
 
     # def compare_chain(
     #     self,

@@ -1,17 +1,22 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
 from imxInsights.utils.excel_helpers import clean_diff_df, shorten_sheet_name
-from imxInsights.utils.pandas_helpers import df_columns_sort_start_end, style_puic_groups, styler_highlight_changes
-from imxInsights.compare.changedImxObjects import ChangedImxObjects
+from imxInsights.utils.pandas_helpers import (
+    df_columns_sort_start_end,
+    style_puic_groups,
+    styler_highlight_changes,
+)
 
 
 class ChangedImxObjectsChain:
     def __init__(
-            self,
-            imx_repo,
-            container_id_pairs: list[tuple[str, str]],
-            object_path: list[str] | None = None,
-            container_id_name_mapping: dict[str, str] | None = None,
+        self,
+        imx_repo,
+        container_id_pairs: list[tuple[str, str]],
+        object_path: list[str] | None = None,
+        container_id_name_mapping: dict[str, str] | None = None,
     ):
         self.imx_repo = imx_repo
         self.container_id_pairs = container_id_pairs
@@ -24,9 +29,16 @@ class ChangedImxObjectsChain:
     def _validate_inputs(self):
         """Ensure the input mappings align with the given container IDs."""
         if self.container_id_name_mapping:
-            container_id_keys = {cid for pair in self.container_id_pairs for cid in pair}
-            if not all(key in container_id_keys for key in self.container_id_name_mapping.keys()):
-                raise ValueError("container_id_name_mapping not matching the given container_ids")
+            container_id_keys = {
+                cid for pair in self.container_id_pairs for cid in pair
+            }
+            if not all(
+                key in container_id_keys
+                for key in self.container_id_name_mapping.keys()
+            ):
+                raise ValueError(
+                    "container_id_name_mapping not matching the given container_ids"
+                )
 
     def _perform_comparisons(self) -> list[dict]:
         """Perform comparisons across container pairs and return formatted data."""
@@ -35,10 +47,13 @@ class ChangedImxObjectsChain:
         for idx, (container_id_a, container_id_b) in enumerate(self.container_id_pairs):
             snapshot_name = {"snapshot_name": ""}
             if self.container_id_name_mapping:
-                snapshot_name[
-                    "snapshot_name"] = f"{self.container_id_name_mapping[container_id_a]} vs {self.container_id_name_mapping[container_id_b]}"
+                snapshot_name["snapshot_name"] = (
+                    f"{self.container_id_name_mapping[container_id_a]} vs {self.container_id_name_mapping[container_id_b]}"
+                )
 
-            compared_objects = self.imx_repo.compare(container_id_a, container_id_b, self.object_path).compared_objects
+            compared_objects = self.imx_repo.compare(
+                container_id_a, container_id_b, self.object_path
+            ).compared_objects
 
             data.extend(
                 [
@@ -88,9 +103,13 @@ class ChangedImxObjectsChain:
         df = df_columns_sort_start_end(df, start_column, end_columns)
 
         custom_order = ["added", "changed", "unchanged", "type_change", "removed"]
-        df["status"] = pd.Categorical(df["status"], categories=custom_order, ordered=True)
+        df["status"] = pd.Categorical(
+            df["status"], categories=custom_order, ordered=True
+        )
 
-        return df.style.map(styler_highlight_changes).apply(style_puic_groups, axis=None)  # type: ignore[attr-defined]
+        return df.style.map(styler_highlight_changes).apply(  # type: ignore[attr-defined]
+            style_puic_groups, axis=None
+        )
 
     def to_excel(self, file_path: str | Path):
         """Writes the comparison results to an Excel file, applying formatting."""
@@ -106,7 +125,7 @@ class ChangedImxObjectsChain:
                     self.imx_repo,
                     self.container_id_pairs,
                     object_path=[path],
-                    container_id_name_mapping=self.container_id_name_mapping
+                    container_id_name_mapping=self.container_id_name_mapping,
                 )
 
                 styler_df = compare.get_dataframe()
@@ -117,4 +136,3 @@ class ChangedImxObjectsChain:
                 worksheet = writer.sheets[sheet_name]
                 worksheet.autofit()
                 worksheet.freeze_panes(1, 0)
-

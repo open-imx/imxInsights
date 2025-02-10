@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import List, Optional
 
 import pandas as pd
+from loguru import logger
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.utils.excel_helpers import clean_diff_df, shorten_sheet_name
@@ -23,38 +23,35 @@ class ChangedImxObjects:
     and export data to Excel.
     """
 
-    def __init__(self, compared_objects: List[ChangedImxObject]):
+    def __init__(self, compared_objects: list[ChangedImxObject]):
         """
         Initializes a new ChangedImxObjects instance.
 
         Args:
-            compared_objects: A list of ChangedImxObject instances
-                              representing the compared objects.
+            compared_objects: A list of ChangedImxObject instances representing the compared objects.
         """
-        self.compared_objects: List[ChangedImxObject] = compared_objects
+        self.compared_objects: list[ChangedImxObject] = compared_objects
 
     def get_geojson(
         self,
-        object_path: Optional[List[str]] = None,
+        object_paths: list[str] | None = None,
         to_wgs: bool = True,
     ) -> ShapelyGeoJsonFeatureCollection:
         """
         Generates a GeoJSON feature collection representing the changed objects.
 
         Args:
-            object_path: An optional list of object paths to filter the
-                         GeoJSON features. If None, all changed objects are included.
+            object_paths:: An optional list of object paths to filter the GeoJSON features. If None, all changed objects are included.
             to_wgs: A boolean indicating whether to convert the coordinates to WGS84.
 
         Returns:
             A ShapelyGeoJsonFeatureCollection representing the changed objects.
         """
-        if object_path:
-            features = self._get_features_by_path(object_path, to_wgs=to_wgs)
+        if object_paths:
+            features = self._get_features_by_path(object_paths, to_wgs=to_wgs)
         else:
             features = [
-                item.as_geojson_feature(as_wgs=to_wgs)
-                for item in self.compared_objects
+                item.as_geojson_feature(as_wgs=to_wgs) for item in self.compared_objects
             ]
 
         return ShapelyGeoJsonFeatureCollection(
@@ -63,14 +60,14 @@ class ChangedImxObjects:
 
     def _get_features_by_path(
         self,
-        object_path: List[str],
+        object_paths: list[str],
         to_wgs: bool = True,
-    ) -> List[ShapelyGeoJsonFeature]:
+    ) -> list[ShapelyGeoJsonFeature]:
         """
         Helper function to get GeoJSON features by object path.
 
         Args:
-            object_path: A list of object paths to filter the GeoJSON features.
+            object_paths: A list of object paths to filter the GeoJSON features.
             to_wgs: A boolean indicating whether to convert the coordinates to WGS84.
 
         Returns:
@@ -78,9 +75,9 @@ class ChangedImxObjects:
         """
         features = []
         for item in self.compared_objects:
-            if item.t1 and item.t1.path in object_path:
+            if item.t1 and item.t1.path in object_paths:
                 features.append(item.as_geojson_feature(as_wgs=to_wgs))
-            if item.t2 and item.t2.path in object_path:
+            if item.t2 and item.t2.path in object_paths:
                 features.append(item.as_geojson_feature(as_wgs=to_wgs))
         return features
 
@@ -142,7 +139,7 @@ class ChangedImxObjects:
         df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
         return df
 
-    def get_all_paths(self) -> List[str]:
+    def get_all_paths(self) -> list[str]:
         """
         Returns a sorted list of all unique object paths in the compared objects.
 
@@ -150,20 +147,28 @@ class ChangedImxObjects:
             A sorted list of unique object paths.
         """
         return sorted(
-            [
-                obj.path
-                for item in self.compared_objects
-                for obj in (item.t1, item.t2)
-                if obj
-            ]
+            set(
+                list(
+                    [
+                        obj.path
+                        for item in self.compared_objects
+                        for obj in (item.t1, item.t2)
+                        if obj
+                    ]
+                )
+            )
         )
 
-    def get_change_df(self, object_path: List[str]) -> pd.DataFrame:
+    def get_pandas(
+        self, object_paths: list[str], add_analyse: bool = False, styled_df: bool = True
+    ) -> pd.DataFrame:
         """
         Generates a DataFrame detailing the changes for a specific object path.
 
         Args:
-            object_path: A list containing the object path to filter the changes.
+            object_paths: A list containing the object path to filter the changes.
+            add_analyse: Add analyse to dataframe
+            styled_df: Style changes in dataframe
 
         Returns:
             A pandas DataFrame representing the changes for the specified object path.
@@ -171,11 +176,12 @@ class ChangedImxObjects:
         items = [
             item
             for item in self.compared_objects
-            if (item.t1 and item.t1.path in object_path)
-            or (item.t2 and item.t2.path in object_path)
+            if (item.t1 and item.t1.path in object_paths)
+            or (item.t2 and item.t2.path in object_paths)
         ]
 
-        out = [item.get_change_dict() for item in items]
+        out = [item.get_change_dict(add_analyse=add_analyse) for item in items]
+
         df = pd.DataFrame(out)
         if not df.empty:
             df = clean_diff_df(df)
@@ -201,43 +207,51 @@ class ChangedImxObjects:
                 df["status"], categories=status_order, ordered=True
             )
             df = df.sort_values(by=["path", "status"])
-
-            df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
+            if styled_df:
+                df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
 
         return df
 
-    def to_excel(self, file_name: str | Path, autofit_columns: bool = True) -> None:
+    def to_excel(
+        self, file_name: str | Path, add_analyse: bool = False, styled_df: bool = True
+    ) -> None:
         """
         Exports the overview and detailed changes to an Excel file.
 
         Args:
             file_name: The name or path of the Excel file to create.
-            autofit_columns: Whether to automatically adjust column widths in Excel.
+            add_analyse: Add analyse to excel
+            styled_df: Style changes in excel
         """
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
         paths = self.get_all_paths()
-        diff_dict = {item: self.get_change_df([item]) for item in paths}
+        logger.info("create change excel file")
 
-        with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
+        diff_dict = {
+            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=styled_df)
+            for item in paths
+        }
+
+        with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
             try:
+                logger.debug("creating overview")
                 overview_df = self.get_overview_df()
-                overview_df.to_excel(writer, sheet_name='overview')
-                worksheet = writer.sheets['overview']
-
-                if autofit_columns:
-                    worksheet.autofit()
+                overview_df.to_excel(writer, sheet_name="overview")
+                worksheet = writer.sheets["overview"]
+                worksheet.autofit()
                 worksheet.freeze_panes(1, 0)
             except Exception as e:
-                print(f"Error writing overview sheet: {e}")
+                logger.error(f"creating overview failed: {e}")
 
             for key, value in diff_dict.items():
+                logger.debug(f"processing {key}")
                 sheet_name = shorten_sheet_name(key)
                 try:
                     value.to_excel(writer, sheet_name=sheet_name)
                     worksheet = writer.sheets[sheet_name]
-                    if autofit_columns:
-                        worksheet.autofit()
-                    worksheet.freeze_panes(1, 0)
+                    worksheet.autofit()
+                    worksheet.freeze_panes(1, 1)
                 except Exception as e:
                     print(f"Error writing sheet {sheet_name}: {e}")
+        logger.success("creating change excel file finished")
