@@ -4,10 +4,14 @@ import pandas as pd
 from loguru import logger
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
-from imxInsights.utils.excel_helpers import clean_diff_df, shorten_sheet_name
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_changes,
+)
+from imxInsights.utils.report_helpers import (
+    clean_diff_df,
+    lower_and_index_duplicates,
+    shorten_sheet_name,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
@@ -82,31 +86,27 @@ class ChangedImxObjects:
         return features
 
     def create_geojson_files(
-        self,
-        directory_path: str | Path,
-        to_wgs: bool = True,
+        self, directory_path: str | Path, to_wgs: bool = True
     ) -> None:
         """
         Creates GeoJSON files for each unique object path in the compared objects.
 
         Args:
-            directory_path: The path to the directory where the GeoJSON files
-                            will be created.
+            directory_path: The path to the directory where the GeoJSON files will be created.
             to_wgs: A boolean indicating whether to convert the coordinates to WGS84.
         """
-        dir_path = Path(directory_path)
-        dir_path.mkdir(parents=True, exist_ok=True)
+        if isinstance(directory_path, str):
+            directory_path = Path(directory_path)
 
-        paths = {obj.t1.path for obj in self.compared_objects if obj.t1} | {
-            obj.t2.path for obj in self.compared_objects if obj.t2
-        }
+        directory_path.mkdir(parents=True, exist_ok=True)
+
+        paths = self.get_all_paths()
+        paths = lower_and_index_duplicates(paths)
 
         for path in paths:
-            try:
-                geojson_collection = self.get_geojson([path], to_wgs)
-                geojson_collection.to_geojson_file(dir_path / f"{path}.geojson")
-            except Exception as e:
-                print(f"Error writing GeoJSON file for {path}: {e}")  # Log the error
+            file_name = f"{directory_path}\\{path}.geojson"
+            geojson_collection = self.get_geojson([path], to_wgs)
+            geojson_collection.to_geojson_file(file_name)
 
     def get_overview_df(self) -> pd.DataFrame:
         """
@@ -137,15 +137,15 @@ class ChangedImxObjects:
         df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
         return df
 
-    def get_all_paths(self) -> list[str]:
+    def get_all_paths(self) -> set[str]:
         """
         Returns a sorted list of all unique object paths in the compared objects.
 
         Returns:
             A sorted list of unique object paths.
         """
-        return sorted(
-            set(
+        return set(
+            sorted(
                 list(
                     [
                         obj.path
@@ -224,13 +224,13 @@ class ChangedImxObjects:
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
         paths = self.get_all_paths()
+
         logger.info("create change excel file")
 
         diff_dict = {
             item: self.get_pandas([item], add_analyse=add_analyse, styled_df=styled_df)
             for item in paths
         }
-
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
             try:
                 logger.debug("creating overview")

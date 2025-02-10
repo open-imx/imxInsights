@@ -2,8 +2,8 @@ import pytest
 import pandas as pd
 
 
-from imxInsights.utils.excel_helpers import shorten_sheet_name
 from imxInsights.utils.pandas_helpers import df_columns_sort_start_end
+from imxInsights.utils.report_helpers import shorten_sheet_name, lower_and_index_duplicates
 
 
 def test_shorten_sheet_name():
@@ -59,3 +59,18 @@ def test_df_columns_sort_start_end():
     sorted_df_no_specified = df_columns_sort_start_end(df, ["X", "Y"], ["Z"])
     expected_columns_no_specified = sorted(df.columns)  # Since no specified columns exist, it should just sort
     assert list(sorted_df_no_specified.columns) == expected_columns_no_specified
+
+
+@pytest.mark.parametrize(
+    "input_strings, expected_output",
+    [
+        (["A", "B", "a", "b", "A", "C"], {"a", "a2", "a3", "b", "b2", "c"}),
+        ({"X", "x", "y", "Y", "y", "Z"}, {"x", "x2", "y", "y2", "z"}),
+        (["test", "Test", "TEST", "tEst"], {"test", "test2", "test3", "test4"}),
+        ([], set()),
+        ({"unique", "Unique", "UNIQUE"}, {"unique", "unique2", "unique3"}),
+        (["same", "same", "same", "same"], {"same", "same2", "same3", "same4"}),
+    ],
+)
+def test_lower_and_index_duplicates(input_strings, expected_output):
+    assert lower_and_index_duplicates(input_strings) == expected_output

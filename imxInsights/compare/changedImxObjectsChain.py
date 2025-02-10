@@ -2,12 +2,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from imxInsights.utils.excel_helpers import clean_diff_df, shorten_sheet_name
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     style_puic_groups,
     styler_highlight_changes,
 )
+from imxInsights.utils.report_helpers import clean_diff_df, shorten_sheet_name
 
 
 class ChangedImxObjectsChain:
@@ -118,7 +118,7 @@ class ChangedImxObjectsChain:
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
             paths = self.imx_repo.get_all_paths()
 
-            for path in sorted(paths):
+            for path in paths:
                 sheet_name = shorten_sheet_name(path)
 
                 compare = ChangedImxObjectsChain(

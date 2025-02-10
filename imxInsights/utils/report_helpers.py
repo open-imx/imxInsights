@@ -26,3 +26,14 @@ def clean_diff_df(df) -> pd.DataFrame:
     df["parent"] = df["parent"].replace({"++": "", "--": ""})
     df["children"] = df["children"].replace({"++": "", "--": ""})
     return df
+
+
+def lower_and_index_duplicates(strings: list[str] | set[str]) -> set[str]:
+    counts: dict[str, int] = {}
+    result: set[str] = set()
+
+    for s in (s.lower() for s in strings):
+        counts[s] = counts.get(s, 0) + 1
+        result.add(f"{s}{counts[s]}" if counts[s] > 1 else s)
+
+    return result
