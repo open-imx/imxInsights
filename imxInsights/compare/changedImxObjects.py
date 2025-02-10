@@ -99,7 +99,7 @@ class ChangedImxObjects:
 
         paths = {
             obj.t1.path for obj in self.compared_objects if obj.t1
-        } | {  # Use set comprehension and union
+        } | {
             obj.t2.path for obj in self.compared_objects if obj.t2
         }
 
