@@ -41,7 +41,7 @@
 - [X] Compare as pandas dataframe
 - [X] Timeline compare
 - [X] Compare and timeline color dataframe
-- [ ] Excel compare output
+- [X] Excel compare output
 - [X] Imx objects as GeoJson
 - [X] Compare as GeoJson
 - [X] Transform from and to WGS/RD
