@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 
 import pytest
@@ -66,17 +67,25 @@ def test_all_paths(compared_multirepo):
 
 
 def test_create_geojson_files(compared_multirepo):
-    with tempfile.TemporaryDirectory() as temp_dir:
+    temp_dir = "test_geojson_output"
+
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+
+    os.makedirs(temp_dir)
+
+    try:
         compared_multirepo.create_geojson_files(temp_dir)
         created_files = [f for f in os.listdir(temp_dir) if f.endswith(".geojson")]
+        print(f"Created files ({len(created_files)}): {created_files}")
         assert len(created_files) == 85, "Incorrect number of GeoJSON files created"
-
+    finally:
+        # Cleanup after test
+        shutil.rmtree(temp_dir)
 
 def test_create_excel(compared_multirepo):
     compared_multirepo.to_excel("tester.xlsx")
     os.remove("tester.xlsx")
-
-
 
 
 ### CHAIN COMPARE IS IN DEVELOPMENT. not stable.
