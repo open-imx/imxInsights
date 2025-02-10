@@ -11,6 +11,7 @@ def shorten_sheet_name(sheet_name: str) -> str:
     Returns:
         The shortened sheet name.
     """
+    sheet_name = sheet_name.lower()
     return (
         f"{sheet_name[:14]}...{sheet_name[-14:]}"
         if len(sheet_name) > 30

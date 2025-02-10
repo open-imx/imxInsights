@@ -173,7 +173,7 @@ class ShapelyLineDiffer(BaseOperator):
 
     def _compare_coordinates(self, l1: LineString, l2: LineString) -> int:
         """Compare the number of coordinates in two LineStrings."""
-        return len(l1.coords) - len(l2.coords)
+        return len(l2.coords) - len(l1.coords)
 
     def _compare_z_coordinates(self, l1: LineString, l2: LineString) -> float | str:
         """Compare the Z coordinates of two LineStrings."""
@@ -219,7 +219,7 @@ class ShapelyLineDiffer(BaseOperator):
     ) -> None:
         """Report the detected differences using DeepDiff."""
         diff_instance.custom_report_result(
-            "geometry",
+            "diff_analyse",
             level,
             {
                 "type": "ShapelyLineDiffer",
@@ -230,5 +230,6 @@ class ShapelyLineDiffer(BaseOperator):
                 "line_max_z_distance": z_difference
                 if isinstance(z_difference, str)
                 else round(z_difference, 3),
+                "display": f"almost_equal: {almost_equal}\nintersection over union: {round(intersection_over_union, 3)}\nplaner length difference: {round(length_difference, 3)}",
             },
         )
