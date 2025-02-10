@@ -97,9 +97,7 @@ class ChangedImxObjects:
         dir_path = Path(directory_path)
         dir_path.mkdir(parents=True, exist_ok=True)
 
-        paths = {
-            obj.t1.path for obj in self.compared_objects if obj.t1
-        } | {
+        paths = {obj.t1.path for obj in self.compared_objects if obj.t1} | {
             obj.t2.path for obj in self.compared_objects if obj.t2
         }
 
