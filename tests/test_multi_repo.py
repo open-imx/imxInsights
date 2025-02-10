@@ -98,15 +98,15 @@ def test_multi_repo_dataframe(
     imx_v1200_multi_repo_instance: ImxMultiRepo
 ):
     multi_repo = imx_v1200_multi_repo_instance
-    result = multi_repo.get_pandas_df(types=["Signal", "Sign"], paths=["Signal.ReflectorPost"])
+    result = multi_repo.get_pandas(types=["Signal", "Sign"], paths=["Signal.ReflectorPost"])
     assert len(result) == 10, "Should have x entries"
-    result = multi_repo.get_pandas_df(types=["Signal", "Sign"], paths=["Signal.ReflectorPost"], pivot_df=True)
+    result = multi_repo.get_pandas(types=["Signal", "Sign"], paths=["Signal.ReflectorPost"], pivot_df=True)
     assert result.index.nlevels == 3, "Index should have x levels"
 
-    result = multi_repo.get_pandas_df(["Signal"])
+    result = multi_repo.get_pandas(["Signal"])
     assert len(result) == 2, "Should have x entries"
 
-    assert len(multi_repo.get_pandas_df_dict().keys()) == 247, "Should have x paths"
+    assert len(multi_repo.get_pandas_dict().keys()) == 247, "Should have x paths"
 
 
 def test_multi_repo_object(

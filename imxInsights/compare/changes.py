@@ -50,6 +50,15 @@ def process_deep_diff(dd: DeepDiff):
                     diff_string=f"--{value}",
                     analyse=None,
                 )
+            elif isinstance(value, (str | int | float)):
+                changes[convert_deepdiff_path(key)] = Change(
+                    status=ChangeStatusEnum.REMOVED,
+                    t1=value,
+                    t2=None,
+                    diff_string=f"--{value}",
+                    analyse=None,
+                )
+
             else:
                 raise NotImplementedError(f"{type(value)}")
 
@@ -78,14 +87,14 @@ def process_deep_diff(dd: DeepDiff):
                         diff_string=f"++{value_2}",
                         analyse=None,
                     )
-            elif isinstance(value, str):
-                changes[f"{convert_deepdiff_path(key)}.{key}"] = Change(
-                    status=ChangeStatusEnum.ADDED,
-                    t1=None,
-                    t2=value,
-                    diff_string=f"++{value}",
-                    analyse=None,
-                )
+            # elif isinstance(value, (str, int, float)):
+            #     changes[f"{convert_deepdiff_path(key)}"] = Change(
+            #         status=ChangeStatusEnum.ADDED,
+            #         t1=None,
+            #         t2=value,
+            #         diff_string=f"++{value}",
+            #         analyse=None,
+            #     )
             else:
                 raise NotImplementedError(f"{type(value)}")
 
@@ -177,6 +186,9 @@ def get_object_changes(
     changes = process_deep_diff(dd)
 
     # we got the unchanged left
+
+    # below is going bad if we insert a item in a list, like we had a.1 a.2 now we have a.1 a.2 a.3 and the a.2 is added...
+
     flatten_dict_1 = flatten_dict(dict1)
     for key, value in flatten_dict_1.items():
         if key not in changes:

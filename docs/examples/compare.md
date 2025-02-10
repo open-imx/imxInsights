@@ -1,5 +1,12 @@
 ## Comparing IMX Containers and Situations
 
+
+
+!!! danger "Warning!"  
+
+    This feature is currently in development. Sections of code that are commented out are not yet functional.
+
+
 Using the `ImxSingleFile` and `ImxMultiRepo` classes, you can seamlessly compare IMX containers or specific scenarios across different versions of the IMX format. Objects sharing the same PUIC are recognized as identical, which simplifies comparisons across various contexts and versions.
 
 We leverage Pandas to manage tabular data, facilitating the analysis and export of comparison results to Excel. Our implementation features custom diff operators tailored for IMX data, and we enhance visualization with color-coded styles on output borders, allowing for quick identification of discrepancies.
@@ -19,7 +26,7 @@ First we need to create a multy repo, then we need to get the compare.
     ```
 === "ContainerImx"
     ```py
-    --8<-- "docs/examples/compare/containerImx_compare.py::17"
+    --8<-- "docs/examples/compare/containerImx_compare.py::16"
     ```
 === "Different IMX version"
     ```py

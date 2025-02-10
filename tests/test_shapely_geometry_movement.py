@@ -3,6 +3,7 @@ from shapely.geometry import Point, LineString, Polygon, MultiPoint, MultiLineSt
 
 from imxInsights.utils.shapely.shapley_helpers import compute_geometry_movement
 
+# TODO: move to shaply diff test
 
 def test_point_movement():
     point1 = Point(0, 0)

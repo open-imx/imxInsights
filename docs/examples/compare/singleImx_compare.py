@@ -12,19 +12,19 @@ multi_repo = ImxMultiRepo(
 )
 
 # compare
-compared_imx = multi_repo.compare()
+compared_imx = multi_repo.compare(imx.initial_situation.container_id, imx.new_situation.container_id)
 
 # get object type specific diff dataframe
-track_diff_dataframe = compared_imx.get_pandas(object_type='Track')
+track_diff_dataframe = compared_imx.get_pandas(object_paths=['Track'])
 
 # optional add analyses and style
 track_diff_dataframe_colored = compared_imx.get_pandas(
-    object_type='Track', add_analyse=True, styled_df=True
+    object_paths=['Track'], add_analyse=True, styled_df=True
 )
 
 # create excel
-compared_imx.create_excel(
-    file_path="diff_excel.xlsx",
+compared_imx.to_excel(
+    file_name="diff_excel.xlsx",
     add_analyse=True, styled_df=True
 )
 
