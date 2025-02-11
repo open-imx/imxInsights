@@ -102,11 +102,16 @@ class ChangedImxObjects:
         directory_path.mkdir(parents=True, exist_ok=True)
 
         paths = self.get_all_paths()
-        paths = set(lower_and_index_duplicates(paths))
 
+        geojson_dict = {}
         for path in paths:
+            geojson_dict[path] = self.get_geojson([path], to_wgs)
+
+        geojson_dict = dict(sorted(geojson_dict.items()))
+        geojson_dict = upper_keys_with_index(geojson_dict)
+
+        for path, geojson_collection in geojson_dict.items():
             file_name = f"{directory_path}\\{path}.geojson"
-            geojson_collection = self.get_geojson([path], to_wgs)
             geojson_collection.to_geojson_file(file_name)
 
     def get_overview_df(self) -> pd.DataFrame:

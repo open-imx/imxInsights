@@ -68,14 +68,10 @@ def test_all_paths(compared_multirepo):
 
 
 def test_create_geojson_files(compared_multirepo):
-    temp_dir = Path("temp_test_dir")
-    temp_dir.mkdir(exist_ok=True)
-    try:
+    with tempfile.TemporaryDirectory() as temp_dir:
         compared_multirepo.create_geojson_files(temp_dir)
-        created_files = [f for f in temp_dir.iterdir() if f.suffix == ".geojson"]
+        created_files = [f for f in os.listdir(temp_dir) if f.endswith(".geojson")]
         assert len(created_files) == 93, "Incorrect number of GeoJSON files created"
-    finally:
-        shutil.rmtree(temp_dir)
 
 
 def test_create_excel(compared_multirepo):

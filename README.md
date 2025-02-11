@@ -30,21 +30,18 @@
     We leverage the remarkable `makedocs` plugins to effortlessly generate a polished website from documentations and markdown files.
 
 ## Features
-- [X] Imx 1.2.4 5.0.0 and 12.0.0 (container) file import
-- [X] ImxExtension objects
-- [X] GML shapley geometry
-- [X] RailConnection shapley geometry
-- [X] Known parent and children
-- [X] Imx data as Pandas dataframe
-- [X] Imx Compair imx (situations)
-- [X] Compare between different IMX versions
-- [X] Compare as pandas dataframe
-- [X] Timeline compare
-- [X] Compare and timeline color dataframe
-- [X] Excel compare output
-- [X] Imx objects as GeoJson
-- [X] Compare as GeoJson
-- [X] Transform from and to WGS/RD
+- ✅ IMX file import (1.2.4, 5.0.0, 12.0.0)
+- ✅ IMXExtension objects
+- ✅ GML & RailConnection Shapely geometry
+- ✅ Parent-child as objects
+- ✅ IMX data as Pandas DataFrame
+- ✅ IMX comparison (situations, timeline)
+- ✅ Compare between different IMX versions
+- ✅ Comparison result as Pandas DataFrame & GeoJSON
+- ✅ Color-coded comparison
+- ✅ Excel compare output
+- ✅ IMX objects as GeoJSON
+- ✅ WGS/RD transformations
 
 
 ## Open-IMX Initiative

@@ -12,7 +12,7 @@ from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProt
 
 # from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
-from imxInsights.utils.report_helpers import lower_and_index_duplicates
+from imxInsights.utils.report_helpers import lower_and_index_duplicates, upper_keys_with_index
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
@@ -300,18 +300,20 @@ class ImxMultiRepo:
         directory_path.mkdir(parents=True, exist_ok=True)
 
         paths = self.get_all_paths()
-        paths = set(lower_and_index_duplicates(paths))
-
+        geojson_dict = {}
         for path in paths:
-            geojson_feature_collection = self.get_geojson(
+            geojson_dict[path] = self.get_geojson(
                 [path],
                 container_id,
                 as_wgs=as_wgs,
                 extension_properties=extension_properties,
             )
+        geojson_dict = dict(sorted(geojson_dict.items()))
+        geojson_dict = upper_keys_with_index(geojson_dict)
 
+        for path, feature_collection in geojson_dict.items():
             file_name = f"{directory_path}\\{path}.geojson"
-            geojson_feature_collection.to_geojson_file(file_name)
+            feature_collection.to_geojson_file(file_name)
             logger.success(f"GeoJSON file created and saved at {file_name}.")
 
     def compare(
