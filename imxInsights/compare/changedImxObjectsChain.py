@@ -7,7 +7,11 @@ from imxInsights.utils.pandas_helpers import (
     style_puic_groups,
     styler_highlight_changes,
 )
-from imxInsights.utils.report_helpers import clean_diff_df, shorten_sheet_name
+from imxInsights.utils.report_helpers import (
+    clean_diff_df,
+    shorten_sheet_name,
+    upper_keys_with_index,
+)
 
 
 class ChangedImxObjectsChain:
@@ -115,19 +119,24 @@ class ChangedImxObjectsChain:
         """Writes the comparison results to an Excel file, applying formatting."""
         file_path = Path(file_path).resolve()
 
+        paths = self.imx_repo.get_all_paths()
+        diff_dict = {
+            item: ChangedImxObjectsChain(
+                self.imx_repo,
+                self.container_id_pairs,
+                object_path=[item],
+                container_id_name_mapping=self.container_id_name_mapping,
+            )
+            for item in paths
+        }
+
+        diff_dict = dict(sorted(diff_dict.items()))
+        diff_dict = upper_keys_with_index(diff_dict)
+
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
-            paths = self.imx_repo.get_all_paths()
 
-            for path in paths:
-                sheet_name = shorten_sheet_name(path)
-
-                compare = ChangedImxObjectsChain(
-                    self.imx_repo,
-                    self.container_id_pairs,
-                    object_path=[path],
-                    container_id_name_mapping=self.container_id_name_mapping,
-                )
-
+            for key, compare in diff_dict.items():
+                sheet_name = shorten_sheet_name(key)
                 styler_df = compare.get_dataframe()
                 if styler_df.data.empty:
                     continue
@@ -136,3 +145,6 @@ class ChangedImxObjectsChain:
                 worksheet = writer.sheets[sheet_name]
                 worksheet.autofit()
                 worksheet.freeze_panes(1, 0)
+
+                num_cols = len(styler_df.columns)
+                worksheet.autofilter(0, 0, 0, num_cols)

@@ -300,7 +300,7 @@ class ImxMultiRepo:
         directory_path.mkdir(parents=True, exist_ok=True)
 
         paths = self.get_all_paths()
-        paths = lower_and_index_duplicates(paths)
+        paths = set(lower_and_index_duplicates(paths))
 
         for path in paths:
             geojson_feature_collection = self.get_geojson(

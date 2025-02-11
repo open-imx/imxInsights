@@ -12,6 +12,7 @@ from imxInsights.utils.report_helpers import (
     clean_diff_df,
     lower_and_index_duplicates,
     shorten_sheet_name,
+    upper_keys_with_index,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
@@ -101,7 +102,7 @@ class ChangedImxObjects:
         directory_path.mkdir(parents=True, exist_ok=True)
 
         paths = self.get_all_paths()
-        paths = lower_and_index_duplicates(paths)
+        paths = set(lower_and_index_duplicates(paths))
 
         for path in paths:
             file_name = f"{directory_path}\\{path}.geojson"
@@ -231,6 +232,9 @@ class ChangedImxObjects:
             item: self.get_pandas([item], add_analyse=add_analyse, styled_df=styled_df)
             for item in paths
         }
+        diff_dict = dict(sorted(diff_dict.items()))
+        diff_dict = upper_keys_with_index(diff_dict)
+
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
             try:
                 logger.debug("creating overview")
@@ -239,17 +243,24 @@ class ChangedImxObjects:
                 worksheet = writer.sheets["overview"]
                 worksheet.autofit()
                 worksheet.freeze_panes(1, 0)
+                num_cols = len(overview_df.columns)
+                worksheet.autofilter(0, 0, 0, num_cols - 1)
+
             except Exception as e:
                 logger.error(f"creating overview failed: {e}")
 
-            for key, value in diff_dict.items():
+            for key, df in diff_dict.items():
                 logger.debug(f"processing {key}")
                 sheet_name = shorten_sheet_name(key)
                 try:
-                    value.to_excel(writer, sheet_name=sheet_name)
+                    df.to_excel(writer, sheet_name=sheet_name)
                     worksheet = writer.sheets[sheet_name]
                     worksheet.autofit()
                     worksheet.freeze_panes(1, 1)
+
+                    num_cols = len(df.columns)
+                    worksheet.autofilter(0, 0, 0, num_cols)
+
                 except Exception as e:
                     print(f"Error writing sheet {sheet_name}: {e}")
         logger.success("creating change excel file finished")

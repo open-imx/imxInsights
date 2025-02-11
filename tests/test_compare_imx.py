@@ -73,8 +73,8 @@ def test_create_geojson_files(compared_multirepo):
 
 
 def test_create_excel(compared_multirepo):
-    compared_multirepo.to_excel("tester.xlsx")
-    os.remove("tester.xlsx")
+    compared_multirepo.to_excel("diff.xlsx")
+    os.remove("diff.xlsx")
 
 ### CHAIN COMPARE IS IN DEVELOPMENT. not stable.
 
@@ -101,8 +101,8 @@ def compared_multirepo_timeline(multi_repo_timeline):
     )
 
 def test_chain_excel(compared_multirepo_timeline):
-    compared_multirepo_timeline.to_excel("tester.xlsx")
-    os.remove("tester.xlsx")
+    compared_multirepo_timeline.to_excel("timeline.xlsx")
+    os.remove("timeline.xlsx")
 
 
 
