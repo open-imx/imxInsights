@@ -10,7 +10,6 @@ from imxInsights.utils.pandas_helpers import (
 )
 from imxInsights.utils.report_helpers import (
     clean_diff_df,
-    lower_and_index_duplicates,
     shorten_sheet_name,
     upper_keys_with_index,
 )
