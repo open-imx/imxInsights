@@ -134,7 +134,6 @@ class ChangedImxObjectsChain:
         diff_dict = upper_keys_with_index(diff_dict)
 
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
-
             for key, compare in diff_dict.items():
                 sheet_name = shorten_sheet_name(key)
                 styler_df = compare.get_dataframe()
