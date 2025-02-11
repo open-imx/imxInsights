@@ -1,11 +1,14 @@
 from collections import defaultdict
 from collections.abc import Callable
+
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.domain.imxReferenceObjects import ImxRef
 
 
 def process_references(
-    imx_object: ImxObject, properties: dict[str, str], find: Callable[[str], ImxObject | None]
+    imx_object: ImxObject,
+    properties: dict[str, str],
+    find: Callable[[str], ImxObject | None],
 ) -> None:
     """
     Helper function to process references in given properties dictionary.
@@ -16,7 +19,9 @@ def process_references(
     """
     for prop_key, prop_value in properties.items():
         if prop_key.endswith("Ref") and prop_value != imx_object.puic:
-            imx_object.refs.append(ImxRef(prop_key, prop_value, prop_value, find(prop_value)))
+            imx_object.refs.append(
+                ImxRef(prop_key, prop_value, prop_value, find(prop_value))
+            )
 
         elif prop_key.endswith("Refs"):
             imx_object.refs.extend(
@@ -24,6 +29,7 @@ def process_references(
                 for item in prop_value.split()
                 if item != imx_object.puic
             )
+
 
 def add_refs(
     tree_dict: defaultdict[str, list[ImxObject]],
