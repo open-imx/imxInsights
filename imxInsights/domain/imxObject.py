@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Optional
+from typing import Any, Optional
 
 from lxml.etree import _Element as Element
 from shapely import (
@@ -76,6 +76,7 @@ class ImxObject:
         )
         self.imx_situation: str | None = self._get_imx_situation()
         self.container_id: str | None = None
+        self.refs: list[Any] = []
 
     def __repr__(self) -> str:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
