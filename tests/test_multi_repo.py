@@ -1,5 +1,7 @@
 import os
+import shutil
 import tempfile
+from pathlib import Path
 
 import pytest
 
@@ -87,11 +89,16 @@ def test_multi_repo_geojson(
     result = multi_repo.get_geojson(["SingleSwitch"], imx_v1200_dir_instance.container_id, as_wgs=False, extension_properties=True)
     assert 'extension.MicroNode.@junctionRef' in result.features[0].properties.keys(), "Should have extension properties"
 
-    for container_id in [imx_v1200_dir_instance.container_id, imx_v1200_zip_instance.container_id]:
-        with tempfile.TemporaryDirectory() as temp_dir:
+    temp_dir = Path("temp_test_dir")
+    temp_dir.mkdir(exist_ok=True)
+
+    try:
+        for container_id in [imx_v1200_dir_instance.container_id, imx_v1200_zip_instance.container_id]:
             multi_repo.create_geojson_files(temp_dir, container_id)
-            file_count = len([f for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
+            file_count = len([f for f in temp_dir.iterdir() if f.is_file()])
             assert file_count == 247, "Should have x geojson files"
+    finally:
+        shutil.rmtree(temp_dir)  # Clean up after the test
 
 
 def test_multi_repo_dataframe(

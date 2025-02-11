@@ -334,7 +334,7 @@ class ImxMultiRepo:
                 compare = multi_object.compare(container_id_1, container_id_2)
                 if compare:
                     out.append(compare)
-
+        # todo: add container info to return object so we can create a info sheet.
         return ChangedImxObjects(out)
 
     def compare_chain(
@@ -343,6 +343,7 @@ class ImxMultiRepo:
         object_path: list[str] | None = None,
         container_id_name_mapping: dict[str, str] | None = None,
     ) -> ChangedImxObjectsChain:
+        # todo: add container info to return object so we can create a info sheet.
         return ChangedImxObjectsChain(
             self, container_id_pairs, object_path, container_id_name_mapping
         )
