@@ -58,7 +58,9 @@ class GeometryChange:
         self.status = self._determine_status()
 
     def _determine_status(self) -> GeometryChangeStatus:
-        if self.t1 is None and self.t2 is None:
+        if (self.t1 is None or self.t1.wkt == "GEOMETRYCOLLECTION EMPTY") and (
+            self.t2 is None or self.t2.wkt == "GEOMETRYCOLLECTION EMPTY"
+        ):
             return GeometryChangeStatus.UNDEFINED
         elif not self.t2:
             return GeometryChangeStatus.REMOVED
