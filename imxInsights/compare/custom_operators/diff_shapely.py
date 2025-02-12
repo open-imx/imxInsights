@@ -22,8 +22,8 @@ class ShapelyPointDiffer(BaseOperator):
         Returns:
             bool: True if the comparison is completed and differences are reported.
         """
-        p1: Point = level.t1
-        p2: Point = level.t2
+        p1: Point = Point(level.t1.split(",")) if level.t1 else Point()
+        p2: Point = Point(level.t2.split(",")) if level.t2 else Point()
         is_changed: bool = False
 
         # Check if XY coordinates are different
@@ -109,8 +109,8 @@ class ShapelyLineDiffer(BaseOperator):
         Returns:
             bool: Always returns True after diffing and reporting the result.
         """
-        l1: LineString = level.t1
-        l2: LineString = level.t2
+        l1: LineString = LineString([tuple(map(float, item.split(","))) for item in level.t1.split(" ")]) if level.t1 else LineString()
+        l2: LineString = LineString([tuple(map(float, item.split(","))) for item in level.t2.split(" ")]) if level.t2 else LineString()
         is_changed: bool = False
 
         # Check if lines are almost equal
@@ -218,6 +218,7 @@ class ShapelyLineDiffer(BaseOperator):
         z_difference: float | str,
     ) -> None:
         """Report the detected differences using DeepDiff."""
+        diff_instance.custom_report_result("values_changed", level)
         diff_instance.custom_report_result(
             "diff_analyse",
             level,
