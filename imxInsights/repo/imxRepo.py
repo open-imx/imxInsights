@@ -1,4 +1,3 @@
-import importlib.metadata
 import tempfile
 import uuid
 import zipfile
@@ -337,6 +336,7 @@ class ImxRepo:
         object_path: list[str],
         to_wgs: bool = True,
         extension_properties: bool = False,
+        nice_display_ref: bool = False,
     ) -> ShapelyGeoJsonFeatureCollection:
         """
         Generate a GeoJSON feature collection from a list of object types or paths.
@@ -345,6 +345,7 @@ class ImxRepo:
             object_path: A list of object paths used to fetch the corresponding data.
             to_wgs: convert to WGS84
             extension_properties: add extension properties to geojson
+            nice_display_ref: add nice display refs
 
         Returns:
             ShapelyGeoJsonFeatureCollection: A GeoJSON feature collection containing the geographical features.
@@ -366,11 +367,15 @@ class ImxRepo:
                 )
             else:
                 geometry = []
+
+            properties = self._extract_overview_properties(
+                item, nice_display_ref=nice_display_ref
+            )
+
             features.append(
                 ShapelyGeoJsonFeature(
                     geometry,
-                    item.properties
-                    | (item.extension_properties if extension_properties else {}),
+                    properties,
                 )
             )
 
@@ -383,6 +388,7 @@ class ImxRepo:
         directory_path: str | Path,
         to_wgs: bool = True,
         extension_properties: bool = False,
+        nice_display_ref: bool = True,
     ):
         """
         Create GeoJSON files for the specified object types or paths and save them to the given directory.
@@ -391,13 +397,17 @@ class ImxRepo:
             directory_path: The directory where the GeoJSON files will be created.
             to_wgs: convert to WGS84
             extension_properties: add extension properties to geojson
+            nice_display_ref: add nice display refs
 
         """
         for path in self.get_all_paths():
             dir_path = Path(directory_path)
             dir_path.mkdir(parents=True, exist_ok=True)
             geojson_feature_collection = self.get_geojson(
-                [path], to_wgs=to_wgs, extension_properties=extension_properties
+                [path],
+                to_wgs=to_wgs,
+                extension_properties=extension_properties,
+                nice_display_ref=nice_display_ref,
             )
             geojson_file_path = dir_path / f"{path}.geojson"
             geojson_feature_collection.to_geojson_file(geojson_file_path)
