@@ -178,8 +178,8 @@ def get_object_changes(
         report_repetition=True,
         custom_operators=[
             UUIDListOperator(regex_paths=[r"root\['.*Refs'\]$"]),
-            ShapelyPointDiffer(types=[Point]),
-            ShapelyLineDiffer(types=[LineString]),
+            ShapelyPointDiffer(regex_paths=[r"root\['.*gml:Point.gml:coordinates'\]$"]),
+            ShapelyLineDiffer(regex_paths=[r"root\['.*gml:LineString.gml:coordinates'\]$"]),
         ],
     )
 
