@@ -484,7 +484,7 @@ class ImxRepo:
                 write_df_to_sheet(
                     writer,
                     sheet_name,
-                    overview_df,
+                    df,
                     index=False,
                     header=True,
                     auto_filter=True,
