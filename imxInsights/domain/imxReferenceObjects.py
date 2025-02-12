@@ -13,7 +13,9 @@ class ImxRef:
     field: str
     field_value: str
     lookup: str
-    imx_object: Any | None = None
+    imx_object: Any | None = (
+        None  # todo: make protocol for imx object.... so we can type hint instead of any
+    )
     status: RefStatus = RefStatus.NOT_PRESENT
 
     def __post_init__(self):
@@ -22,4 +24,6 @@ class ImxRef:
 
     @property
     def display(self) -> str:
-        return f"{self.field} {self.lookup} {f'{self.status.value} ({self.imx_object.tag})' if self.imx_object else self.status.value}"
+        if self.imx_object:
+            return f"{self.lookup}|{self.imx_object.tag if self.imx_object else ""}|{self.imx_object.name if self.imx_object else ""}"
+        return f"{self.lookup}-{self.status.value}"

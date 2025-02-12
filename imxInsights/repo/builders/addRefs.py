@@ -41,7 +41,7 @@ def add_refs(
     :param tree_dict: A dictionary mapping PUICs to lists of ImxObjects.
     :param find: A callable that retrieves an ImxObject by its identifier.
     """
-    for imx_objects in tree_dict.values():
+    for key, imx_objects in tree_dict.items():
         for imx_object in imx_objects:
             process_references(imx_object, imx_object.properties, find)
             process_references(imx_object, imx_object.extension_properties, find)

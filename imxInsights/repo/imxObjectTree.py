@@ -111,7 +111,11 @@ class ObjectTree:
         extend_objects(self.tree_dict, self.build_exceptions, imx_file, element)
         add_children(self.tree_dict, self.find)
         build_rail_connections(self.get_by_types, self.find, self.build_exceptions)
-        add_refs(self.tree_dict, self.find)
+
+        # add refs once on core, all other links will point inbound so we extend.
+        if "SignalingDesign" in imx_file.tag or "}ImSpoor" in imx_file.tag:
+            add_refs(self.tree_dict, self.find)
+
         # todo: classify area
 
     @staticmethod
