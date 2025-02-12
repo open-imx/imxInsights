@@ -12,6 +12,7 @@ from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProt
 
 # from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
+from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
 from imxInsights.utils.report_helpers import upper_keys_with_index
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
@@ -21,7 +22,7 @@ from imxInsights.utils.shapely.shapely_geojson import (
 from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
-class ImxMultiRepo:
+class ImxMultiRepo(ImxMultiRepoProtocol):
     def __init__(
         self,
         containers: list[ImxContainerProtocol | ImxSituationProtocol],
@@ -325,19 +326,7 @@ class ImxMultiRepo:
         logger.info(
             f"compare {container_id_1} vs {container_id_2} {object_path if object_path else ""}"
         )
-        out = []
-        if object_path:
-            for multi_object in self.get_by_paths(object_path):
-                compare = multi_object.compare(container_id_1, container_id_2)
-                if compare:
-                    out.append(compare)
-        else:
-            for multi_object in self.get_all():
-                compare = multi_object.compare(container_id_1, container_id_2)
-                if compare:
-                    out.append(compare)
-        # todo: add container info to return object so we can create a info sheet.
-        return ChangedImxObjects(out)
+        return ChangedImxObjects(self, container_id_1, container_id_2)
 
     def compare_chain(
         self,
