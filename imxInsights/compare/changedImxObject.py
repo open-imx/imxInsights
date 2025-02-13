@@ -21,8 +21,6 @@ class ChangedImxObject:
         self.t1 = t1
         self.t2 = t2
         self.puic: str = self._get_puic()
-        if self.puic == "514169ce-81df-4100-b5b2-59a0639828a5":
-            print()
 
         t1_props, t2_props = self._prepare_properties()
         self.changes = get_object_changes(t1_props, t2_props)
