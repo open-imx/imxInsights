@@ -4,13 +4,11 @@ from pathlib import Path
 import pandas as pd
 from loguru import logger
 
+from imxInsights.compare.changedImxChainObjects import ChangedImxObjectsChain
 from imxInsights.compare.changedImxObjects import ChangedImxObjects
-from imxInsights.compare.changedImxObjectsChain import ChangedImxObjectsChain
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
-
-# from imxInsights.repo.imxComparedRepo import ComparedMultiRepo
 from imxInsights.repo.imxMultiRepoObject import ImxMultiRepoObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
 from imxInsights.utils.report_helpers import upper_keys_with_index
@@ -328,13 +326,16 @@ class ImxMultiRepo(ImxMultiRepoProtocol):
         )
         return ChangedImxObjects(self, container_id_1, container_id_2)
 
-    def compare_chain(
-        self,
-        container_id_pairs: list[tuple[str, str]],
-        object_path: list[str] | None = None,
-        container_id_name_mapping: dict[str, str] | None = None,
-    ) -> ChangedImxObjectsChain:
-        # todo: add container info to return object so we can create a info sheet.
-        return ChangedImxObjectsChain(
-            self, container_id_pairs, object_path, container_id_name_mapping
-        )
+
+    # TODO: remake:
+    # def compare_chain(
+    #     self,
+    #     container_id_pairs: list[tuple[str, str]],
+    #     object_path: list[str] | None = None,
+    #     container_id_name_mapping: dict[str, str] | None = None,
+    # ) -> ChangedImxObjectsChain:
+    #
+    #     # todo: add container info to return object so we can create a info sheet.
+    #     return ChangedImxObjectsChain(
+    #         self, container_id_pairs, object_path, container_id_name_mapping
+    #     )

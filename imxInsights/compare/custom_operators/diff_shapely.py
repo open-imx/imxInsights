@@ -24,6 +24,9 @@ class ShapelyPointDiffer(BaseOperator):
         """
         p1: Point = Point(level.t1.split(",")) if level.t1 else Point()
         p2: Point = Point(level.t2.split(",")) if level.t2 else Point()
+
+        type_changed = True if (p1.is_empty or p2.is_empty) else False
+
         is_changed: bool = False
 
         # Check if XY coordinates are different
@@ -40,7 +43,7 @@ class ShapelyPointDiffer(BaseOperator):
         if is_changed:
             almost_equal: bool = self._check_almost_equal(p1, p2)
             self._report_differences(
-                diff_instance, level, almost_equal, xy_distance, z_distance
+                diff_instance, level, almost_equal, xy_distance, z_distance, type_changed
             )
 
         return True
@@ -79,9 +82,14 @@ class ShapelyPointDiffer(BaseOperator):
         almost_equal: bool,
         xy_distance: float,
         z_distance: float | str,
+        type_changed: bool
     ) -> None:
         """Report the detected differences."""
-        diff_instance.custom_report_result("values_changed", level)
+        if type_changed:
+            diff_instance.custom_report_result("type_changes", level)
+        else:
+            diff_instance.custom_report_result("values_changed", level)
+
         diff_instance.custom_report_result(
             "diff_analyse",
             level,
@@ -89,7 +97,8 @@ class ShapelyPointDiffer(BaseOperator):
                 "type": "ShapelyPointDiffer",
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
-                "point_z_distance": z_distance,
+                "point_z_distance": round(z_distance, 3) if isinstance(z_distance, float) else z_distance ,
+
                 "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance}",
             },
         )
@@ -109,8 +118,20 @@ class ShapelyLineDiffer(BaseOperator):
         Returns:
             bool: Always returns True after diffing and reporting the result.
         """
-        l1: LineString = LineString([tuple(map(float, item.split(","))) for item in level.t1.split(" ")]) if level.t1 else LineString()
-        l2: LineString = LineString([tuple(map(float, item.split(","))) for item in level.t2.split(" ")]) if level.t2 else LineString()
+        l1: LineString = (
+            LineString(
+                [tuple(map(float, item.split(","))) for item in level.t1.split(" ")]
+            )
+            if level.t1
+            else LineString()
+        )
+        l2: LineString = (
+            LineString(
+                [tuple(map(float, item.split(","))) for item in level.t2.split(" ")]
+            )
+            if level.t2
+            else LineString()
+        )
         is_changed: bool = False
 
         # Check if lines are almost equal
@@ -228,7 +249,7 @@ class ShapelyLineDiffer(BaseOperator):
                 "intersection_over_union": round(intersection_over_union, 3),
                 "line_planer_length_difference": round(length_difference, 3),
                 "line_coordinate_difference": coordinate_difference,
-                "line_max_z_distance": z_difference
+                "line_max_z_distance": round(z_difference,3) if isinstance(z_difference, float) else z_difference
                 if isinstance(z_difference, str)
                 else round(z_difference, 3),
                 "display": f"almost_equal: {almost_equal}\nintersection over union: {round(intersection_over_union, 3)}\nplaner length difference: {round(length_difference, 3)}",

@@ -16,7 +16,7 @@ class ImxMultiRepoProtocol(Protocol):
     containers: list[ImxContainerProtocol | ImxSituationProtocol]
     container_order: list[str]
     tree_dict: OrderedDict[str, OrderedDict[str, list[ImxObject]]]
-    _keys: list[str]
+    _keys: frozenset[str]
 
     def get_keys(self) -> list[str]:
         """Returns all unique keys (puics) in the tree_dict."""

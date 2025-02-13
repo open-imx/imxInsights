@@ -2,6 +2,7 @@ import importlib.metadata
 from typing import Any
 
 import pandas as pd
+from pandas.io.formats.style import Styler
 
 
 def shorten_sheet_name(sheet_name: str) -> str:
@@ -90,17 +91,21 @@ def app_info_df(process_data: dict) -> pd.DataFrame:
 def write_df_to_sheet(
     writer,
     sheet_name: str,
-    df: pd.DataFrame,
+    df: pd.DataFrame | Styler,
     *,
     index: bool = False,
     header: bool = True,
     auto_filter: bool = True,
 ) -> None:
+    """Write a DataFrame or Styler object to an Excel sheet."""
     df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
     worksheet = writer.sheets[sheet_name]
     worksheet.autofit()
     worksheet.freeze_panes(1, 0)
 
-    if auto_filter and not df.empty:
-        num_cols = len(df.columns) - 1
+    data = df.data if isinstance(df, Styler) else df  # type: ignore
+
+    if auto_filter and not data.empty:
+        num_cols = len(data.columns) - 1
         worksheet.autofilter(0, 0, 0, num_cols)
+

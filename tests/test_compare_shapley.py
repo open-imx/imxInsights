@@ -2,6 +2,7 @@ import pytest
 from deepdiff import DeepDiff
 from shapely.geometry import Point, LineString
 
+from imxInsights.compare.changes import process_deep_diff
 from imxInsights.compare.custom_operators.diff_shapely import ShapelyPointDiffer, ShapelyLineDiffer
 
 
