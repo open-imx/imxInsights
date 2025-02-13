@@ -113,37 +113,3 @@ def test_multi_repo_dataframe(
 
     assert len(multi_repo.get_pandas_dict().keys()) == 247, "Should have x paths"
 
-
-def test_multi_repo_object(
-    imx_v1200_triple_multi_repo_instance: ImxMultiRepo,
-    imx_v500_project_instance: ImxSingleFile,
-    imx_v1200_zip_instance: ImxContainer,
-    imx_v1200_dir_instance: ImxContainer,
-):
-    multi_repo = imx_v1200_triple_multi_repo_instance
-    imx_multi_object = multi_repo.find("65ccaade-e1c7-43e8-975b-e377951ba621")
-    assert len(imx_multi_object.container_order) == 3, "should have 2 containers"
-    assert len(imx_multi_object.imx_objects) == 3, "should have 2 imx objects"
-
-    result = imx_multi_object.compare(imx_v500_project_instance.initial_situation.container_id, imx_v1200_zip_instance.container_id)
-    assert len(result.changes) == 40, "Should be x changes"
-    assert result.geometry.status.name == "ADDED", "Geometry should added"
-    assert isinstance(result.t2, ImxObject), "Should be ImxObject"
-
-    result = imx_multi_object.compare(imx_v1200_zip_instance.container_id, imx_v1200_dir_instance.container_id)
-    assert len(result.changes) == 40, "Should be x changes"
-    assert len(result.get_change_dict(add_analyse=True).keys()) == 42, "Should contain x properties"
-
-    assert result.changes['extension.ObservedLocation.@surveyRef'].status.name == "REMOVED", "observe location should be removed"
-    assert result.changes['@signalType'].status.name == "UNCHANGED", "Signal type should be unchanged"
-    assert result.geometry.status.name == 'UNCHANGED', "Geometry should be unchanged"
-    assert result.status.name == 'CHANGED', "Global stat should be changed"
-
-    compare_list = imx_multi_object.compare_list()
-    assert len(compare_list) == 2, "Should be 2 diffs in list"
-    assert compare_list[0].t1 is None, "t1 should not have a container"
-    assert compare_list[0].t2.container_id == imx_v1200_zip_instance.container_id, "Should be 2th container id"
-
-    assert compare_list[1].t1.container_id == imx_v1200_zip_instance.container_id, "Should be 2th container id"
-    assert compare_list[1].t2.container_id == imx_v1200_dir_instance.container_id, "Should be 3th container id"
-

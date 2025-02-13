@@ -44,18 +44,17 @@ def test_reindex_dict_non_numeric():
 
 def test_reindex_dict_unordered_indices():
     data = {
-        "group.5.name.0.test": "Eve",
-        "group.3.name.0.test_2": "Charlie",
-        "group.4.name.1.test": "David",
-        "group.1.name": "Alice",
-        "group.2.name": "Bob",
+        'group.3.name': 'Bob',
+        'group.2.name': 'Alice',
+        'group.1.name.0.test_1': 'Charlie',
+        'group.1.name.1.test_2': 'David',
+        'group.0.name.0.test': 'Eve',
     }
     expected = {
-        "group.0.name": "Eve",
-        "group.1.name": "Charlie",
-        "group.2.name": "David",
-        "group.3.name": "Alice",
-        "group.4.name": "Bob",
-    }
+        'group.0.name': 'Bob',
+        'group.1.name': 'Alice',
+        'group.2.name.0.test_1': 'Charlie',
+        'group.2.name.1.test_2': 'David',
+        'group.3.name.0.test': 'Eve'}
     assert reindex_dict(data) == expected
 

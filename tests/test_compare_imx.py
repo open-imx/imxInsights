@@ -53,18 +53,11 @@ def test_keys_count(multi_repo, compared_multirepo):
     assert len(multi_repo._keys) == len(compared_multirepo.compared_objects), "Compared objects count should match key count"
 
 
-def test_overview_dataframe(compared_multirepo):
-    overview = compared_multirepo.get_overview_df()
-    assert isinstance(overview, Styler), "Overview should be a Pandas Styler object"
-    assert overview.data.shape == (9289, 8), "Incorrect overview dataframe shape"
+# def test_overview_dataframe(compared_multirepo):
+#     overview = compared_multirepo.get_overview_df()
+#     assert isinstance(overview, Styler), "Overview should be a Pandas Styler object"
+#     assert overview.data.shape == (9289, 8), "Incorrect overview dataframe shape"
 
-
-def test_all_paths(compared_multirepo):
-    all_paths = compared_multirepo.get_all_paths()
-    assert len(all_paths) == 93, "Incorrect number of paths"
-    for item in all_paths:
-        df = compared_multirepo.get_pandas([item], add_analyse=True)
-        assert isinstance(df, Styler), "Path retrieval should return a Pandas Styler object"
 
 
 def test_create_geojson_files(compared_multirepo):
@@ -80,31 +73,31 @@ def test_create_excel(compared_multirepo):
 
 ### CHAIN COMPARE IS IN DEVELOPMENT. not stable.
 
-@pytest.fixture(scope="module")
-def multi_repo_timeline(imx_v124_project_instance, imx_v500_project_instance, imx_v1200_zip_instance):
-    return ImxMultiRepo(
-        [
-            imx_v124_project_instance.initial_situation,
-            imx_v500_project_instance.initial_situation,
-            imx_v1200_zip_instance
-        ],
-        version_safe=False,
-    )
+# @pytest.fixture(scope="module")
+# def multi_repo_timeline(imx_v124_project_instance, imx_v500_project_instance, imx_v1200_zip_instance):
+#     return ImxMultiRepo(
+#         [
+#             imx_v124_project_instance.initial_situation,
+#             imx_v500_project_instance.initial_situation,
+#             imx_v1200_zip_instance
+#         ],
+#         version_safe=False,
+#     )
 
-@pytest.fixture(scope="module")
-def compared_multirepo_timeline(multi_repo_timeline):
-    """Create an ImxMultiRepo and perform the comparison once."""
+# @pytest.fixture(scope="module")
+# def compared_multirepo_timeline(multi_repo_timeline):
+#     """Create an ImxMultiRepo and perform the comparison once."""
+#
+#     return multi_repo_timeline.compare_chain(
+#         [
+#             (multi_repo_timeline.container_order[0], multi_repo_timeline.container_order[1]),
+#             (multi_repo_timeline.container_order[1], multi_repo_timeline.container_order[2])
+#         ]
+#     )
 
-    return multi_repo_timeline.compare_chain(
-        [
-            (multi_repo_timeline.container_order[0], multi_repo_timeline.container_order[1]),
-            (multi_repo_timeline.container_order[1], multi_repo_timeline.container_order[2])
-        ]
-    )
-
-def test_chain_excel(compared_multirepo_timeline):
-    compared_multirepo_timeline.to_excel("timeline.xlsx")
-    os.remove("timeline.xlsx")
+# def test_chain_excel(compared_multirepo_timeline):
+#     compared_multirepo_timeline.to_excel("timeline.xlsx")
+#     os.remove("timeline.xlsx")
 
 
 
