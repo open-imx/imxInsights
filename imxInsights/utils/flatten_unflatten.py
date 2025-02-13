@@ -1,3 +1,5 @@
+import re
+from collections import defaultdict
 from typing import Any
 
 from imxInsights.utils.hash import hash_dict_ignor_nested
@@ -109,5 +111,79 @@ def parse_to_nested_dict(input_dict: dict[str, Any]) -> dict[str | int, Any]:
             d.append(value)
         else:
             d[last_part] = value
+
+    return result
+
+
+def sort_dict_by_sourceline(data):
+    keys = [k for k in data]  # if not k.endswith(':sourceline')]
+    sorted_keys = sorted(keys, key=lambda k: int(data.get(f"{k}:sourceline", 1e9)))
+    sorted_data = {k: data[k] for k in sorted_keys}
+    return sorted_data
+
+
+def remove_sourceline_from_dict(dict_whit_sourcelines: dict[str, Any]):
+    return {
+        k: v for k, v in dict_whit_sourcelines.items() if not k.endswith(":sourceline")
+    }
+
+
+def reindex_dict(data: dict[str, str]) -> dict[str, str]:
+    new_data: dict[str, Any] = {}
+    # index_map keeps a mapping per parent key: parent_path -> { original_index: new_index }
+    index_map: defaultdict[str, dict[str, int]] = defaultdict(dict)
+    # counter_map tracks how many items we have seen per parent (to assign new indices)
+    counter_map: defaultdict[str, int] = defaultdict(int)
+
+    for key, value in data.items():
+        parts: list[str] = key.split(".")
+        new_parts: list[str] = []
+        current_path: list[str] = []  # will accumulate segments to build the parent key
+
+        for part in parts:
+            if part.isdigit():
+                parent: str = ".".join(current_path)
+                # If this numeric part has not been seen under this parent, assign the next index
+                if part not in index_map[parent]:
+                    new_index: int = counter_map[parent]
+                    index_map[parent][part] = new_index
+                    counter_map[parent] += 1
+                else:
+                    new_index = index_map[parent][part]
+                new_parts.append(str(new_index))
+                current_path.append(str(new_index))
+            else:
+                new_parts.append(part)
+                current_path.append(part)
+        new_key: str = ".".join(new_parts)
+        new_data[new_key] = value
+
+    return new_data
+
+
+def dict_normalize_indexed_keys(data):
+    """
+    Normalize keys with indices across all dictionaries in the list,
+    ensuring that similar keys without an index are indexed as 0.
+    """
+    result = []
+
+    for item in data:
+        # Create a copy to avoid modifying the original dictionary
+        normalized_item = item.copy()
+
+        # Find all keys with an index (e.g., 'Jumper.0')
+        indexed_keys = [key for key in item.keys() if re.search(r"\.\d+$", key)]
+
+        for indexed_key in indexed_keys:
+            # Extract the key part before the index
+            base_key = re.sub(r"\.\d+$", "", indexed_key)
+
+            # If the base key exists without an index, set it as index 0
+            if base_key in item and f"{base_key}.0" not in normalized_item:
+                normalized_item[f"{base_key}.0"] = item[base_key]
+
+        # Append the normalized dictionary to the result list
+        result.append(normalized_item)
 
     return result

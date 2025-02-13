@@ -1,5 +1,5 @@
 import re
-from typing import Any, List
+from typing import Any
 
 from deepdiff.operator import BaseOperator  # type: ignore
 
@@ -14,14 +14,16 @@ class UUIDListOperator(BaseOperator):
     Custom DeepDiff operator for comparing strings containing lists of UUIDs.
     """
 
-    def __init__(self, regex_paths: List[str]):
+    def __init__(self, regex_paths: list[str]):
         """
         Initialize with paths to match UUID fields.
         """
         super().__init__(regex_paths)
 
     @staticmethod
-    def _create_display(added: List[str], removed: List[str], unchanged: List[str]) -> List[str]:
+    def _create_display(
+        added: list[str], removed: list[str], unchanged: list[str]
+    ) -> list[str]:
         """
         Create a display list where added UUIDs are prefixed with '++'
         and removed UUIDs with '--'. Unchanged UUIDs remain unmodified.
@@ -31,7 +33,7 @@ class UUIDListOperator(BaseOperator):
         return display_added + unchanged + display_removed
 
     @staticmethod
-    def _split_uuids(uuid_str: str) -> List[str]:
+    def _split_uuids(uuid_str: str) -> list[str]:
         """
         Extract UUIDs from the input string using the UUIDv4_PATTERN.
         """

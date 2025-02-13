@@ -19,16 +19,23 @@ def process_references(
     """
     for prop_key, prop_value in properties.items():
         if prop_key.endswith("Ref") and prop_value != imx_object.puic:
-            imx_object.refs.append(
-                ImxRef(prop_key, prop_value, prop_value, find(prop_value))
-            )
+            if not any(
+                ref.field == prop_key and ref.lookup == prop_value
+                for ref in imx_object.refs
+            ):
+                imx_object.refs.append(
+                    ImxRef(prop_key, prop_value, prop_value, find(prop_value))
+                )
 
         elif prop_key.endswith("Refs"):
-            imx_object.refs.extend(
-                ImxRef(prop_key, prop_value, item, find(item))
-                for item in prop_value.split()
-                if item != imx_object.puic
-            )
+            for item in prop_value.split():
+                if item != imx_object.puic and not any(
+                    ref.field == prop_key and ref.lookup == item
+                    for ref in imx_object.refs
+                ):
+                    imx_object.refs.append(
+                        ImxRef(prop_key, prop_value, item, find(item))
+                    )
 
 
 def add_refs(

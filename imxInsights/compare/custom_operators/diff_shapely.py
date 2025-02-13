@@ -43,7 +43,12 @@ class ShapelyPointDiffer(BaseOperator):
         if is_changed:
             almost_equal: bool = self._check_almost_equal(p1, p2)
             self._report_differences(
-                diff_instance, level, almost_equal, xy_distance, z_distance, type_changed
+                diff_instance,
+                level,
+                almost_equal,
+                xy_distance,
+                z_distance,
+                type_changed,
             )
 
         return True
@@ -82,7 +87,7 @@ class ShapelyPointDiffer(BaseOperator):
         almost_equal: bool,
         xy_distance: float,
         z_distance: float | str,
-        type_changed: bool
+        type_changed: bool,
     ) -> None:
         """Report the detected differences."""
         if type_changed:
@@ -97,8 +102,9 @@ class ShapelyPointDiffer(BaseOperator):
                 "type": "ShapelyPointDiffer",
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
-                "point_z_distance": round(z_distance, 3) if isinstance(z_distance, float) else z_distance ,
-
+                "point_z_distance": round(z_distance, 3)
+                if isinstance(z_distance, float)
+                else z_distance,
                 "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance}",
             },
         )
@@ -249,7 +255,9 @@ class ShapelyLineDiffer(BaseOperator):
                 "intersection_over_union": round(intersection_over_union, 3),
                 "line_planer_length_difference": round(length_difference, 3),
                 "line_coordinate_difference": coordinate_difference,
-                "line_max_z_distance": round(z_difference,3) if isinstance(z_difference, float) else z_difference
+                "line_max_z_distance": round(z_difference, 3)
+                if isinstance(z_difference, float)
+                else z_difference
                 if isinstance(z_difference, str)
                 else round(z_difference, 3),
                 "display": f"almost_equal: {almost_equal}\nintersection over union: {round(intersection_over_union, 3)}\nplaner length difference: {round(length_difference, 3)}",

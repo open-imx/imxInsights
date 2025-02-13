@@ -108,4 +108,3 @@ def write_df_to_sheet(
     if auto_filter and not data.empty:
         num_cols = len(data.columns) - 1
         worksheet.autofilter(0, 0, 0, num_cols)
-
