@@ -99,7 +99,7 @@ class ShapelyPointDiffer(BaseOperator):
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
                 "point_z_distance": z_distance if isinstance(z_distance, str) else round(z_distance, 4),
-                "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance}",
+                "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance if isinstance(z_distance, str) else round(z_distance, 4)}",
             },
         )
 
