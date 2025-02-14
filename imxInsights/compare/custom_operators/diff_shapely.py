@@ -10,6 +10,8 @@ class ShapelyPointDiffer(BaseOperator):
     Custom DeepDiff operator for comparing Shapely Point objects and
     reporting their differences in coordinates.
     """
+    def __init__(self, regex_paths: list[str]):
+        super().__init__(regex_paths)
 
     def give_up_diffing(self, level: DiffLevel, diff_instance: DeepDiff) -> bool:
         """
@@ -22,11 +24,15 @@ class ShapelyPointDiffer(BaseOperator):
         Returns:
             bool: True if the comparison is completed and differences are reported.
         """
+        if level.t1 is None and level.t2 is not None:
+            diff_instance.custom_report_result("type_changes", level, )
+            return True
+        elif level.t1 is not None and level.t2 is None:
+            diff_instance.custom_report_result("type_changes", level, )
+            return True
+
         p1: Point = Point(level.t1.split(",")) if level.t1 else Point()
         p2: Point = Point(level.t2.split(",")) if level.t2 else Point()
-
-        type_changed = True if (p1.is_empty or p2.is_empty) else False
-
         is_changed: bool = False
 
         # Check if XY coordinates are different
@@ -43,12 +49,7 @@ class ShapelyPointDiffer(BaseOperator):
         if is_changed:
             almost_equal: bool = self._check_almost_equal(p1, p2)
             self._report_differences(
-                diff_instance,
-                level,
-                almost_equal,
-                xy_distance,
-                z_distance,
-                type_changed,
+                diff_instance, level, almost_equal, xy_distance, z_distance
             )
 
         return True
@@ -87,14 +88,9 @@ class ShapelyPointDiffer(BaseOperator):
         almost_equal: bool,
         xy_distance: float,
         z_distance: float | str,
-        type_changed: bool,
     ) -> None:
         """Report the detected differences."""
-        if type_changed:
-            diff_instance.custom_report_result("type_changes", level)
-        else:
-            diff_instance.custom_report_result("values_changed", level)
-
+        diff_instance.custom_report_result("values_changed", level)
         diff_instance.custom_report_result(
             "diff_analyse",
             level,
@@ -102,9 +98,7 @@ class ShapelyPointDiffer(BaseOperator):
                 "type": "ShapelyPointDiffer",
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
-                "point_z_distance": round(z_distance, 3)
-                if isinstance(z_distance, float)
-                else z_distance,
+                "point_z_distance": z_distance if isinstance(z_distance, str) else round(z_distance, 4),
                 "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance}",
             },
         )
@@ -124,6 +118,14 @@ class ShapelyLineDiffer(BaseOperator):
         Returns:
             bool: Always returns True after diffing and reporting the result.
         """
+
+        if level.t1 is None and level.t2 is not None:
+            diff_instance.custom_report_result("type_changes", level, )
+            return True
+        elif level.t1 is not None and level.t2 is None:
+            diff_instance.custom_report_result("type_changes", level, )
+            return True
+
         l1: LineString = (
             LineString(
                 [tuple(map(float, item.split(","))) for item in level.t1.split(" ")]

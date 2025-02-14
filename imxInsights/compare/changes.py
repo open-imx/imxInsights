@@ -57,7 +57,6 @@ def process_deep_diff(dd: DeepDiff):
                     diff_string=f"--{value}",
                     analyse=None,
                 )
-
             else:
                 raise NotImplementedError(f"{type(value)}")
 
@@ -182,7 +181,6 @@ def get_object_changes(
             ),
         ],
     )
-
     changes = process_deep_diff(dd)
 
     # we got the unchanged left

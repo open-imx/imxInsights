@@ -236,9 +236,11 @@ class ChangedImxObjects:
         geojson_dict = upper_keys_with_index(geojson_dict)
 
         for path, geojson_collection in geojson_dict.items():
-            logger.info(f"create geojson file {path}")
-            file_name = f"{directory_path}\\{path}.geojson"
-            geojson_collection.to_geojson_file(file_name)
+
+            if len(geojson_collection.features) != 0:
+                logger.info(f"create geojson file {path}")
+                file_name = f"{directory_path}\\{path}.geojson"
+                geojson_collection.to_geojson_file(file_name)
 
         logger.success("creating change excel file finished")
 
@@ -268,6 +270,9 @@ class ChangedImxObjects:
 
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
             for key, df in diff_dict.items():
+                if len(df.columns) == 0:
+                    continue
+
                 logger.debug(f"processing {key}")
                 sheet_name = shorten_sheet_name(key)
                 try:
