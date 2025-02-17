@@ -62,6 +62,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install hatch
+        hatch env create
 
     - name: Extract version
       id: extract_version
@@ -92,6 +93,11 @@ jobs:
         fi
         echo "MATCH=$GITHUB_ENV.match"
 
+    - name: Build wheel and source distribution
+      run: |
+        hatch build
+      if: env.match == 'false'
+
     - name: Create draft release
       if: env.match == 'false'
       uses: ncipollo/release-action@v1
@@ -100,8 +106,5 @@ jobs:
         name: 🚀 Version ${{ env.version }}
         tag: v${{ env.version }}
         generateReleaseNotes: true
-        artifacts: |
-          dist/*.whl
-          dist/*.tar.gz
-          source-code.zip
+        artifacts: dist/*
         token: ${{ secrets.GITHUB_TOKEN }}

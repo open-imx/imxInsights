@@ -98,7 +98,7 @@ class ChangedImxObjects:
 
         return re.sub(guid_pattern, replacer, input_string)
 
-    def _nice_ref(self, property_dict: dict[str, str]) -> dict[str, str]:
+    def _nice_display(self, property_dict: dict[str, str]) -> dict[str, str]:
         new_property_dict = {}
         for key, value in property_dict.items():
             if key[-3:] == "Ref" or key[-4:] == "Refs":
@@ -107,6 +107,9 @@ class ChangedImxObjects:
                 new_property_dict[f"{key}|.display"] = "\n".join(
                     ref_display_value.split(" ")
                 )
+            if key[-15:] == "gml:coordinates" and "->" in value:
+                before, after = value.split(" -> ", 1)
+                new_property_dict[key] = f"{before}\n->\n{after}"
             else:
                 new_property_dict[key] = value
         return new_property_dict
@@ -140,7 +143,7 @@ class ChangedImxObjects:
         out = [item.get_change_dict(add_analyse=add_analyse) for item in items]
 
         if ref_display:
-            out = [self._nice_ref(item) for item in out]
+            out = [self._nice_display(item) for item in out]
 
         df = pd.DataFrame(out)
         if not df.empty:
@@ -220,7 +223,7 @@ class ChangedImxObjects:
 
         if ref_display:
             for feature in features:
-                feature.properties = self._nice_ref(feature.properties)
+                feature.properties = self._nice_display(feature.properties)
 
         return ShapelyGeoJsonFeatureCollection(
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
