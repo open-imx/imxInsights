@@ -3,6 +3,7 @@ from typing import Any
 
 import pandas as pd
 from pandas.io.formats.style import Styler
+from xlsxwriter.worksheet import Worksheet  # type: ignore
 
 
 def shorten_sheet_name(sheet_name: str) -> str:
@@ -96,7 +97,7 @@ def write_df_to_sheet(
     index: bool = False,
     header: bool = True,
     auto_filter: bool = True,
-) -> None:
+) -> Worksheet:
     """Write a DataFrame or Styler object to an Excel sheet."""
     df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
     worksheet = writer.sheets[sheet_name]
@@ -108,3 +109,4 @@ def write_df_to_sheet(
     if auto_filter and not data.empty:
         num_cols = len(data.columns) - 1
         worksheet.autofilter(0, 0, 0, num_cols)
+    return worksheet
