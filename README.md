@@ -35,13 +35,11 @@
 - ✅ GML & RailConnection Shapely geometry
 - ✅ Parent-child as objects
 - ✅ IMX data as Pandas DataFrame
-- ✅ IMX comparison (situations, timeline)
-- ✅ Compare between different IMX versions
+- ✅ IMX objects as GeoJSON (WGS or RD)
+- ✅ IMX compare between different IMX versions (situations, timeline)
 - ✅ Comparison result as Pandas DataFrame & GeoJSON
-- ✅ Color-coded comparison
-- ✅ Excel compare output
-- ✅ IMX objects as GeoJSON
-- ✅ WGS/RD transformations
+- ✅ Color changes for better comparison 
+- ✅ Excel compare output 
 
 
 ## Open-IMX Initiative

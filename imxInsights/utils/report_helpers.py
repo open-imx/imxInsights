@@ -1,6 +1,8 @@
+import importlib.metadata
 from typing import Any
 
 import pandas as pd
+from pandas.io.formats.style import Styler
 
 
 def shorten_sheet_name(sheet_name: str) -> str:
@@ -55,3 +57,54 @@ def upper_keys_with_index(original_dict: dict[str, Any]) -> dict[str, Any]:
         new_dict[new_key] = value
 
     return new_dict
+
+
+def app_info_df(process_data: dict) -> pd.DataFrame:
+    app_info = {
+        "App Name": "ImxInsights",
+        "Version": importlib.metadata.version("imxInsights"),
+        "Developer": "OpenIMX",
+        "Website": "https://open-imx.github.io/imxInsights/",
+    }
+    disclaimer = "This document is auto-generated. No guarantees are provided regarding the accuracy of the data."
+    df = pd.DataFrame(list(app_info.items()), columns=["Attribute", "Value"])
+    process_data_df = pd.DataFrame(
+        list(process_data.items()), columns=["Attribute", "Value"]
+    )
+
+    disclaimer_df = pd.DataFrame({"Attribute": ["Disclaimer"], "Value": [disclaimer]})
+
+    metadata_df = pd.concat(
+        [
+            df,
+            pd.DataFrame([["", ""]]),
+            process_data_df,
+            pd.DataFrame([["", ""]]),
+            disclaimer_df,
+        ],
+        ignore_index=True,
+    )
+
+    return metadata_df
+
+
+def write_df_to_sheet(
+    writer,
+    sheet_name: str,
+    df: pd.DataFrame | Styler,
+    *,
+    index: bool = False,
+    header: bool = True,
+    auto_filter: bool = True,
+) -> None:
+    """Write a DataFrame or Styler object to an Excel sheet."""
+    df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
+    worksheet = writer.sheets[sheet_name]
+    worksheet.autofit()
+    worksheet.freeze_panes(1, 0)
+
+    data = df.data if isinstance(df, Styler) else df  # type: ignore
+
+    if auto_filter and not data.empty:
+        num_cols = len(data.columns) - 1
+        worksheet.autofilter(0, 0, 0, num_cols)

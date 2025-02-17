@@ -8,6 +8,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions.imxExceptions import ImxDuplicatedPuicsInContainer
 from imxInsights.file.imxFile import ImxFile
 from imxInsights.repo.builders.addChildren import add_children
+from imxInsights.repo.builders.addRefs import add_refs
 from imxInsights.repo.builders.buildExceptions import BuildExceptions
 from imxInsights.repo.builders.buildRailConnections import build_rail_connections
 from imxInsights.repo.builders.extendObjects import extend_objects
@@ -110,9 +111,8 @@ class ObjectTree:
         extend_objects(self.tree_dict, self.build_exceptions, imx_file, element)
         add_children(self.tree_dict, self.find)
         build_rail_connections(self.get_by_types, self.find, self.build_exceptions)
+        add_refs(self.tree_dict, self.find)
 
-        # todo: link ref and refs
-        # add_refs(self.objects(), self.find, self.build_extensions)
         # todo: classify area
 
     @staticmethod
