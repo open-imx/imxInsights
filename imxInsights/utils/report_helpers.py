@@ -3,7 +3,8 @@ from typing import Any
 
 import pandas as pd
 from pandas.io.formats.style import Styler
-from xlsxwriter.worksheet import Worksheet
+from xlsxwriter.worksheet import Worksheet  # type: ignore
+
 
 def shorten_sheet_name(sheet_name: str) -> str:
     """

@@ -48,6 +48,7 @@ def styler_highlight_change_status(value: str) -> str:  # pragma: no cover
         return "color: green; font-weight: bold;"
     elif str(value) == "removed":
         return "color: blue; font-weight: bold;"
+    return ""
 
 
 def style_puic_groups(df):  # pragma: no cover
