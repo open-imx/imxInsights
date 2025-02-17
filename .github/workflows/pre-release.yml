@@ -1,0 +1,107 @@
+name: Pre Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      actions: write
+
+    strategy:
+      matrix:
+        python_version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install hatch
+        hatch env create
+    - name: Lint and typecheck
+      run: |
+        hatch run lint-check
+    - name: Test
+      run: |
+        hatch run test
+
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    needs: test
+    permissions:
+        contents: write
+        id-token: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install hatch
+
+    - name: Extract version
+      id: extract_version
+      shell: bash
+      run: |
+        # Extract __version__ from the specified file
+        VERSION=$(python -c "exec(open('imxInsights/__init__.py').read()); print(__version__)")
+        echo "version=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=$$GITHUB_ENV.version" 
+
+    - name: Fetch latest release version
+      id: fetch_latest_release
+      run: |
+        LATEST_VERSION=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name | sed 's/^v//') 
+        echo "latest_version=$LATEST_VERSION" >> $GITHUB_ENV
+        echo "LATEST_VERSION=$GITHUB_ENV.latest_version"
+
+    - name: Check version match
+      id: check_version
+      run: |
+        echo "VERSION=$GITHUB_ENV.version"
+        echo "LATEST_VERSION=$GITHUB_ENV.latest_version" 
+        
+        if [ "$GITHUB_ENV.latest_version" = "$GITHUB_ENV.version" ]; then
+          echo "match=true" >> $GITHUB_ENV
+        else
+          echo "match=false" >> $GITHUB_ENV
+        fi
+        echo "MATCH=$GITHUB_ENV.match"
+
+    - name: Create draft release
+      if: env.match == 'false'
+      uses: ncipollo/release-action@v1
+      with:
+        draft: true
+        name: 🚀 Version ${{ env.version }}
+        tag: v${{ env.version }}
+        generateReleaseNotes: true
+        artifacts: |
+          dist/*.whl
+          dist/*.tar.gz
+          source-code.zip
+        token: ${{ secrets.GITHUB_TOKEN }}
