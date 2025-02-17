@@ -18,7 +18,7 @@ class ImxMultiRepoProtocol(Protocol):
     tree_dict: OrderedDict[str, OrderedDict[str, list[ImxObject]]]
     _keys: frozenset[str]
 
-    def get_keys(self) -> frozenset[str]:
+    def get_keys(self) -> list[str]:
         """Returns all unique keys (puics) in the tree_dict."""
         ...
 
@@ -26,7 +26,7 @@ class ImxMultiRepoProtocol(Protocol):
         """Helper to retrieve ImxObjects by key or return default None values if the key is missing."""
         ...
 
-    def find(self, key: str, return_none: bool = True) -> ImxMultiRepoObject:
+    def find(self, key: str) -> ImxMultiRepoObject:
         """Returns all ImxObject instances for a given key (puic), maintaining container order."""
         ...
 

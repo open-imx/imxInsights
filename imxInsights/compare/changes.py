@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from deepdiff import DeepDiff  # type: ignore
-from shapely import LineString, Point
 
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.compare.custom_operators.diff_refs import UUIDListOperator
@@ -58,7 +57,6 @@ def process_deep_diff(dd: DeepDiff):
                     diff_string=f"--{value}",
                     analyse=None,
                 )
-
             else:
                 raise NotImplementedError(f"{type(value)}")
 
@@ -166,7 +164,6 @@ def get_object_changes(
         A dictionary where keys represent the paths to changed elements,
         and values are `Change` objects describing the type of change.
     """
-
     # verbose should diff dicts in a list, make sure we set cutoff to 1
     dd = DeepDiff(
         dict1,
@@ -178,11 +175,12 @@ def get_object_changes(
         report_repetition=True,
         custom_operators=[
             UUIDListOperator(regex_paths=[r"root\['.*Refs'\]$"]),
-            ShapelyPointDiffer(types=[Point]),
-            ShapelyLineDiffer(types=[LineString]),
+            ShapelyPointDiffer(regex_paths=[r"root\['.*gml:Point.gml:coordinates'\]$"]),
+            ShapelyLineDiffer(
+                regex_paths=[r"root\['.*gml:LineString.gml:coordinates'\]$"]
+            ),
         ],
     )
-
     changes = process_deep_diff(dd)
 
     # we got the unchanged left

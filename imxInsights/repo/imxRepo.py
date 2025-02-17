@@ -3,6 +3,7 @@ import uuid
 import zipfile
 from collections import defaultdict
 from collections.abc import Iterable
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +12,12 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
+from imxInsights.utils.report_helpers import (
+    app_info_df,
+    shorten_sheet_name,
+    upper_keys_with_index,
+    write_df_to_sheet,
+)
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeature,
@@ -36,6 +43,7 @@ class ImxRepo:
         self._tree: ObjectTree = ObjectTree()
         self.container_id: str = str(uuid.uuid4())
         self.imx_version: str | None = None
+        self.file_path: Path = Path(imx_file_path)
         self.path: Path = self._get_file_path(imx_file_path=imx_file_path)
 
     def _get_file_path(self, imx_file_path: Path | str) -> Path:
@@ -156,21 +164,61 @@ class ImxRepo:
         return self._tree.build_exceptions.exceptions
 
     @staticmethod
-    def _extract_overview_properties(item, input_props=None):
+    def _add_nice_display(imx_object, props):
+        # TODO: not sure, if we overwrite the ref, or add a column...
+        add_column = True
+
+        ref_lookup_map = {
+            ref.lookup: ref.display for ref in imx_object.refs
+        }  # Create a lookup map once
+
+        result = {}
+        for key, value in props.items():
+            formatted_value = "\n".join(value.split(" "))
+            result[key] = formatted_value
+
+            if key.endswith("Ref"):
+                if value in ref_lookup_map:
+                    result[f"{key}|display" if add_column else key] = ref_lookup_map[
+                        value
+                    ]
+
+            elif key.endswith("Refs"):
+                ref_displays = [
+                    ref_lookup_map[item]
+                    for item in value.split(" ")
+                    if item in ref_lookup_map
+                ]
+                if ref_displays:
+                    result[f"{key}|display" if add_column else key] = "\n".join(
+                        ref_displays
+                    )
+        return result
+
+    @staticmethod
+    def _extract_overview_properties(
+        imx_object, input_props=None, nice_display_ref=False
+    ):
         props = (
-            item.get_imx_property_dict()
+            imx_object.get_imx_property_dict()
             if input_props is None
             else {
                 key: value
-                for key, value in item.get_imx_property_dict().items()
+                for key, value in imx_object.get_imx_property_dict().items()
                 if key in input_props
             }
         )
 
+        if nice_display_ref:
+            props = ImxRepo._add_nice_display(imx_object, props)
+
         return props
 
     def get_pandas_df(
-        self, object_type_or_path: list[str] | None = None, puic_as_index: bool = True
+        self,
+        object_type_or_path: list[str] | None = None,
+        puic_as_index: bool = True,
+        nice_display_ref: bool = True,
     ) -> pd.DataFrame:
         """
         Get Pandas dataframe of one value object type or limited view of all objects.
@@ -182,6 +230,7 @@ class ImxRepo:
         Args:
             object_type_or_path: path or imx type to get df of
             puic_as_index: if true puic value will be the index
+            nice_display_ref: if we process refs as nice display
 
         Returns:
             pd.DataFrame: pandas dataframe of the object properties
@@ -199,7 +248,9 @@ class ImxRepo:
                 "Metadata.@source",
             ]
             records = [
-                self._extract_overview_properties(item, props_in_overview)
+                self._extract_overview_properties(
+                    item, props_in_overview, nice_display_ref=False
+                )
                 for item in self.get_all()
             ]
         else:
@@ -211,7 +262,10 @@ class ImxRepo:
                     value_objects.extend(self.get_by_types([item]))
 
             records = [
-                self._extract_overview_properties(item) for item in value_objects
+                self._extract_overview_properties(
+                    item, nice_display_ref=nice_display_ref
+                )
+                for item in value_objects
             ]
 
         df = pd.DataFrame.from_records(records)
@@ -242,7 +296,7 @@ class ImxRepo:
 
         return out_dict
 
-    def get_pandas_df_overview(self) -> pd.DataFrame:
+    def get_pandas_df_overview(self, nice_display_ref: bool = True) -> pd.DataFrame:
         nodes = list(self.get_all())
         paths = [self._get_full_path(node) for node in nodes]
 
@@ -259,7 +313,10 @@ class ImxRepo:
             "Metadata.@source",
         ]
         properties = [
-            self._extract_overview_properties(node, list_of_columns) for node in nodes
+            self._extract_overview_properties(
+                node, list_of_columns, nice_display_ref=nice_display_ref
+            )
+            for node in nodes
         ]
 
         max_depth = max(len(path) for path in paths)
@@ -279,6 +336,7 @@ class ImxRepo:
         object_path: list[str],
         to_wgs: bool = True,
         extension_properties: bool = False,
+        nice_display_ref: bool = False,
     ) -> ShapelyGeoJsonFeatureCollection:
         """
         Generate a GeoJSON feature collection from a list of object types or paths.
@@ -287,6 +345,7 @@ class ImxRepo:
             object_path: A list of object paths used to fetch the corresponding data.
             to_wgs: convert to WGS84
             extension_properties: add extension properties to geojson
+            nice_display_ref: add nice display refs
 
         Returns:
             ShapelyGeoJsonFeatureCollection: A GeoJSON feature collection containing the geographical features.
@@ -308,11 +367,15 @@ class ImxRepo:
                 )
             else:
                 geometry = []
+
+            properties = self._extract_overview_properties(
+                item, nice_display_ref=nice_display_ref
+            )
+
             features.append(
                 ShapelyGeoJsonFeature(
                     geometry,
-                    item.properties
-                    | (item.extension_properties if extension_properties else {}),
+                    properties,
                 )
             )
 
@@ -325,6 +388,7 @@ class ImxRepo:
         directory_path: str | Path,
         to_wgs: bool = True,
         extension_properties: bool = False,
+        nice_display_ref: bool = True,
     ):
         """
         Create GeoJSON files for the specified object types or paths and save them to the given directory.
@@ -333,13 +397,17 @@ class ImxRepo:
             directory_path: The directory where the GeoJSON files will be created.
             to_wgs: convert to WGS84
             extension_properties: add extension properties to geojson
+            nice_display_ref: add nice display refs
 
         """
         for path in self.get_all_paths():
             dir_path = Path(directory_path)
             dir_path.mkdir(parents=True, exist_ok=True)
             geojson_feature_collection = self.get_geojson(
-                [path], to_wgs=to_wgs, extension_properties=extension_properties
+                [path],
+                to_wgs=to_wgs,
+                extension_properties=extension_properties,
+                nice_display_ref=nice_display_ref,
             )
             geojson_file_path = dir_path / f"{path}.geojson"
             geojson_feature_collection.to_geojson_file(geojson_file_path)
@@ -356,3 +424,68 @@ class ImxRepo:
         path.insert(0, node.path.split(".")[0])
         path.append(node.path)
         return path
+
+    def to_excel(self, file_path: str | Path):
+        """Writes the comparison results to an Excel file, applying formatting."""
+        pandas_dict = dict(sorted(self.get_pandas_df_dict().items()))
+        pandas_dict = upper_keys_with_index(pandas_dict)
+
+        overview_df = self.get_pandas_df_overview()
+
+        file_path = Path(file_path).resolve()
+        with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
+            index_data = []
+
+            process_data = {
+                "FilePath": f"{self.file_path}",
+                "Run Date": f"{datetime.now()}",
+            }
+            write_df_to_sheet(
+                writer,
+                "INFO",
+                app_info_df(process_data),
+                index=False,
+                header=False,
+                auto_filter=False,
+            )
+            index_data.append(["INFO", "AppInfo", '=HYPERLINK("#INFO!A1", "Go")'])
+
+            index_data.append(
+                [
+                    "META_OVERVIEW",
+                    "Meta Overview",
+                    '=HYPERLINK("#META_OVERVIEW!A1", "Go")',
+                ]
+            )
+            for key, df in pandas_dict.items():
+                sheet_name = shorten_sheet_name(key)
+                index_data.append(
+                    [sheet_name, key, f'=HYPERLINK("#{sheet_name}!A1", "Go the sheet")']
+                )
+            index_df = pd.DataFrame(
+                index_data, columns=["Sheet Name", "Full Name", "Link"]
+            )
+            write_df_to_sheet(
+                writer, "INDEX", index_df, index=True, header=True, auto_filter=True
+            )
+
+            overview_df.to_excel(writer, sheet_name="META_OVERVIEW", index=False)
+            write_df_to_sheet(
+                writer,
+                "META_OVERVIEW",
+                overview_df,
+                index=True,
+                header=True,
+                auto_filter=True,
+            )
+
+            for key, df in pandas_dict.items():
+                sheet_name = shorten_sheet_name(key)
+                write_df_to_sheet(
+                    writer,
+                    sheet_name,
+                    df,
+                    index=False,
+                    header=True,
+                    auto_filter=True,
+                )

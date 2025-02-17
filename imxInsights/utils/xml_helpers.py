@@ -47,25 +47,24 @@ def find_parent_entity(elem: Element) -> Element | None:
 
 
 def lxml_element_to_dict(
-    node: Element, attributes: object = True, children: object = True
-) -> dict[str, dict | str | list]:
+    node: Element, attributes: bool = True, children: bool = True
+) -> dict[str, dict[str, str | list] | str | list]:
     """
-    Convert lxml.etree node into a dict. adapted from https://gist.github.com/jacobian/795571.
+    Convert lxml.etree node into a dict. Adapted from https://gist.github.com/jacobian/795571.
 
     Args:
-        node (ET.Element): the lxml.etree node to convert into a dict
-        attributes (Optional[bool]): include the attributes of the node in the resulting dict, defaults to True
-        children: (Optional[bool]): include the children
+        node (ET.Element): The lxml.etree node to convert into a dict.
+        attributes (Optional[bool]): Include the attributes of the node in the resulting dict, defaults to True.
+        children (Optional[bool]): Include the children.
 
     Returns:
-        ( dict[str, dict | str | list]): A dictionary representation of the lxml.etree node
-
-
+        (Dict[str, dict[str, str | list] | str | list]): A dictionary representation of the lxml.etree node.
     """
-    result = dict[str, dict | str | list]()
+    result: dict[str, dict[str, str | list] | str | list] = {}
     if attributes:
         for key, value in node.attrib.items():
             result[f"@{key}"] = value
+            result[f"@{key}:sourceline"] = f"{node.sourceline}"
 
     if not children:
         return result
@@ -75,7 +74,8 @@ def lxml_element_to_dict(
 
         # Process element as tree element if the inner XML contains non-whitespace content
         if element.text and element.text.strip():
-            value_: dict | str = element.text
+            value_: str | dict = element.text
+            result[f"{key}:sourceline"] = f"{element.sourceline}"
         else:
             value_ = lxml_element_to_dict(element)
 

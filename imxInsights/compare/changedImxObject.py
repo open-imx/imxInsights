@@ -1,5 +1,3 @@
-from dataclasses import dataclass, field
-
 from shapely.geometry import (
     GeometryCollection,
     LineString,
@@ -10,7 +8,7 @@ from shapely.geometry import (
     Polygon,
 )
 
-from imxInsights.compare.changes import Change, get_object_changes
+from imxInsights.compare.changes import get_object_changes
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.compare.geometryChange import GeometryChange
 from imxInsights.domain.imxObject import ImxObject
@@ -18,21 +16,20 @@ from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeature
 from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 
-@dataclass
 class ChangedImxObject:
-    t1: ImxObject | None
-    t2: ImxObject | None
-    puic: str = field(init=False)
-    changes: dict[str, Change] = field(init=False)
-    status: ChangeStatusEnum = field(init=False)
-    geometry: GeometryChange | None = field(init=False)
+    def __init__(self, t1: ImxObject | None, t2: ImxObject | None):
+        self.t1 = t1
+        self.t2 = t2
+        self.puic: str = self._get_puic()
 
-    def __post_init__(self):
-        self.puic = self._get_puic()
         t1_props, t2_props = self._prepare_properties()
         self.changes = get_object_changes(t1_props, t2_props)
         self.status = self._determine_object_overall_status()
         self.geometry = self._initialize_geometry()
+
+    @property
+    def tag(self) -> str:
+        return self.changes["tag"].diff_string
 
     def _get_puic(self) -> str:
         if self.t1 and hasattr(self.t1, "puic"):
@@ -76,7 +73,9 @@ class ChangedImxObject:
     def get_change_dict(self, add_analyse: bool = False) -> dict[str, str]:
         analyse = (
             {
-                f"{key}_analyse": value.analyse["display"]
+                f"{key}|analyse": "\n".join(value.analyse["display"].split(" "))
+                if value.analyse["type"] == "UUIDListOperator"
+                else value.analyse["display"]
                 for key, value in self.changes.items()
                 if value.analyse is not None
             }
@@ -84,7 +83,7 @@ class ChangedImxObject:
             else {}
         )
 
-        return (
+        response = (
             {key: value.diff_string for key, value in self.changes.items()}
             | analyse
             | {
@@ -93,8 +92,10 @@ class ChangedImxObject:
             }
         )
 
+        return response
+
     def as_geojson_feature(
-        self, add_analyse: bool = False, as_wgs: bool = True
+        self, add_analyse: bool = True, as_wgs: bool = True
     ) -> ShapelyGeoJsonFeature:
         geometry = []
 

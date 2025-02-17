@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Optional
+from typing import Any, Optional
 
 from lxml.etree import _Element as Element
 from shapely import (
@@ -17,7 +17,12 @@ from imxInsights.domain.imxGeographicLocation import ImxGeographicLocation
 from imxInsights.file.containerizedImx.imxDesignCoreFile import ImxDesignCoreFile
 from imxInsights.file.containerizedImx.imxDesignPetalFile import ImxDesignPetalFile
 from imxInsights.file.imxFile import ImxFile
-from imxInsights.utils.flatten_unflatten import flatten_dict
+from imxInsights.utils.flatten_unflatten import (
+    flatten_dict,
+    reindex_dict,
+    remove_sourceline_from_dict,
+    sort_dict_by_sourceline,
+)
 from imxInsights.utils.xml_helpers import (
     find_parent_entity,
     find_parent_with_tag,
@@ -71,14 +76,22 @@ class ImxObject:
             | MultiPolygon
             | GeometryCollection
         ) = GeometryCollection()
-        self.properties: dict[str, str] = flatten_dict(
-            lxml_element_to_dict(self._element)
-        )
+        self.properties: dict[str, str] = self._set_properties()
         self.imx_situation: str | None = self._get_imx_situation()
         self.container_id: str | None = None
+        self.refs: list[Any] = []
 
     def __repr__(self) -> str:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
+
+    def _set_properties(self):
+        return remove_sourceline_from_dict(
+            reindex_dict(
+                sort_dict_by_sourceline(
+                    flatten_dict(lxml_element_to_dict(self._element))
+                )
+            )
+        )
 
     @property
     def parent_path(self):
@@ -213,6 +226,10 @@ class ImxObject:
         Args:
             imx_extension_object (ImxObject): The ImxObject to extend with.
         """
+
+        imx_extension_object.properties = reindex_dict(
+            sort_dict_by_sourceline(imx_extension_object.properties)
+        )
         self.imx_extensions.append(imx_extension_object)
 
     def _get_imx_situation(self) -> str | None:

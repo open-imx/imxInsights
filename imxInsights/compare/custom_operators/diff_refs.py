@@ -3,131 +3,112 @@ from typing import Any
 
 from deepdiff.operator import BaseOperator  # type: ignore
 
+# Regular expression for UUID v4
 UUIDv4_PATTERN = re.compile(
-    r"\b[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b"
+    r"\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b"
 )
 
 
 class UUIDListOperator(BaseOperator):
     """
-    Custom DeepDiff operator for comparing lists of UUIDs.
+    Custom DeepDiff operator for comparing strings containing lists of UUIDs.
     """
 
     def __init__(self, regex_paths: list[str]):
         """
-        Initialize UUIDListOperator with regex paths to match UUIDs.
-
-        Args:
-            regex_paths: List of regex paths to identify UUID fields.
+        Initialize with paths to match UUID fields.
         """
         super().__init__(regex_paths)
 
     @staticmethod
     def _create_display(
-        added_items: list[str], removed_items: list[str], unchanged_items: list[str]
+        added: list[str], removed: list[str], unchanged: list[str]
     ) -> list[str]:
         """
-        Create a display list of items with added and removed prefixes.
-
-        Args:
-            added_items: List of added UUIDs.
-            removed_items: List of removed UUIDs.
-            unchanged_items: List of unchanged UUIDs.
-
-        Returns:
-            List of display strings showing added and removed items.
+        Create a display list where added UUIDs are prefixed with '++'
+        and removed UUIDs with '--'. Unchanged UUIDs remain unmodified.
         """
-        added_items = [f"++{item}" for item in added_items]
-        removed_items = [f"--{item}" for item in removed_items]
-        return added_items + unchanged_items + removed_items
+        display_added = [f"++{item}" for item in added]
+        display_removed = [f"--{item}" for item in removed]
+        return display_added + unchanged + display_removed
 
     @staticmethod
     def _split_uuids(uuid_str: str) -> list[str]:
         """
-        Split a string into UUIDs using a regex pattern.
-
-        Args:
-            uuid_str: The string containing UUIDs.
-
-        Returns:
-            List of extracted UUIDs.
+        Extract UUIDs from the input string using the UUIDv4_PATTERN.
         """
         return re.findall(UUIDv4_PATTERN, uuid_str)
 
     def give_up_diffing(self, level: Any, diff_instance: Any) -> bool:
         """
-        Compare two UUID lists and report differences in added, removed, and unchanged UUIDs.
+        Compare two UUID strings (level.t1 and level.t2) and report:
+          - Order changes (same set of UUIDs, but different order)
+          - Genuine additions or removals of UUIDs.
 
-        Args:
-            level: The comparison level containing the two objects to compare.
-            diff_instance: The instance of DeepDiff that reports the differences.
-
-        Returns:
-            bool: True if a difference was found and reported.
+        Returns True if the difference has been reported.
         """
-        if isinstance(level.t1, str) and isinstance(level.t2, str):
-            if UUIDv4_PATTERN.search(level.t1) and UUIDv4_PATTERN.search(level.t2):
-                left_list = self._split_uuids(level.t1)
-                right_list = self._split_uuids(level.t2)
+        # Ensure both items are strings containing UUIDs
+        if not (isinstance(level.t1, str) and isinstance(level.t2, str)):
+            return False
+        if not (UUIDv4_PATTERN.search(level.t1) and UUIDv4_PATTERN.search(level.t2)):
+            return False
+        elif level.t1 == level.t2:
+            return True
 
-                old_set = set(left_list)
-                new_set = set(right_list)
+        # Extract UUIDs from both strings
+        old_uuids = self._split_uuids(level.t1)
+        new_uuids = self._split_uuids(level.t2)
 
-                added_items = list(new_set - old_set)
-                removed_items = list(old_set - new_set)
-                unchanged_items = list(old_set & new_set)
+        # Use sets to identify differences regardless of order
+        old_set, new_set = set(old_uuids), set(new_uuids)
+        added = list(new_set - old_set)
+        removed = list(old_set - new_set)
+        unchanged = list(old_set & new_set)
 
-                # Case when order of UUIDs changed but no items were added/removed
-                if (len(added_items) == 0 or len(removed_items) == 0) and all(
-                    item in left_list for item in right_list
-                ):
-                    diff_instance.custom_report_result(
-                        "diff_analyse",
-                        level,
-                        {
-                            "type": "UUIDListOperator",
-                            "added": added_items,
-                            "removed": removed_items,
-                            "unchanged": unchanged_items,
-                            "display": f"{left_list} -order_changed> {right_list} ",
-                            "status": "uuid_list_order_change",
-                        },
-                    )
-                    return True
+        # Case 1: The two lists have the same UUIDs, so any difference is just order.
+        if not added and not removed:
+            if old_uuids != new_uuids:
+                diff_instance.custom_report_result("values_changed", level)
 
-                # Case when there are added or removed UUIDs
-                elif len(added_items) > 0 or len(removed_items) > 0:
-                    diff_instance.custom_report_result("values_changed", level)
+                diff_instance.custom_report_result(
+                    "diff_analyse",
+                    level,
+                    {
+                        "type": "UUIDListOperator",
+                        "added": [],
+                        "removed": [],
+                        "unchanged": unchanged,
+                        "display": "order_changed",
+                        "status": "uuid_list_order_change",
+                    },
+                )
+            else:
+                # No differences at all
+                diff_instance.custom_report_result("values_unchanged", level, level.t1)
+            return True
 
-                    status = (
-                        "uuid_list_only_added"
-                        if removed_items == []
-                        else "uuid_list_only_removed"
-                        if added_items == []
-                        else "uuid_list_changed"
-                    )
+        # Case 2: There are genuine additions and/or removals.
+        diff_instance.custom_report_result("values_changed", level)
 
-                    diff_instance.custom_report_result(
-                        "diff_analyse",
-                        level,
-                        {
-                            "type": "UUIDListOperator",
-                            "added": added_items,
-                            "removed": removed_items,
-                            "unchanged": unchanged_items,
-                            "display": " ".join(
-                                self._create_display(
-                                    added_items, removed_items, unchanged_items
-                                )
-                            ),
-                            "status": status,
-                        },
-                    )
+        # Determine the status based on the differences
+        if not removed:
+            status = "uuid_list_only_added"
+        elif not added:
+            status = "uuid_list_only_removed"
+        else:
+            status = "uuid_list_changed"
 
-                else:
-                    diff_instance.custom_report_result(
-                        "values_unchanged", level, level.t1
-                    )
-
-                return True
-        return False
+        display = " ".join(self._create_display(added, removed, unchanged))
+        diff_instance.custom_report_result(
+            "diff_analyse",
+            level,
+            {
+                "type": "UUIDListOperator",
+                "added": added,
+                "removed": removed,
+                "unchanged": unchanged,
+                "display": display,
+                "status": status,
+            },
+        )
+        return True
