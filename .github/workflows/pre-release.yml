@@ -68,9 +68,9 @@ jobs:
       shell: bash
       run: |
         # Extract __version__ from the specified file
-        VERSION=$(python -c "exec(open('imxInsights/__init__.py').read()); print(__version__)")
+        VERSION=$(grep -oP '__version__\s*=\s*"\K[^"]+' imxInsights/__init__.py)
         echo "version=$VERSION" >> $GITHUB_ENV
-        echo "VERSION=$$GITHUB_ENV.version" 
+        echo "VERSION=${{ env.version }}"
 
     - name: Fetch latest release version
       id: fetch_latest_release
