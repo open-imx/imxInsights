@@ -32,6 +32,24 @@ def styler_highlight_changes(value: str, borders=False) -> str:  # pragma: no co
         return ""
 
 
+def styler_highlight_change_status(value: str) -> str:  # pragma: no cover
+    """
+    Highlight changes in a DataFrame cell with change status.
+
+    Args:
+        value: The value of the cell to be styled.
+
+    Returns:
+        The CSS style string for highlighting.
+    """
+    if str(value) == "added":
+        return "color: red; font-weight: bold;"
+    elif str(value) == "changed":
+        return "color: green; font-weight: bold;"
+    elif str(value) == "removed":
+        return "color: blue; font-weight: bold;"
+
+
 def style_puic_groups(df):  # pragma: no cover
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
     last_value = None

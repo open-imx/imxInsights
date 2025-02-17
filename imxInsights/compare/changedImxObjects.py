@@ -8,7 +8,7 @@ from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
-    styler_highlight_changes,
+    styler_highlight_changes, styler_highlight_change_status,
 )
 from imxInsights.utils.report_helpers import (
     clean_diff_df,
@@ -173,6 +173,10 @@ class ChangedImxObjects:
                     styler_highlight_changes,
                     subset=df.columns.difference(excluded_columns),
                 )
+                styler = styler.map(  # type: ignore[attr-defined]
+                    styler_highlight_change_status,
+                    subset=['status'],
+                )
                 styler.set_properties(
                     **{
                         "border": "1px solid black",
@@ -285,8 +289,13 @@ class ChangedImxObjects:
 
                 logger.debug(f"processing {key}")
                 sheet_name = shorten_sheet_name(key)
+
                 try:
-                    write_df_to_sheet(writer, sheet_name, df)
+                    work_sheet = write_df_to_sheet(writer, sheet_name, df)
+                    status_column = df["status"] if isinstance(df, pd.DataFrame) else df.data["status"]
+
+                    if status_column.eq("unchanged").all():
+                        work_sheet.set_tab_color("gray")
 
                 except Exception as e:
                     logger.error(f"Error writing sheet {sheet_name}: {e}")
