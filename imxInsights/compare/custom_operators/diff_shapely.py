@@ -30,6 +30,8 @@ class ShapelyPointDiffer(BaseOperator):
         elif level.t1 is not None and level.t2 is None:
             diff_instance.custom_report_result("type_changes", level, )
             return True
+        elif level.t1 == level.t2:
+            return True
 
         p1: Point = Point(level.t1.split(",")) if level.t1 else Point()
         p2: Point = Point(level.t2.split(",")) if level.t2 else Point()
@@ -64,9 +66,10 @@ class ShapelyPointDiffer(BaseOperator):
 
     def _compare_z_coordinates(self, p1: Point, p2: Point) -> float | str:
         """Compare Z coordinates of two points and return the Z distance or status."""
+        # todo: make literals for string values
         if p1.has_z and p2.has_z:
             z_distance: float = p2.z - p1.z
-            return z_distance if abs(z_distance) > 0.0 else "no z"
+            return z_distance if abs(z_distance) > 0.0 else "no change in z"
         elif p1.has_z:
             return "removed"
         elif p2.has_z:
@@ -106,6 +109,8 @@ class ShapelyPointDiffer(BaseOperator):
 
 class ShapelyLineDiffer(BaseOperator):
     """Deepdiff custom Shapely LineString differ."""
+    def __init__(self, regex_paths: list[str]):
+        super().__init__(regex_paths)
 
     def give_up_diffing(self, level: DiffLevel, diff_instance: DeepDiff) -> bool:
         """
@@ -124,6 +129,8 @@ class ShapelyLineDiffer(BaseOperator):
             return True
         elif level.t1 is not None and level.t2 is None:
             diff_instance.custom_report_result("type_changes", level, )
+            return True
+        elif level.t1 == level.t2:
             return True
 
         l1: LineString = (
@@ -163,7 +170,8 @@ class ShapelyLineDiffer(BaseOperator):
 
         # Compare Z-values if applicable
         z_difference: float | str = self._compare_z_coordinates(l1, l2)
-        if z_difference != "no z":
+        # todo: make literals for string values
+        if z_difference != "no z" or z_difference != "no change in z":
             is_changed = True
 
         # Report differences if changes are detected
@@ -206,9 +214,10 @@ class ShapelyLineDiffer(BaseOperator):
 
     def _compare_z_coordinates(self, l1: LineString, l2: LineString) -> float | str:
         """Compare the Z coordinates of two LineStrings."""
+        # todo: make literals for string values
         if l1.has_z and l2.has_z:
             max_z_difference = self._get_max_z_difference(l1, l2)
-            return max_z_difference if max_z_difference != 0 else "no z"
+            return max_z_difference if max_z_difference != 0 else "no change in z"
         elif l1.has_z:
             return "removed"
         elif l2.has_z:

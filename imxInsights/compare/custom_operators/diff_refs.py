@@ -52,6 +52,8 @@ class UUIDListOperator(BaseOperator):
             return False
         if not (UUIDv4_PATTERN.search(level.t1) and UUIDv4_PATTERN.search(level.t2)):
             return False
+        elif level.t1 == level.t2:
+            return True
 
         # Extract UUIDs from both strings
         old_uuids = self._split_uuids(level.t1)
@@ -66,6 +68,8 @@ class UUIDListOperator(BaseOperator):
         # Case 1: The two lists have the same UUIDs, so any difference is just order.
         if not added and not removed:
             if old_uuids != new_uuids:
+                diff_instance.custom_report_result("values_changed", level)
+
                 diff_instance.custom_report_result(
                     "diff_analyse",
                     level,
@@ -74,7 +78,7 @@ class UUIDListOperator(BaseOperator):
                         "added": [],
                         "removed": [],
                         "unchanged": unchanged,
-                        "display": f"{old_uuids} -order_changed> {new_uuids}",
+                        "display": f"order_changed",
                         "status": "uuid_list_order_change",
                     },
                 )

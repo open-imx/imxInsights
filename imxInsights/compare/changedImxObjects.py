@@ -168,7 +168,15 @@ class ChangedImxObjects:
             df = df.sort_values(by=["path", "status"])
 
             if styled_df:
-                df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
+                excluded_columns = df.filter(regex=r'(\.display|\|analyse)$').columns
+                styler = df.style.map(styler_highlight_changes, subset=df.columns.difference(excluded_columns))
+                styler.set_properties(**{
+                    'border': '1px solid black',
+                    'vertical-align': 'middle',
+                })
+                df = styler
+                # todo: make every cell has a border en center it vertical
+                # df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
 
         return df
 
