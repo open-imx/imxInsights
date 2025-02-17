@@ -143,7 +143,9 @@ def reindex_dict(data: dict[str, str]) -> dict[str, str]:
     for key, value in data.items():
         # Split the key by dots to get individual segments (path parts)
         parts: list[str] = key.split(".")
-        new_parts: list[str] = []  # List to store the transformed key parts with new indices
+        new_parts: list[
+            str
+        ] = []  # List to store the transformed key parts with new indices
         current_path: list[str] = []  # This will track the current path as we build it
 
         # Iterate over each part of the key
@@ -155,8 +157,12 @@ def reindex_dict(data: dict[str, str]) -> dict[str, str]:
 
                 # If this numeric part hasn't been seen under the current parent, assign the next available index
                 if part not in index_map[parent]:
-                    new_index: int = counter_map[parent]  # Get the next index for this parent
-                    index_map[parent][part] = new_index  # Update the mapping for this part under the parent
+                    new_index: int = counter_map[
+                        parent
+                    ]  # Get the next index for this parent
+                    index_map[parent][part] = (
+                        new_index  # Update the mapping for this part under the parent
+                    )
                     counter_map[parent] += 1  # Increment the counter for the next index
                 else:
                     # If the numeric part has already been encountered, retrieve the existing index

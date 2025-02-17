@@ -78,7 +78,7 @@ class UUIDListOperator(BaseOperator):
                         "added": [],
                         "removed": [],
                         "unchanged": unchanged,
-                        "display": f"order_changed",
+                        "display": "order_changed",
                         "status": "uuid_list_order_change",
                     },
                 )

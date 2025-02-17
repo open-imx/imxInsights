@@ -10,6 +10,7 @@ class ShapelyPointDiffer(BaseOperator):
     Custom DeepDiff operator for comparing Shapely Point objects and
     reporting their differences in coordinates.
     """
+
     def __init__(self, regex_paths: list[str]):
         super().__init__(regex_paths)
 
@@ -25,10 +26,16 @@ class ShapelyPointDiffer(BaseOperator):
             bool: True if the comparison is completed and differences are reported.
         """
         if level.t1 is None and level.t2 is not None:
-            diff_instance.custom_report_result("type_changes", level, )
+            diff_instance.custom_report_result(
+                "type_changes",
+                level,
+            )
             return True
         elif level.t1 is not None and level.t2 is None:
-            diff_instance.custom_report_result("type_changes", level, )
+            diff_instance.custom_report_result(
+                "type_changes",
+                level,
+            )
             return True
         elif level.t1 == level.t2:
             return True
@@ -101,7 +108,9 @@ class ShapelyPointDiffer(BaseOperator):
                 "type": "ShapelyPointDiffer",
                 "point_almost_equal": almost_equal,
                 "point_xy_distance": round(xy_distance, 3),
-                "point_z_distance": z_distance if isinstance(z_distance, str) else round(z_distance, 4),
+                "point_z_distance": z_distance
+                if isinstance(z_distance, str)
+                else round(z_distance, 4),
                 "display": f"almost_equal: {almost_equal}\nplanar distance: {round(xy_distance, 3)}\nz_distance: {z_distance if isinstance(z_distance, str) else round(z_distance, 4)}",
             },
         )
@@ -109,6 +118,7 @@ class ShapelyPointDiffer(BaseOperator):
 
 class ShapelyLineDiffer(BaseOperator):
     """Deepdiff custom Shapely LineString differ."""
+
     def __init__(self, regex_paths: list[str]):
         super().__init__(regex_paths)
 
@@ -125,10 +135,16 @@ class ShapelyLineDiffer(BaseOperator):
         """
 
         if level.t1 is None and level.t2 is not None:
-            diff_instance.custom_report_result("type_changes", level, )
+            diff_instance.custom_report_result(
+                "type_changes",
+                level,
+            )
             return True
         elif level.t1 is not None and level.t2 is None:
-            diff_instance.custom_report_result("type_changes", level, )
+            diff_instance.custom_report_result(
+                "type_changes",
+                level,
+            )
             return True
         elif level.t1 == level.t2:
             return True

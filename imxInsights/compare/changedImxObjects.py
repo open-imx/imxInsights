@@ -168,15 +168,18 @@ class ChangedImxObjects:
             df = df.sort_values(by=["path", "status"])
 
             if styled_df:
-                excluded_columns = df.filter(regex=r'(\.display|\|analyse)$').columns
-                styler = df.style.map(styler_highlight_changes, subset=df.columns.difference(excluded_columns))
-                styler.set_properties(**{
-                    'border': '1px solid black',
-                    'vertical-align': 'middle',
-                })
+                excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
+                styler = df.style.map(  # type: ignore[attr-defined]
+                    styler_highlight_changes,
+                    subset=df.columns.difference(excluded_columns),
+                )
+                styler.set_properties(
+                    **{
+                        "border": "1px solid black",
+                        "vertical-align": "middle",
+                    }
+                )
                 df = styler
-                # todo: make every cell has a border en center it vertical
-                # df = df.style.map(styler_highlight_changes)  # type: ignore[attr-defined]
 
         return df
 
@@ -244,7 +247,6 @@ class ChangedImxObjects:
         geojson_dict = upper_keys_with_index(geojson_dict)
 
         for path, geojson_collection in geojson_dict.items():
-
             if len(geojson_collection.features) != 0:
                 logger.info(f"create geojson file {path}")
                 file_name = f"{directory_path}\\{path}.geojson"
