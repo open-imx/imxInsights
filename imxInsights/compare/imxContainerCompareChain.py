@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 from loguru import logger
 
-from imxInsights.compare.changedImxObjects import ChangedImxObjects
+from imxInsights.compare.imxContainerCompare import ImxContainerCompare
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     style_puic_groups,
@@ -29,7 +29,7 @@ class ImxContainerCompareChain:
         self.container_id_pairs = container_id_pairs
         self.container_id_name_mapping = container_id_name_mapping
         self._validate_inputs()
-        self._compare: list[ChangedImxObjects] = []
+        self._compare: list[ImxContainerCompare] = []
         self._set_comparisons()
 
     def _validate_inputs(self):

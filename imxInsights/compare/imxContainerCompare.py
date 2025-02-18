@@ -23,7 +23,7 @@ from imxInsights.utils.shapely.shapely_geojson import (
 )
 
 
-class ChangedImxObjects:
+class ImxContainerCompare:
     def __init__(
         self,
         repo: ImxMultiRepoProtocol,

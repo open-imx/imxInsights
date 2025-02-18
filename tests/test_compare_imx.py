@@ -71,33 +71,34 @@ def test_create_excel(compared_multirepo):
     compared_multirepo.to_excel("diff.xlsx")
     os.remove("diff.xlsx")
 
-### CHAIN COMPARE IS IN DEVELOPMENT. not stable.
 
-# @pytest.fixture(scope="module")
-# def multi_repo_timeline(imx_v124_project_instance, imx_v500_project_instance, imx_v1200_zip_instance):
-#     return ImxMultiRepo(
-#         [
-#             imx_v124_project_instance.initial_situation,
-#             imx_v500_project_instance.initial_situation,
-#             imx_v1200_zip_instance
-#         ],
-#         version_safe=False,
-#     )
+@pytest.fixture(scope="module")
+def multi_repo_timeline(imx_v124_project_instance, imx_v500_project_instance, imx_v1200_zip_instance):
+    return ImxMultiRepo(
+        [
+            imx_v124_project_instance.initial_situation,
+            imx_v500_project_instance.initial_situation,
+            imx_v1200_zip_instance
+        ],
+        version_safe=False,
+    )
 
-# @pytest.fixture(scope="module")
-# def compared_multirepo_timeline(multi_repo_timeline):
-#     """Create an ImxMultiRepo and perform the comparison once."""
-#
-#     return multi_repo_timeline.compare_chain(
-#         [
-#             (multi_repo_timeline.container_order[0], multi_repo_timeline.container_order[1]),
-#             (multi_repo_timeline.container_order[1], multi_repo_timeline.container_order[2])
-#         ]
-#     )
+@pytest.fixture(scope="module")
+def compared_multirepo_timeline(multi_repo_timeline):
+    """Create an ImxMultiRepo and perform the comparison once."""
 
-# def test_chain_excel(compared_multirepo_timeline):
-#     compared_multirepo_timeline.to_excel("timeline.xlsx")
-#     os.remove("timeline.xlsx")
+    return multi_repo_timeline.compare_chain(
+        [
+            (multi_repo_timeline.container_order[0], multi_repo_timeline.container_order[1]),
+            (multi_repo_timeline.container_order[1], multi_repo_timeline.container_order[2])
+        ]
+    )
+
+
+
+def test_chain_excel(compared_multirepo_timeline):
+    compared_multirepo_timeline.to_excel("timeline.xlsx")
+    os.remove("timeline.xlsx")
 
 
 

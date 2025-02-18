@@ -40,7 +40,7 @@
 - ✅ Comparison result as Pandas DataFrame & GeoJSON
 - ✅ Color changes for better comparison 
 - ✅ Excel compare output 
-
+- ✅ Excel container compare chain 
 
 ## Open-IMX Initiative
 **imxInsights** is part of the **Open-IMX initiative**, which is dedicated to enhancing the accessibility and usability of IMX data. 
