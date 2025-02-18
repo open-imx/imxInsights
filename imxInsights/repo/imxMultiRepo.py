@@ -5,6 +5,7 @@ import pandas as pd
 from loguru import logger
 
 from imxInsights.compare.changedImxObjects import ChangedImxObjects
+from imxInsights.compare.imxContainerCompareChain import ImxContainerCompareChain
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
 from imxInsights.file.singleFileImx.imxSituationProtocol import ImxSituationProtocol
@@ -325,15 +326,11 @@ class ImxMultiRepo(ImxMultiRepoProtocol):
         )
         return ChangedImxObjects(self, container_id_1, container_id_2)
 
-    # TODO: remake:
-    # def compare_chain(
-    #     self,
-    #     container_id_pairs: list[tuple[str, str]],
-    #     object_path: list[str] | None = None,
-    #     container_id_name_mapping: dict[str, str] | None = None,
-    # ) -> ChangedImxObjectsChain:
-    #
-    #     # todo: add container info to return object so we can create a info sheet.
-    #     return ChangedImxObjectsChain(
-    #         self, container_id_pairs, object_path, container_id_name_mapping
-    #     )
+    def compare_chain(
+        self,
+        container_id_pairs: list[tuple[str, str]],
+        container_id_name_mapping: dict[str, str] | None = None,
+    ) -> ImxContainerCompareChain:
+        return ImxContainerCompareChain(
+            self, container_id_pairs, container_id_name_mapping
+        )
