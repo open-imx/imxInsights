@@ -111,6 +111,7 @@ dependencies = [
     "deepdiff",
     "jinja2", # for pandas styler 😊
     "geojson",
+    "packaging",
 ]
 
 [project.urls]
