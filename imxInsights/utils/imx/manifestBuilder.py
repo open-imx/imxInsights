@@ -1,35 +1,33 @@
-import mimetypes
 import zipfile
 from pathlib import Path
 
 from loguru import logger
 from lxml import etree
 from lxml.etree import _Element as Element
+import content_types
 
 from imxInsights.utils.hash import hash_sha256
 
-# should not be included in this library, implicit create mutate feature.
-
 
 def zip_folder(folder_path: Path, output_path: Path):  # pragma: no cover
-    """Create a zip file containing the folder's contents, including subdirectories."""
+    """Create a zip file containing the folder's contents, excluding itself if present."""
     if not folder_path.is_dir():
         raise ValueError(f"The path {folder_path} is not a valid directory.")
 
     with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
         for file_path in folder_path.rglob("*"):  # rglob to include subdirectories
-            if file_path.is_file():
+            if file_path.is_file() and file_path != output_path:
                 zip_file.write(file_path, arcname=file_path.relative_to(folder_path))
 
     logger.success(
-        "Folder {folder_path} has been successfully zipped to {output_path}."
+        f"Folder {folder_path} has been successfully zipped to {output_path}."
     )
 
 
-def get_media_NIME_type(file_name: str) -> str:  # pragma: no cover
+def get_http_content_type(file_name: str) -> str:  # pragma: no cover
     """Return the MIME type of a file."""
-    mimetypes.init()
-    return mimetypes.guess_type(file_name)[0] or "application/octet-stream"
+    the_type = content_types.get_content_type(file_name)
+    return the_type or "application/octet-stream"
 
 
 class ManifestBuilder:  # pragma: no cover
@@ -82,7 +80,7 @@ class ManifestBuilder:  # pragma: no cover
                     attrib={"fileName": file_name, "hash": file_hash},
                 )
             elif file_type == "media":
-                media_type = get_media_NIME_type(file_name)
+                media_type = get_http_content_type(file_name)
                 etree.SubElement(
                     parent_element,
                     "Media",
@@ -143,6 +141,9 @@ class ManifestBuilder:  # pragma: no cover
 if __name__ == "__main__":  # pragma: no cover
     folder = Path(input("input folder"))
     output = Path(input("output zip file"))
+    if output in folder.rglob("*"):
+        raise ValueError("The output zip file cannot be inside the input folder.")
+
     builder = ManifestBuilder(
         folder,
         output,

@@ -112,6 +112,7 @@ dependencies = [
     "jinja2", # for pandas styler 😊
     "geojson",
     "packaging",
+    "content-types",
 ]
 
 [project.urls]
