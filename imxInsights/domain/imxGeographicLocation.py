@@ -4,7 +4,7 @@ from typing import Optional
 from lxml.etree import _Element
 from shapely import LineString, Point, Polygon
 
-from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapelyFactory
 
 
 @dataclass
@@ -55,7 +55,7 @@ class ImxGeographicLocation:
             return None
 
         instance = ImxGeographicLocation(location_node)
-        instance.shapely = GmlShapleyFactory.shapley(location_node)
+        instance.shapely = GmlShapelyFactory.shapely(location_node)
 
         instance.data_acquisition_method = location_node.attrib.get(
             "dataAcquisitionMethod", None

@@ -1,29 +1,29 @@
 import pytest
 from shapely.geometry import Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
 from imxInsights.utils.shapely.shapely_transform import ShapelyTransform  # Adjust the import to the actual module name
-from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapelyFactory
 
 
 def test_rs_wgs_point_no_z():
-    rd_point = Point(GmlShapleyFactory.gml_point_to_shapely("209021.633,461739.949"))
+    rd_point = Point(GmlShapelyFactory.gml_point_to_shapely("209021.633,461739.949"))
     wgs_point = ShapelyTransform.rd_to_wgs(rd_point)
     rd_point_back = ShapelyTransform.wgs_to_rd(wgs_point)
     assert rd_point_back.equals_exact(rd_point, 3), "Round trip should result the same"
 
 def test_rs_wgs_point():
-    rd_point = Point(GmlShapleyFactory.gml_point_to_shapely("209021.633,461739.949,15.015"))
+    rd_point = Point(GmlShapelyFactory.gml_point_to_shapely("209021.633,461739.949,15.015"))
     wgs_point = ShapelyTransform.rd_to_wgs(rd_point)
     rd_point_back = ShapelyTransform.wgs_to_rd(wgs_point)
     assert rd_point_back.equals_exact(rd_point, 3), "Round trip should result the same"
 
 def test_rs_wgs_linestring_no_z():
-    rd_linestring = LineString(GmlShapleyFactory.gml_linestring_to_shapely("210427.279,462296.441 210422.279,462291.441 210414.566,462281.001"))
+    rd_linestring = LineString(GmlShapelyFactory.gml_linestring_to_shapely("210427.279,462296.441 210422.279,462291.441 210414.566,462281.001"))
     wgs_linestring = ShapelyTransform.rd_to_wgs(rd_linestring)
     rd_linestring_back = ShapelyTransform.wgs_to_rd(wgs_linestring)
     assert rd_linestring.equals_exact(rd_linestring_back, 3), "Round trip should result the same"
 
 def test_rs_wgs_linestring():
-    rd_linestring = LineString(GmlShapleyFactory.gml_linestring_to_shapely("210427.279,462296.441,10.977 210414.566,462281.001,11.058"))
+    rd_linestring = LineString(GmlShapelyFactory.gml_linestring_to_shapely("210427.279,462296.441,10.977 210414.566,462281.001,11.058"))
     wgs_linestring = ShapelyTransform.rd_to_wgs(rd_linestring)
     rd_linestring_back = ShapelyTransform.wgs_to_rd(wgs_linestring)
     assert rd_linestring.equals_exact(rd_linestring_back, 3), "Round trip should result the same"
@@ -45,8 +45,8 @@ def test_rs_wgs_polygon():
 def test_rd_wgs_multilinestring():
     rd_multilinestring = MultiLineString(
         [
-            LineString(GmlShapleyFactory.gml_linestring_to_shapely("210427.279,462296.441 210414.566,462281.001")),
-            LineString(GmlShapleyFactory.gml_linestring_to_shapely("210400.000,462300.000 210380.000,462280.000"))
+            LineString(GmlShapelyFactory.gml_linestring_to_shapely("210427.279,462296.441 210414.566,462281.001")),
+            LineString(GmlShapelyFactory.gml_linestring_to_shapely("210400.000,462300.000 210380.000,462280.000"))
         ]
     )
     wgs_multilinestring = ShapelyTransform.rd_to_wgs(rd_multilinestring)
@@ -58,8 +58,8 @@ def test_rd_wgs_multilinestring():
 def test_rd_wgs_multipoint():
     rd_multipoint = MultiPoint(
         [
-            Point(GmlShapleyFactory.gml_point_to_shapely("209021.633,461739.949")),
-            Point(GmlShapleyFactory.gml_point_to_shapely("210021.633,462739.949"))
+            Point(GmlShapelyFactory.gml_point_to_shapely("209021.633,461739.949")),
+            Point(GmlShapelyFactory.gml_point_to_shapely("210021.633,462739.949"))
         ]
     )
     wgs_multipoint = ShapelyTransform.rd_to_wgs(rd_multipoint)
@@ -83,8 +83,8 @@ def test_rd_wgs_multipolygon():
 def test_rd_wgs_geometrycollection():
     rd_geometrycollection = GeometryCollection(
         [
-            Point(GmlShapleyFactory.gml_point_to_shapely("209021.633,461739.949")),
-            LineString(GmlShapleyFactory.gml_linestring_to_shapely("210427.279,462296.441 210414.566,462281.001")),
+            Point(GmlShapelyFactory.gml_point_to_shapely("209021.633,461739.949")),
+            LineString(GmlShapelyFactory.gml_linestring_to_shapely("210427.279,462296.441 210414.566,462281.001")),
             Polygon(shell=[(0, 0), (0, 10), (10, 10), (10, 0)])
         ]
     )
