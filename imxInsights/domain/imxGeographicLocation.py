@@ -55,7 +55,12 @@ class ImxGeographicLocation:
             return None
 
         instance = ImxGeographicLocation(location_node)
-        instance.shapely = GmlShapelyFactory.shapely(location_node)
+
+        geometry = GmlShapelyFactory.shapely(location_node)
+        if isinstance(geometry, Point | LineString | Polygon):
+            instance.shapely = geometry
+        else:
+            raise TypeError(f"Unexpected geometry type: {type(geometry)}")
 
         instance.data_acquisition_method = location_node.attrib.get(
             "dataAcquisitionMethod", None
