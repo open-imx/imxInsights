@@ -9,5 +9,3 @@
 ::: imxInsights.compare.changeStatusEnum
 
 ::: imxInsights.compare.geometryChange
-
-::: imxInsights.compare.helpers
