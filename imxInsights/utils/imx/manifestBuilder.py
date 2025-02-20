@@ -1,152 +1,229 @@
-import mimetypes
-import zipfile
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 from loguru import logger
 from lxml import etree
 from lxml.etree import _Element as Element
 
+from imxInsights.utils.file import get_http_content_type, zip_folder
 from imxInsights.utils.hash import hash_sha256
 
-# should not be included in this library, implicit create mutate feature.
+
+class FileType(Enum):
+    CORE = "core"
+    PETAL = "petal"
+    MEDIA = "media"
 
 
-def zip_folder(folder_path: Path, output_path: Path):  # pragma: no cover
-    """Create a zip file containing the folder's contents, including subdirectories."""
-    if not folder_path.is_dir():
-        raise ValueError(f"The path {folder_path} is not a valid directory.")
+@dataclass
+class ManifestFile:
+    """
+    Represents a file entry in the manifest, containing metadata.
 
-    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for file_path in folder_path.rglob("*"):  # rglob to include subdirectories
-            if file_path.is_file():
-                zip_file.write(file_path, arcname=file_path.relative_to(folder_path))
+    Attributes:
+        file: Path to the file.
+        hash: SHA-256 hash of the file.
+        file_type: Type of file.
+        parent_document_name: Name of the parent document (if applicable).
+        parent_hash_code: Hash of the parent document (if applicable).
+    """
 
-    logger.success(
-        "Folder {folder_path} has been successfully zipped to {output_path}."
-    )
+    file: Path
+    hash: str
+    file_type: FileType
+    parent_document_name: str | None = None
+    parent_hash_code: str | None = None
 
 
-def get_media_NIME_type(file_name: str) -> str:  # pragma: no cover
-    """Return the MIME type of a file."""
-    mimetypes.init()
-    return mimetypes.guess_type(file_name)[0] or "application/octet-stream"
+class ManifestBuilder:
+    """
+    Generate an XML manifest file from the contents of a folder.
 
+    The manifest categorizes files into three types:
 
-class ManifestBuilder:  # pragma: no cover
-    def __init__(self, folder_path: Path, output_zip: Path):
-        self.folder_path = folder_path
-        self.output_zip_path = output_zip
-        self.im_spoor_files = {"SignalingDesign.xml"}
-        self.manifest: Element | None = None
+    1. **Core Files**
+       - The primary IM Spoor file, identified by the root tag `<SignalingDesign>`.
+       - Only one core file should exist.
 
-    @staticmethod
-    def _create_manifest_xml_imx_12() -> Element:
+    2. **Petal Files**
+       - Supporting XML files that reference the core file.
+       - Identified by specific root tags such as `<Bgt>`, `<Furniture>`, etc.
+       - Must contain a `<BaseReference>` element linking to the core file via `parentDocumentName` and `parentHashcode`.
+       - If a petal file references a mismatched core file or hash, a comment is added:
+         - `"Invalid CoreFile reference"` (if `parentDocumentName` doesn’t match).
+         - `"Invalid ParentHashCode"` (if `parentHashcode` doesn’t match).
+
+    2b. **Including Old Core or Petal Files**
+       - Old core or petal files can be added as media files by appending `-old.xml` to the filename.
+
+    3. **Media Files**
+       - Non-XML files (e.g., images, PDFs, other binary formats).
+       - Included under the `<MediaList>` section.
+
+    Additional Comments in the Manifest:
+    - A warning is added if a petal file's `parentDocumentName` does not match the core file.
+    - A comment is included if a petal file’s `parentHashcode` differs from the core file’s hash.
+
+    Args:
+        folder_path (str): Path to the folder containing IM Spoor files.
+    """
+
+    NAMESPACE = "http://www.prorail.nl/IMSpoor"
+    SCHEMA_LOCATION = "http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd"
+
+    def __init__(self, folder_path: Path | str):
+        self.folder_path = Path(folder_path)
+
+    def _create_manifest_root(self) -> Element:
+        """Creates root XML element for the manifest."""
         nsmap = {
-            None: "http://www.prorail.nl/IMSpoor",
+            None: self.NAMESPACE,
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
-            "gml": "http://www.opengis.net/gml",
         }
         manifest = etree.Element(
             "Manifest",
             attrib={
                 "imxVersion": "12.0.0",
-                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": "http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd",
-                "coreFileName": "SignalingDesign.xml",
+                "coreFileName": "to_fill",
                 "nidRbc": "to_fill",
                 "nidC": "to_fill",
+                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": self.SCHEMA_LOCATION,
             },
             nsmap=nsmap,
         )
-        manifest.append(
-            etree.Comment(
-                "This IMX 12 manifest is created (and zipped as a container) using imxInsights, see open-imx.nl for more information."
-            )
-        )
-        manifest.append(
-            etree.Comment(
-                'Manifest and zip container currently marked as "INTENDED FOR TEST PURPOSES"!'
-            )
-        )
+        manifest.append(etree.Comment("IMX 12 manifest generated by imxInsights."))
+        manifest.append(etree.Comment("Manifest marked as 'FOR TEST PURPOSES'!"))
         return manifest
 
-    def _add_file_to_list(
-        self, file_name: str, parent_element: Element, file_type: str
-    ):
-        file_path = self.folder_path / file_name
-        if file_path.is_file():
-            file_hash = hash_sha256(file_path)
-            if file_type == "imspoor":
-                etree.SubElement(
-                    parent_element,
-                    "ImSpoorData",
-                    attrib={"fileName": file_name, "hash": file_hash},
-                )
-            elif file_type == "media":
-                media_type = get_media_NIME_type(file_name)
-                etree.SubElement(
-                    parent_element,
-                    "Media",
-                    attrib={
-                        "fileName": file_name,
-                        "mediaType": media_type,
-                        "hash": file_hash,
-                    },
-                )
+    def _parse_xml(self, file: Path) -> str | None:
+        """Parses XML and extracts the root tag safely."""
+        try:
+            return f"{etree.parse(file).getroot().tag!r}"
+        except etree.XMLSyntaxError:
+            logger.error(f"Invalid XML: {file}")
+            return None
 
-    def _add_im_spoor_data_imx_12(self, manifest: Element):
-        # todo: check core file hash, and if not based on same hash add comment to manifest
-        im_spoor_data_list = etree.SubElement(manifest, "ImSpoorDataList")
+    def _list_folder_content(
+        self,
+    ) -> tuple[list[ManifestFile], str | None, Path | None]:
+        """Scans folder for XML and media files, determining core file and petal dependencies."""
+        core_file_tag = f"{{{self.NAMESPACE}}}SignalingDesign"
+        petal_tags = {
+            f"{{{self.NAMESPACE}}}{tag}"
+            for tag in [
+                "Bgt",
+                "Furniture",
+                "Legacy",
+                "InstallationDesign",
+                "ManagementAreas",
+                "NetworkConfiguration",
+                "Observations",
+                "RailwayElectrification",
+                "SchemaLayout",
+                "TrainControl",
+                "Extensions",
+            ]
+        }
+
+        files = []
+        core_file, core_hash = None, None
+
         for file in self.folder_path.iterdir():
-            if file.name in self.im_spoor_files:
-                self._add_file_to_list(file.name, im_spoor_data_list, "imspoor")
+            if not file.is_file():
+                continue
 
-    def _add_media_data_imx_12(self, manifest: Element):
+            file_hash = hash_sha256(file)
+            file_type, parent_name, parent_hash = FileType.MEDIA, None, None
+
+            if file.suffix.lower() == ".xml":
+                root_tag = self._parse_xml(file)
+                if root_tag:
+                    if root_tag == core_file_tag:
+                        core_file, core_hash = file, file_hash
+                        file_type = FileType.CORE
+                    elif root_tag in petal_tags:
+                        tree = etree.parse(file)
+                        base_ref = tree.find(f"*{{{self.NAMESPACE}}}BaseReference")
+                        parent_name = (
+                            base_ref.get("parentDocumentName") if base_ref else None
+                        )
+                        parent_hash = (
+                            base_ref.get("parentHashcode") if base_ref else None
+                        )
+                        file_type = FileType.PETAL
+
+            files.append(
+                ManifestFile(file, file_hash, file_type, parent_name, parent_hash)
+            )
+
+        return files, core_hash, core_file
+
+    def create_manifest(self, file_path: Path | str | None = None) -> None:
+        """
+        Generates an XML manifest file containing metadata for IM Spoor files.
+
+        Args:
+            file_path: Output path for the manifest XML file, if not given will be generated in input folder.
+        """
+        manifest = self._create_manifest_root()
+        file_list, core_hash, core_file = self._list_folder_content()
+
+        if core_file:
+            manifest.set("coreFileName", core_file.name)
+
+        im_spoor_list = etree.SubElement(manifest, "ImSpoorDataList")
         media_list = etree.SubElement(manifest, "MediaList")
-        for file in self.folder_path.iterdir():
-            if file.name not in self.im_spoor_files and file.name != "Manifest.xml":
-                self._add_file_to_list(file.name, media_list, "media")
 
-    def _build_manifest_imx12(self) -> Element:
-        manifest = self._create_manifest_xml_imx_12()
-        self._add_im_spoor_data_imx_12(manifest)
-        self._add_media_data_imx_12(manifest)
-        return manifest
+        for item in file_list:
+            attributes = {
+                "fileName": item.file.name,
+                "mediaType": get_http_content_type(item.file.name),
+                "hash": item.hash,
+            }
 
-    def build_manifest(self):
-        """Build the (IMX v12) manifest element from folder contents."""
-        self.manifest = self._build_manifest_imx12()
+            if (
+                item.file_type in {FileType.CORE, FileType.PETAL}
+                and "-old" not in item.file.name
+            ):
+                petal_element = etree.SubElement(
+                    im_spoor_list, "ImSpoorData", attrib=attributes
+                )
+                if item.file_type != FileType.CORE:
+                    if item.parent_document_name != (
+                        core_file.name if core_file else None
+                    ):
+                        petal_element.append(
+                            etree.Comment("Invalid CoreFile reference.")
+                        )
+                    if item.parent_hash_code != core_hash:
+                        petal_element.append(etree.Comment("Invalid ParentHashCode."))
+            else:
+                etree.SubElement(media_list, "Media", attrib=attributes)
 
-    def save_manifest(self):
-        """Save the generated manifest to a file."""
-        if self.manifest is None:
-            raise ValueError(
-                "Manifest has not been built yet. Call build_manifest() first."
-            )
-
-        manifest_file = self.folder_path / "Manifest.xml"
-        with open(manifest_file, "wb") as f:
-            # noinspection PyDeprecation
+        output_path = (
+            Path(file_path) if file_path else self.folder_path / "Manifest.xml"
+        )
+        with output_path.open("wb") as f:
             f.write(
                 etree.tostring(
-                    self.manifest,
-                    pretty_print=True,
-                    xml_declaration=True,
-                    encoding="UTF-8",
+                    manifest, pretty_print=True, xml_declaration=True, encoding="UTF-8"
                 )
             )
 
-    def zip_folder(self):
-        """Create a zip file containing the folder's contents."""
-        zip_folder(self.folder_path, self.output_zip_path)
+        logger.success(f"Manifest created: {output_path}")
+
+    def to_zip(self, out_path: Path | str) -> None:
+        """
+        Generates an .zip file of the input_folder.
+
+        Args:
+            out_path: Output path for the manifest XML file.
+        """
+        zip_folder(self.folder_path, Path(out_path))
 
 
-if __name__ == "__main__":  # pragma: no cover
-    folder = Path(input("input folder"))
-    output = Path(input("output zip file"))
-    builder = ManifestBuilder(
-        folder,
-        output,
-    )
-    builder.build_manifest()
-    builder.save_manifest()
-    builder.zip_folder()
+if __name__ == "__main__":
+    tester = ManifestBuilder(r"C:\repos\imxInsights\klad\edl_km")
+    tester.create_manifest(r"C:\repos\imxInsights\klad\edl_km\manifest.xml")
+    tester.to_zip(r"C:\repos\imxInsights\klad\edl_km\imx_container.zip")

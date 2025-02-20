@@ -31,6 +31,25 @@ class ImxContainerCompare:
         container_id_2: str,
         object_paths: list[str] | None = None,
     ):
+        """
+        Initialize an IMX container comparison instance.
+
+        This class retrieves objects from the given repository, compares their attributes across two container IDs.
+
+        Args:
+            repo: The repository containing the IMX objects to be compared.
+            container_id_1: The first container ID for comparison.
+            container_id_2: The second container ID for comparison.
+            object_paths: A list of object paths to filter the comparison.
+                If None, all objects within the containers will be compared.
+
+        Attributes:
+            container_id_1: The first container ID.
+            container_id_2: The second container ID.
+            object_paths: The object paths used to filter comparisons.
+            compared_objects: A list of compared IMX objects.
+
+        """
         self._repo = repo
         self.container_id_1 = container_id_1
         self.container_id_2 = container_id_2
@@ -125,13 +144,13 @@ class ImxContainerCompare:
         Generates a DataFrame detailing the changes for a specific object path.
 
         Args:
-            object_paths: A list containing the object path to filter the changes.
-            add_analyse: Add analyse to dataframe
-            styled_df: Style changes in dataframe
-            ref_display: Add refs display property to output
+            object_paths (list[str]): A list containing the object path to filter the changes.
+            add_analyse (bool): Whether to add analysis to the DataFrame.
+            styled_df (bool): Whether to apply styling to highlight changes.
+            ref_display (bool): Whether to add reference display properties to the output.
 
         Returns:
-            A pandas DataFrame representing the changes for the specified object path.
+            pd.DataFrame: A DataFrame representing the changes for the specified object path.
         """
         items = [
             item
@@ -201,12 +220,12 @@ class ImxContainerCompare:
         Generates a GeoJSON feature collection representing the changed objects.
 
         Args:
-            object_paths:: An optional list of object paths to filter the GeoJSON features. If None, all changed objects are included.
-            to_wgs: A boolean indicating whether to convert the coordinates to WGS84.
-            ref_display: Add refs display property to output
+            object_paths (list[str] | None): Optional list of object paths to filter the GeoJSON features. If None, all changed objects are included.
+            to_wgs (bool): Whether to convert the coordinates to WGS84.
+            ref_display (bool): Whether to add reference display properties to the output.
 
         Returns:
-            A ShapelyGeoJsonFeatureCollection representing the changed objects.
+            ShapelyGeoJsonFeatureCollection: A GeoJSON collection representing the changed objects.
         """
         if object_paths:
             features = []
@@ -236,8 +255,8 @@ class ImxContainerCompare:
         Creates GeoJSON files for each unique object path in the compared objects.
 
         Args:
-            directory_path: The path to the directory where the GeoJSON files will be created.
-            to_wgs: A boolean indicating whether to convert the coordinates to WGS84.
+            directory_path (str | Path): The directory where the GeoJSON files will be created.
+            to_wgs (bool): Whether to convert the coordinates to WGS84.
         """
         logger.info("create geojson files")
 
@@ -269,9 +288,9 @@ class ImxContainerCompare:
         Exports the overview and detailed changes to an Excel file.
 
         Args:
-            file_name: The name or path of the Excel file to create.
-            add_analyse: Add analyse to excel
-            styled_df: Style changes in excel
+            file_name (str | Path): The name or path of the Excel file to create.
+            add_analyse (bool): Whether to add analysis to the Excel output.
+            styled_df (bool): Whether to apply styling to highlight changes.
         """
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
