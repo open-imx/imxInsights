@@ -111,6 +111,8 @@ dependencies = [
     "deepdiff",
     "jinja2", # for pandas styler 😊
     "geojson",
+    "packaging",
+    "content-types",
 ]
 
 [project.urls]
@@ -128,6 +130,8 @@ ignore_missing_imports = true
 omit = [
     "*/utils/version_check.py",
     "*/*Protocol.py",
+    "*/utils/imx/manifestBuilder.py"
+
 ]
 [tool.coverage.report]
 exclude_also = [

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from lxml.etree import _Element as Element
 from shapely import Polygon
 
-from imxInsights.utils.shapely.shapely_gml import GmlShapleyFactory
+from imxInsights.utils.shapely.shapely_gml import GmlShapelyFactory
 
 
 @dataclass
@@ -25,7 +25,7 @@ class Area:
         return Area(
             name=name_value,
             coordinates=coordinates,
-            shapely=GmlShapleyFactory.gml_polygon_to_shapely(coordinates),
+            shapely=Polygon(GmlShapelyFactory.parse_coordinates(coordinates)),
         )
 
 

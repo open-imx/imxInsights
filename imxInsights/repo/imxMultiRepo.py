@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from loguru import logger
 
-from imxInsights.compare.changedImxObjects import ChangedImxObjects
+from imxInsights.compare.imxContainerCompare import ImxContainerCompare
 from imxInsights.compare.imxContainerCompareChain import ImxContainerCompareChain
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.file.containerizedImx.imxContainerProtocol import ImxContainerProtocol
@@ -320,11 +320,11 @@ class ImxMultiRepo(ImxMultiRepoProtocol):
         container_id_1: str,
         container_id_2: str,
         object_path: list[str] | None = None,
-    ) -> ChangedImxObjects:
+    ) -> ImxContainerCompare:
         logger.info(
             f"compare {container_id_1} vs {container_id_2} {object_path if object_path else ""}"
         )
-        return ChangedImxObjects(self, container_id_1, container_id_2)
+        return ImxContainerCompare(self, container_id_1, container_id_2)
 
     def compare_chain(
         self,
