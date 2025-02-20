@@ -3,9 +3,6 @@ name: Release
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - main
 
 jobs:
   test:
@@ -37,25 +34,24 @@ jobs:
         pip install hatch
         hatch env create
 
-#    - name: Lint and typecheck
-#      run: |
-#        hatch run lint-check
-#
-#    - name: Test
-#      run: |
-#        hatch run test
-#
-#    - name: Upload coverage reports to Codecov
-#      uses: codecov/codecov-action@v5
-#      with:
-#        token: ${{ secrets.CODECOV_TOKEN }}
-#        fail_ci_if_error: false
-#        verbose: true
+    - name: Lint and typecheck
+      run: |
+        hatch run lint-check
+
+    - name: Test
+      run: |
+        hatch run test
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+        verbose: true
 
   release:
     runs-on: ubuntu-latest
     environment: release
-#    needs: test
     permissions:
       contents: write
       id-token: write
