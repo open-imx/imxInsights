@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -9,8 +10,37 @@ from imxInsights.compare.custom_operators.diff_shapely import (
     ShapelyLineDiffer,
     ShapelyPointDiffer,
 )
-from imxInsights.compare.helpers import convert_deepdiff_path
 from imxInsights.utils.flatten_unflatten import flatten_dict
+
+
+def convert_deepdiff_path(deepdiff_path: str) -> str:
+    """
+    Converts a DeepDiff path to a dot-separated path format using regular expressions.
+
+    This function takes a DeepDiff path and transforms it into a dot-separated format
+    by removing unnecessary characters and adjusting the path representation for easier use.
+
+    Args:
+        deepdiff_path: A string representing the path from DeepDiff, typically formatted
+                       with brackets and quotes.
+
+    Returns:
+        A string representing the converted path in a dot-separated format.
+    """
+    # Remove "root" at the beginning if it exists
+    if deepdiff_path.startswith("root"):
+        deepdiff_path = deepdiff_path[4:]  # Remove "root"
+
+    # Replace the pattern ['key'] with .key
+    deepdiff_path = re.sub(r"\['([^']+)'\]", r".\1", deepdiff_path)
+
+    # Replace patterns like [0] with .0
+    deepdiff_path = re.sub(r"\[(\d+)\]", r".\1", deepdiff_path)
+
+    # Remove any leading '.' that might have resulted from replacements
+    deepdiff_path = deepdiff_path.lstrip(".")
+
+    return deepdiff_path
 
 
 @dataclass
@@ -85,14 +115,6 @@ def process_deep_diff(dd: DeepDiff):
                         diff_string=f"++{value_2}",
                         analyse=None,
                     )
-            # elif isinstance(value, (str, int, float)):
-            #     changes[f"{convert_deepdiff_path(key)}"] = Change(
-            #         status=ChangeStatusEnum.ADDED,
-            #         t1=None,
-            #         t2=value,
-            #         diff_string=f"++{value}",
-            #         analyse=None,
-            #     )
             else:
                 raise NotImplementedError(f"{type(value)}")
 
@@ -104,7 +126,6 @@ def process_deep_diff(dd: DeepDiff):
                     t1=None,
                     t2=value["new_value"],
                     diff_string=f"++{value['new_value']}",
-                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -114,7 +135,6 @@ def process_deep_diff(dd: DeepDiff):
                     t1=value["old_value"],
                     t2=None,
                     diff_string=f"--{value['old_value']}",
-                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -124,7 +144,6 @@ def process_deep_diff(dd: DeepDiff):
                     t1=value["old_value"],
                     t2=value["new_value"],
                     diff_string=f"{value['old_value']} -> {value['new_value']}",
-                    # f"{value['old_value']} {value['old_type']} -> {value['new_value']} {value['new_type']}",
                     analyse=None,
                 )
 
@@ -184,9 +203,6 @@ def get_object_changes(
     changes = process_deep_diff(dd)
 
     # we got the unchanged left
-
-    # below is going bad if we insert a item in a list, like we had a.1 a.2 now we have a.1 a.2 a.3 and the a.2 is added...
-
     flatten_dict_1 = flatten_dict(dict1)
     for key, value in flatten_dict_1.items():
         if key not in changes:

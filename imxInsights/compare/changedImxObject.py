@@ -18,6 +18,12 @@ from imxInsights.utils.shapely.shapely_transform import ShapelyTransform
 
 class ChangedImxObject:
     def __init__(self, t1: ImxObject | None, t2: ImxObject | None):
+        """Represents a changed IMX object by comparing two versions (t1 and t2).
+
+        Args:
+            t1: The first version of the IMX object.
+            t2: The second version of the IMX object.
+        """
         self.t1 = t1
         self.t2 = t2
         self.puic: str = self._get_puic()
@@ -29,6 +35,11 @@ class ChangedImxObject:
 
     @property
     def tag(self) -> str:
+        """Gets the tag of the changed object.
+
+        Returns:
+            The diff string of the tag change.
+        """
         return self.changes["tag"].diff_string
 
     def _get_puic(self) -> str:
@@ -71,6 +82,14 @@ class ChangedImxObject:
         )
 
     def get_change_dict(self, add_analyse: bool = False) -> dict[str, str]:
+        """Generates a dictionary representing the changes.
+
+        Args:
+            add_analyse: Whether to include analysis information.
+
+        Returns:
+            A dictionary mapping property names to their change representations.
+        """
         analyse = (
             {
                 f"{key}|analyse": "\n".join(value.analyse["display"].split(" "))
@@ -97,6 +116,15 @@ class ChangedImxObject:
     def as_geojson_feature(
         self, add_analyse: bool = True, as_wgs: bool = True
     ) -> ShapelyGeoJsonFeature:
+        """Converts the changed object to a GeoJSON feature.
+
+        Args:
+            add_analyse: Whether to include analysis information.
+            as_wgs: Whether to transform the geometry to WGS coordinates.
+
+        Returns:
+            A ShapelyGeoJsonFeature representing the object.
+        """
         geometry = []
 
         if self.geometry:

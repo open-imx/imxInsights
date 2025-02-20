@@ -25,6 +25,18 @@ class ImxContainerCompareChain:
         container_id_pairs: list[tuple[str, str]],
         container_id_name_mapping: dict[str, str] | None = None,
     ):
+        """
+        Initializes the comparison chain for the given container ID pairs.
+
+        Args:
+            imx_repo: The IMX repository object that holds the container data.
+            container_id_pairs: A list of tuples containing pairs of container IDs to compare.
+            container_id_name_mapping: An optional dictionary mapping container IDs to names.
+
+        Raises:
+            ValueError: If any container ID in the pairs is not found in the repository.
+        """
+
         self.imx_repo = imx_repo
         self.container_id_pairs = container_id_pairs
         self.container_id_name_mapping = container_id_name_mapping
@@ -124,6 +136,17 @@ class ImxContainerCompareChain:
         object_paths: list[str],
         styled_df: bool = True,
     ) -> pd.DataFrame:
+        """
+        Retrieves a processed dataframe for the given object paths.
+
+        Args:
+            object_paths: A list of object paths to retrieve data from.
+            styled_df: Whether to apply styling to the dataframe. Defaults to True.
+
+        Returns:
+            pd.DataFrame: The processed and optionally styled dataframe with comparison results,
+                optionally styled as pd.Styler.
+        """
         df = self._get_combined_dataframe(object_paths)
         if df.empty:
             return df
@@ -138,6 +161,15 @@ class ImxContainerCompareChain:
         self,
         styled_df: bool = True,
     ):
+        """
+        Retrieves an overview dataframe for the comparison results.
+
+        Args:
+            styled_df: Whether to apply styling to the dataframe. Defaults to True.
+
+        Returns:
+            pd.DataFrame: The overview dataframe, optionally styled as pd.Styler.
+        """
         df = self.get_dataframe(
             object_paths=self.imx_repo.get_all_paths(), styled_df=False
         )
@@ -164,7 +196,13 @@ class ImxContainerCompareChain:
         return df
 
     def to_excel(self, file_path: str | Path):
-        """Writes the comparison results to an Excel file, applying formatting."""
+        """
+        Writes the comparison results to an Excel file, applying formatting.
+
+        Args:
+            file_path: The path to save the Excel file.
+
+        """
 
         file_path = Path(file_path).resolve()
 
