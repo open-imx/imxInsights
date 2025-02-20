@@ -130,6 +130,8 @@ ignore_missing_imports = true
 omit = [
     "*/utils/version_check.py",
     "*/*Protocol.py",
+    "*/utils/imx/manifestBuilder.py"
+
 ]
 [tool.coverage.report]
 exclude_also = [
