@@ -92,11 +92,3 @@ jobs:
           
           # Pass the API token as output for later steps
           echo "api-token=${api_token}" >> "${GITHUB_OUTPUT}"
-
-#      - name: Build and publish on PyPI
-#        env:
-#          HATCH_INDEX_USER: __token__
-#          HATCH_INDEX_AUTH: ${{ steps['mint-token'].outputs['api-token'] }}
-#        run: |
-#          hatch build
-#          hatch publish

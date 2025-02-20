@@ -1,6 +1,6 @@
 # Reference
 
-::: imxInsights.compare.changedImxObjects
+::: imxInsights.compare.imxContainerCompare
 
 ::: imxInsights.compare.changedImxObject
 
