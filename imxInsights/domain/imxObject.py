@@ -79,7 +79,10 @@ class ImxObject:
         self.properties: dict[str, str] = self._set_properties()
         self.imx_situation: str | None = self._get_imx_situation()
         self.container_id: str | None = None
+
+        # todo: make proper type hints for refs and atRailCons
         self.refs: list[Any] = []
+        self.on_rail_geometry: list[Any] = []
 
     def __repr__(self) -> str:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
