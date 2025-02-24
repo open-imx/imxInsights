@@ -70,11 +70,11 @@ class ImxRepo:
         Returns:
             Path: The extracted directory path of the zip container.
         """
-        with tempfile.TemporaryDirectory(delete=False) as temp_dir:
-            temp_path = Path(temp_dir)
-            with zipfile.ZipFile(imx_container_as_zip, "r") as zip_ref:
-                zip_ref.extractall(temp_path)
-            return Path(temp_path)
+        temp_dir = tempfile.mkdtemp()
+        temp_path = Path(temp_dir)
+        with zipfile.ZipFile(imx_container_as_zip, "r") as zip_ref:
+            zip_ref.extractall(temp_path)
+        return Path(temp_path)
 
     def get_all(self) -> Iterable[ImxObject]:
         """

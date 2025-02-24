@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        python_version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Check out the release tag
@@ -41,6 +41,18 @@ jobs:
     - name: Test
       run: |
         hatch run test
+
+    - name: Build package
+      run: |
+        hatch build
+
+    - name: Install built package
+      run: |
+        pip install dist/*.whl
+
+    - name: Test imports
+      run: |
+        python -c "from imxInsights import *"
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
