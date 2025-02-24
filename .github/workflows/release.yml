@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        python_version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Check out the release tag
@@ -74,6 +74,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch
 
+      - name: Build package
+        run: |
+          hatch build
+
+      - name: Install built package
+        run: |
+          pip install dist/*.whl
+
+      - name: Test imports
+        run: |
+          python -c "from imxInsights import *"
+
       - name: Mint API token
         id: mint-token
         run: |
@@ -97,5 +109,4 @@ jobs:
           HATCH_INDEX_USER: __token__
           HATCH_INDEX_AUTH: ${{ steps['mint-token'].outputs['api-token'] }}
         run: |
-          hatch build
           hatch publish

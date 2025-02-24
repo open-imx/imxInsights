@@ -322,7 +322,7 @@ class ImxMultiRepo(ImxMultiRepoProtocol):
         object_path: list[str] | None = None,
     ) -> ImxContainerCompare:
         logger.info(
-            f"compare {container_id_1} vs {container_id_2} {object_path if object_path else ""}"
+            f"compare {container_id_1} vs {container_id_2} {object_path if object_path else ''}"
         )
         return ImxContainerCompare(self, container_id_1, container_id_2)
 

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
     - uses: actions/checkout@v4
@@ -37,42 +37,14 @@ jobs:
       run: |
         hatch run test
 
-# TODO: activate just before clean git by fresh upload of code :tada:
-#    - uses: codecov/codecov-action@v4
-#      with:
-#        token: ${{ secrets.CODECOV_TOKEN }}
-#        fail_ci_if_error: true
-#        verbose: true
-#
-#  release:
-#    runs-on: ubuntu-latest
-#    needs: test
-#    if: startsWith(github.ref, 'refs/tags/')
-#    permissions:
-#        contents: write
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Set up Python
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: '3.12'
-#    - name: Install dependencies
-#      shell: bash
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install hatch
-#    - name: Build and publish on PyPI
-#      env:
-#        HATCH_INDEX_USER: ${{ secrets.HATCH_INDEX_USER }}
-#        HATCH_INDEX_AUTH: ${{ secrets.HATCH_INDEX_AUTH }}
-#      run: |
-#        hatch build
-#        hatch publish
-#    - name: Create release
-#      uses: ncipollo/release-action@v1
-#      with:
-#        draft: true
-#        body: ${{ github.event.head_commit.message }}
-#        artifacts: dist/*.whl,dist/*.tar.gz
-#        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build package for testing
+      run: |
+        hatch build
+
+    - name: Install built package
+      run: |
+        pip install dist/*.whl
+
+    - name: Test imports
+      run: |
+        python -c "from imxInsights import *;"
