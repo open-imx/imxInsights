@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python_version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python_version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
     - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
       run: |
         hatch run test
 
-  release:
+  pre-release:
     runs-on: ubuntu-latest
     environment: release
     needs: test
