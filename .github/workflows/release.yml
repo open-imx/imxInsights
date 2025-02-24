@@ -84,7 +84,7 @@ jobs:
 
       - name: Test imports
         run: |
-          python -c "from imxInsights import *; print(imxInsights.__version__)"
+          python -c "from imxInsights import *"
 
       - name: Mint API token
         id: mint-token
