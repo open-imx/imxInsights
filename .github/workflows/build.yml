@@ -36,7 +36,15 @@ jobs:
     - name: Test
       run: |
         hatch run test
-        
-    - name: Test build installation
+
+    - name: Build package for testing
       run: |
-        python _test_build.py
+        hatch build
+
+    - name: Install built package
+      run: |
+        pip install dist/*.whl
+
+    - name: Test imports
+      run: |
+        python -c "from imxInsights import *; print(imxInsights.__version__)"
