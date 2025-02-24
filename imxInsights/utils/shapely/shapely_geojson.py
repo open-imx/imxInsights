@@ -52,6 +52,8 @@ class ShapelyGeoJsonFeature:
             for geom in geometry_list:
                 if isinstance(geom, Point | LineString | Polygon):
                     self._geometry_list.append(geom)
+                elif isinstance(geom, MultiPoint | MultiLineString):
+                    self._geometry_list.extend([point for point in geom.geoms])
                 else:
                     raise ValueError("geometry is not a shapley geometry")  # NOQA TRY004 TRY003
 
@@ -134,9 +136,11 @@ class ShapelyGeoJsonFeature:
                 properties=self.properties,
             )
         elif all(isinstance(geom, Point) for geom in self.geometry_list):
+            # TODO multipoint is not working
+
             return GeoJsonFeature(
                 geometry=GeoJsonMultiPoint(
-                    *[self._get_point_coordinates(_) for _ in self.geometry_list]
+                    [*[self._get_point_coordinates(_)[0] for _ in self.geometry_list]]
                 ),
                 properties=self.properties,
             )

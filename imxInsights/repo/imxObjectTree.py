@@ -14,6 +14,7 @@ from imxInsights.repo.builders.buildOnRailConnectionGeometry import (
     add_on_rail_connection_geometry,
 )
 from imxInsights.repo.builders.buildRailConnections import build_rail_connections
+from imxInsights.repo.builders.buildSpecificGeometry import add_specific_geometry
 from imxInsights.repo.builders.extendObjects import extend_objects
 
 
@@ -116,6 +117,7 @@ class ObjectTree:
         build_rail_connections(self.get_by_types, self.find, self.build_exceptions)
         add_refs(self.tree_dict, self.find)
         add_on_rail_connection_geometry(self.tree_dict, self.find)
+        add_specific_geometry(self.tree_dict, self.find)
 
         # todo: classify area
 
