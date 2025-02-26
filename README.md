@@ -41,6 +41,8 @@
 - ✅ Color changes for better comparison 
 - ✅ Excel compare output 
 - ✅ Excel container compare chain 
+- ✅ On-Rail Geometry Constructor (RailConnectionInfo, TrackFragments, Demarcations)
+- ✅ Specific ImxObject Geometry Builder
 
 ## Open-IMX Initiative
 **imxInsights** is part of the **Open-IMX initiative**, which is dedicated to enhancing the accessibility and usability of IMX data. 
