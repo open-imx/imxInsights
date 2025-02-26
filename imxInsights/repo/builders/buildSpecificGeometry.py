@@ -1,171 +1,201 @@
 from collections import defaultdict
-from typing import Callable
+from collections.abc import Callable
 
 from loguru import logger
-from shapely import GeometryCollection, MultiLineString, MultiPoint
+from shapely import MultiLineString, MultiPoint, Point  # GeometryCollection
 
 from imxInsights.domain.imxObject import ImxObject
+
+
+def safe_find(
+    find: Callable[[str], ImxObject | None], ref: str | None
+) -> ImxObject | None:
+    if ref is None:
+        logger.warning("Received a None reference; skipping lookup.")
+        return None
+    obj = find(ref)
+    if obj is None:
+        logger.warning(f"Could not find object for reference: {ref}")
+    return obj
 
 
 def build_ppc_tracks(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version == "1.2.4":
-        imx_object.geometry = MultiPoint(
-            [
-                find(imx_object.properties["@beginDemarcatorRef"]).geometry,
-                find(imx_object.properties["@endDemarcatorRef"]).geometry,
-            ]
-        )
-    elif imx_object.imx_file.imx_version == "5.0.0":
-        imx_object.geometry = MultiPoint(
-            [
-                find(imx_object.properties["@demarcatorOneSideRef"]).geometry,
-                find(imx_object.properties["@demarcatorOtherSideRef"]).geometry,
-            ]
-        )
-    elif imx_object.imx_file.imx_version == "12.0.0":
+    version = imx_object.imx_file.imx_version
+    refs = []
+
+    if version == "1.2.4":
+        refs = [
+            imx_object.properties.get("@beginDemarcatorRef"),
+            imx_object.properties.get("@endDemarcatorRef"),
+        ]
+    elif version == "5.0.0":
+        refs = [
+            imx_object.properties.get("@demarcatorOneSideRef"),
+            imx_object.properties.get("@demarcatorOtherSideRef"),
+        ]
+    elif version == "12.0.0":
         imx_object.geometry = MultiPoint(
             [
                 ref.imx_object.geometry
                 for ref in imx_object.refs
-                if "DemarcationObject" in ref.field
+                if "DemarcationObject" in ref.field and ref.imx_object is not None
             ]
         )
+        return
     else:
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
-        )
+        logger.warning(f"{imx_object.tag} IMX {version} has no geometry builder!")
+        return
+
+    geometries = [
+        obj.geometry
+        for ref in refs
+        if (obj := safe_find(find, ref)) is not None and isinstance(obj.geometry, Point)
+    ]
+    if geometries:
+        if geometries:
+            imx_object.geometry = MultiPoint(geometries)
+        else:
+            logger.warning(
+                f"{imx_object.tag} has no valid Point geometries for MultiPoint."
+            )
+
+        imx_object.geometry = MultiPoint(geometries)
 
 
 def build_stop_connections(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version == "1.2.4":
-        # stop connection is a element of signal.
-        pass
-    elif imx_object.imx_file.imx_version in ["5.0.0", "12.0.0"]:
-        imx_object.geometry = find(imx_object.properties["@signalRef"]).geometry
+    version = imx_object.imx_file.imx_version
+    ref = imx_object.properties.get("@signalRef")
+
+    if version == "1.2.4":
+        return  # Stop connection is an element of signal.
+    elif version in ["5.0.0", "12.0.0"]:
+        if (obj := safe_find(find, ref)) is not None:
+            imx_object.geometry = obj.geometry
     else:
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
+        logger.warning(f"{imx_object.tag} IMX {version} has no geometry builder!")
+
+
+def build_generic_geometry(
+    imx_object: ImxObject, find: Callable[[str], ImxObject | None], property_key: str
+) -> None:
+    version = imx_object.imx_file.imx_version
+
+    if version in ["1.2.4", "5.0.0"]:
+        refs = imx_object.properties.get(property_key, "").split()
+        geometries = [
+            obj.geometry
+            for ref in refs
+            if (obj := safe_find(find, ref)) is not None
+            and isinstance(obj.geometry, Point)
+        ]
+        if geometries:
+            imx_object.geometry = MultiPoint(geometries)
+    elif version == "12.0.0":
+        imx_object.geometry = MultiPoint(
+            [
+                ref.imx_object.geometry
+                for ref in imx_object.refs
+                if "DemarcationObject" in ref.field and ref.imx_object is not None
+            ]
         )
+    else:
+        logger.warning(f"{imx_object.tag} IMX {version} has no geometry builder!")
 
 
 def build_track_circuit(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version in ["1.2.4", "5.0.0"]:
-        imx_object.geometry = MultiPoint(
-            [
-                find(item).geometry
-                for item in imx_object.properties["InsulatedJointRefs"].split()
-            ]
-        )
-    elif imx_object.imx_file.imx_version == "12.0.0":
-        imx_object.geometry = MultiPoint(
-            [
-                ref.imx_object.geometry
-                for ref in imx_object.refs
-                if "DemarcationObject" in ref.field
-            ]
-        )
-    else:
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
-        )
+    build_generic_geometry(imx_object, find, "InsulatedJointRefs")
 
 
 def build_axle_counter_section(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version in ["1.2.4", "5.0.0"]:
-        imx_object.geometry = MultiPoint(
-            [
-                find(item).geometry
-                for item in imx_object.properties[
-                    "AxleCounterDetectionPointRefs"
-                ].split()
-            ]
-        )
-    elif imx_object.imx_file.imx_version == "12.0.0":
-        imx_object.geometry = MultiPoint(
-            [
-                ref.imx_object.geometry
-                for ref in imx_object.refs
-                if "DemarcationObject" in ref.field
-            ]
-        )
-    else:
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
-        )
+    build_generic_geometry(imx_object, find, "AxleCounterDetectionPointRefs")
 
 
 def build_work_zones(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version in ["1.2.4", "5.0.0"]:
+    version = imx_object.imx_file.imx_version
+
+    if version in ["1.2.4", "5.0.0"]:
+        refs = imx_object.properties.get("SectionRefs", "").split()
         multipoints = [
-            find(item).geometry for item in imx_object.properties["SectionRefs"].split()
+            obj.geometry
+            for ref in refs
+            if (obj := safe_find(find, ref)) is not None
+            and isinstance(obj.geometry, Point)
         ]
-        merged_multipoint = MultiPoint([pt for mp in multipoints for pt in mp.geoms])
-        imx_object.geometry = merged_multipoint
-    elif imx_object.imx_file.imx_version == "12.0.0":
+        merged_multipoint = (
+            MultiPoint(
+                [
+                    pt
+                    for mp in multipoints
+                    for pt in (mp.geoms if isinstance(mp, MultiPoint) else [mp])
+                ]
+            )
+            if multipoints
+            else None
+        )
+        if merged_multipoint is not None:
+            imx_object.geometry = merged_multipoint
+
+    elif version == "12.0.0":
         imx_object.geometry = MultiLineString(
             [item.geometry for item in imx_object.on_rail_geometry]
         )
     else:
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
-        )
+        logger.warning(f"{imx_object.tag} IMX {version} has no geometry builder!")
 
 
 def build_temporary_shunting_areas(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
-    if imx_object.imx_file.imx_version in ["1.2.4", "5.0.0"]:
+    version = imx_object.imx_file.imx_version
+
+    if version in ["1.2.4", "5.0.0"]:
+        refs = imx_object.properties.get("DemarcationRefs", "").split()
         points = [
-            find(item).geometry
-            for item in imx_object.properties["DemarcationRefs"].split()
+            obj.geometry
+            for ref in refs
+            if (obj := safe_find(find, ref)) is not None
+            and isinstance(obj.geometry, Point)
         ]
-        imx_object.geometry = MultiPoint(points)
-    elif imx_object.imx_file.imx_version == "12.0.0":
-        logger.warning(
-            f"{imx_object.tag} IMX {imx_object.imx_file.imx_version} haz no geometry builder!"
-        )
+        if points:
+            imx_object.geometry = MultiPoint(points)
+    elif version == "12.0.0":
+        logger.warning(f"{imx_object.tag} IMX {version} has no geometry builder!")
 
 
 def add_specific_geometry(
     tree_dict: defaultdict[str, list[ImxObject]],
     find: Callable[[str], ImxObject | None],
-):
-    # TODO: CREATE GEOMETRY COLLECTION if lines and points !!!
-    # TODO: WHAT TO DO WHIT FlankProtectionConfiguration (geometry collection?
-
+) -> None:
     second_process_list = []
-    for key, imx_objects in tree_dict.items():
+    for imx_objects in tree_dict.values():
         for imx_object in imx_objects:
-            if imx_object.tag in ["PPCTrack", "PpcTrack"]:
-                build_ppc_tracks(imx_object, find)
-            elif imx_object.tag == "StopConnection":
-                build_stop_connections(imx_object, find)
-            elif imx_object.tag == "TrackCircuit":
-                build_track_circuit(imx_object, find)
-            elif imx_object.tag == "AxleCounterSection":
-                build_axle_counter_section(imx_object, find)
-
-            elif imx_object.tag == "Workzone":
-                second_process_list.append(imx_object)
-            elif imx_object.tag == "TemporaryShuntingArea":
-                second_process_list.append(imx_object)
-
-            else:
-                if imx_object.geometry is None:
-                    logger.warning(f"{imx_object.tag} haz no geometry builder!")
+            match imx_object.tag:
+                case "PPCTrack" | "PpcTrack":
+                    build_ppc_tracks(imx_object, find)
+                case "StopConnection":
+                    build_stop_connections(imx_object, find)
+                case "TrackCircuit":
+                    build_track_circuit(imx_object, find)
+                case "AxleCounterSection":
+                    build_axle_counter_section(imx_object, find)
+                case "Workzone" | "TemporaryShuntingArea":
+                    second_process_list.append(imx_object)
+                case _ if imx_object.geometry is None:
+                    logger.warning(f"{imx_object.tag} has no geometry builder!")
 
     for imx_object in second_process_list:
-        if imx_object.tag == "Workzone":
-            build_work_zones(imx_object, find)
-        elif imx_object.tag == "TemporaryShuntingArea":
-            build_temporary_shunting_areas(imx_object, find)
+        match imx_object.tag:
+            case "Workzone":
+                build_work_zones(imx_object, find)
+            case "TemporaryShuntingArea":
+                build_temporary_shunting_areas(imx_object, find)
