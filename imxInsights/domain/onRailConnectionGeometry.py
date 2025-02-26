@@ -12,6 +12,8 @@ from imxInsights.utils.shapely.shapley_helpers import (
 )
 
 
+# TODO: remove exceptions!
+
 class RailConnectionInfoException(Exception):
     """Something is wrong shit the railConnectionInfo"""
 
@@ -92,7 +94,6 @@ class RailConnectionProfile:
             raise RailConnectionInfoException(
                 "RailConnection geometry is not a Linestring"
             )
-
         self.geometry = cut_profile(
             self._rail_connection.geometry, self.from_measure, self.to_measure
         )
