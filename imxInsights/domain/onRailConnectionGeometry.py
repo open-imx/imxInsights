@@ -11,8 +11,8 @@ from imxInsights.utils.shapely.shapley_helpers import (
     reverse_line,
 )
 
-
 # TODO: remove exceptions!
+
 
 class RailConnectionInfoException(Exception):
     """Something is wrong shit the railConnectionInfo"""

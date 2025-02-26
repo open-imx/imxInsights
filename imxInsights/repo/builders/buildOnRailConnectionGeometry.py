@@ -43,11 +43,17 @@ def process_on_rail_connection_geometry(
         from_measure = rail_con_info.get("fromMeasure", None)
         to_measure = rail_con_info.get("toMeasure", None)
 
-        if at_measure is not None and (from_measure is not None or to_measure is not None):
-            raise ValueError("If 'atMeasure' is present, 'fromMeasure' and 'toMeasure' must not be present.")
+        if at_measure is not None and (
+            from_measure is not None or to_measure is not None
+        ):
+            raise ValueError(
+                "If 'atMeasure' is present, 'fromMeasure' and 'toMeasure' must not be present."
+            )
 
         if at_measure is None and (from_measure is None or to_measure is None):
-            raise ValueError("If 'atMeasure' is not present, both 'fromMeasure' and 'toMeasure' must be present.")
+            raise ValueError(
+                "If 'atMeasure' is not present, both 'fromMeasure' and 'toMeasure' must be present."
+            )
 
         if at_measure:
             imx_object.on_rail_geometry.append(
@@ -67,10 +73,14 @@ def create_rail_connection_info_geometry(
         for imx_object in imx_objects:
             try:
                 process_on_rail_connection_geometry(
-                    imx_object, find, "{http://www.prorail.nl/IMSpoor}RailConnectionInfo"
+                    imx_object,
+                    find,
+                    "{http://www.prorail.nl/IMSpoor}RailConnectionInfo",
                 )
             except ValueError as e:
-                logger.error(f"{imx_object.puic} ({imx_object.tag}) cant create railConnectionInfo geometry {e}")
+                logger.error(
+                    f"{imx_object.puic} ({imx_object.tag}) cant create railConnectionInfo geometry {e}"
+                )
 
 
 def create_track_fragment_geometry(
@@ -84,7 +94,9 @@ def create_track_fragment_geometry(
                     imx_object, find, "{http://www.prorail.nl/IMSpoor}TrackFragment"
                 )
             except ValueError as e:
-                logger.error(f"{imx_object.puic} ({imx_object.tag}) cant create TrackFragment geometry {e}")
+                logger.error(
+                    f"{imx_object.puic} ({imx_object.tag}) cant create TrackFragment geometry {e}"
+                )
 
 
 def create_demarcation_geometry(
@@ -98,7 +110,9 @@ def create_demarcation_geometry(
                     imx_object, find, "{http://www.prorail.nl/IMSpoor}DemarcationMarker"
                 )
             except ValueError as e:
-                logger.error(f"{imx_object.puic} ({imx_object.tag}) cant create DemarcationMarker geometry {e}")
+                logger.error(
+                    f"{imx_object.puic} ({imx_object.tag}) cant create DemarcationMarker geometry {e}"
+                )
 
 
 def add_on_rail_connection_geometry(

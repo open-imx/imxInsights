@@ -230,7 +230,9 @@ class ImxContainerCompare:
         if object_paths:
             features = []
             for item in self.compared_objects:
-                if (item.t1 and item.t1.path in object_paths) or (item.t2 and item.t2.path in object_paths):
+                if (item.t1 and item.t1.path in object_paths) or (
+                    item.t2 and item.t2.path in object_paths
+                ):
                     features.append(item.as_geojson_feature(as_wgs=to_wgs))
 
         else:

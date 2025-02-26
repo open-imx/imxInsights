@@ -99,7 +99,9 @@ def get_azimuth_from_points(point1: Point, point2: Point) -> float:
 def line_length_3d(line: LineString) -> float:
     coords = np.array(line.coords)
     diffs = np.diff(coords, axis=0)  # Compute differences between consecutive points
-    segment_lengths = np.linalg.norm(diffs, axis=1)  # Compute Euclidean distance for each segment
+    segment_lengths = np.linalg.norm(
+        diffs, axis=1
+    )  # Compute Euclidean distance for each segment
     return segment_lengths.sum()
 
 
