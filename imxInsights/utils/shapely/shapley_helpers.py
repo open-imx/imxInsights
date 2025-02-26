@@ -96,13 +96,19 @@ def get_azimuth_from_points(point1: Point, point2: Point) -> float:
     return float(np.degrees(angle)) if angle >= 0 else float(np.degrees(angle) + 360)
 
 
-def cut_profile(line: LineString, measure_from: float, measure_to: float) -> LineString:
+def line_length_3d(line: LineString) -> float:
+    coords = np.array(line.coords)
+    diffs = np.diff(coords, axis=0)  # Compute differences between consecutive points
+    segment_lengths = np.linalg.norm(diffs, axis=1)  # Compute Euclidean distance for each segment
+    return segment_lengths.sum()
 
-    line_length = line.length
+
+def cut_profile(line: LineString, measure_from: float, measure_to: float) -> LineString:
+    line_3d_length = line_length_3d(line) + 0.0015
 
     if measure_from < 0 or measure_to < 0:
         raise ValueError("Measure values cannot be negative.")
-    elif measure_from > line_length or measure_to > line_length:
+    elif measure_from > line_3d_length or measure_to > line_3d_length:
         raise ValueError("Measure values cannot exceed the line length.")
     elif measure_from == measure_to:
         raise ValueError("Measure values cannot be equal.")
