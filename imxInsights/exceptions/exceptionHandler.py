@@ -29,7 +29,10 @@ class ExceptionHandler:
     ) -> None:
         self.log_file = log_file
         self.log_lvl: ErrorLevelEnum = lvl
-        logger.add(log_file, rotation=self.LOG_ROTATION_SIZE, level=lvl.value)
+        try:
+            logger.add(log_file, rotation=self.LOG_ROTATION_SIZE, level=lvl.value)
+        except (PermissionError, OSError):
+            logger.warning(f"Could not write to {log_file}, falling back to console logging.")
 
     @staticmethod
     def handle_exception(
