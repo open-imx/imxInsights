@@ -76,6 +76,16 @@ class ChangedImxObject:
             return ChangeStatusEnum.CHANGED
 
     def _initialize_geometry(self) -> GeometryChange | None:
+        if any(
+            obj
+            and isinstance(
+                obj.geometry,
+                MultiPoint | MultiPolygon | MultiLineString | GeometryCollection,
+            )
+            for obj in (self.t1, self.t2)
+        ):
+            return GeometryChange(t1=None, t2=None)
+
         return GeometryChange(
             t1=self.t1.geometry if self.t1 else None,
             t2=self.t2.geometry if self.t2 else None,

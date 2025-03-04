@@ -117,6 +117,8 @@ def cut_profile(line: LineString, measure_from: float, measure_to: float) -> Lin
         measure_from, measure_to = measure_to, measure_from
 
     result = substring(line, measure_from, measure_to, normalized=False)
-    if isinstance(result, Point):
+    if isinstance(
+        result, Point
+    ):  # no need, cant return point by raising error on equal.. but he typing
         raise TypeError("line cut results in a Point.")
     return result

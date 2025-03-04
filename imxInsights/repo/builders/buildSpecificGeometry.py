@@ -2,7 +2,7 @@ from collections import defaultdict
 from collections.abc import Callable
 
 from loguru import logger
-from shapely import MultiLineString, MultiPoint, Point  # GeometryCollection
+from shapely import GeometryCollection, MultiLineString, MultiPoint, Point
 
 from imxInsights.domain.imxObject import ImxObject
 
@@ -23,7 +23,6 @@ def build_ppc_tracks(
     imx_object: ImxObject, find: Callable[[str], ImxObject | None]
 ) -> None:
     version = imx_object.imx_file.imx_version
-    refs = []
 
     if version == "1.2.4":
         refs = [
@@ -190,6 +189,10 @@ def add_specific_geometry(
                     build_axle_counter_section(imx_object, find)
                 case "Workzone" | "TemporaryShuntingArea":
                     second_process_list.append(imx_object)
+                case "CbgDepartureTrack":
+                    # TODO: How to handle geometry collections....
+                    pass
+
                 case _ if imx_object.geometry is None:
                     logger.warning(f"{imx_object.tag} has no geometry builder!")
 

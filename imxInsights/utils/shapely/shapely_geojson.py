@@ -54,6 +54,10 @@ class ShapelyGeoJsonFeature:
                     self._geometry_list.append(geom)
                 elif isinstance(geom, MultiPoint | MultiLineString):
                     self._geometry_list.extend([point for point in geom.geoms])
+
+                elif isinstance(geom, GeometryCollection):
+                    raise NotImplementedError()
+
                 else:
                     raise ValueError("geometry is not a shapley geometry")  # NOQA TRY004 TRY003
 
