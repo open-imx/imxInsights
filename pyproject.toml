@@ -44,6 +44,7 @@ dependencies = [
     "pre-commit",
     "filelock",
     "distlib",
+    "zizmor",
 ]
 
 [[tool.hatch.envs.test.matrix]]
