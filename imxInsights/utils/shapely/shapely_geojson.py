@@ -1,6 +1,7 @@
 from enum import Enum
 from pathlib import Path
 
+import geojson as geojson_dependency
 from geojson import Feature as GeoJsonFeature
 from geojson import FeatureCollection as GeoJsonFeatureCollection
 from geojson import GeometryCollection as GeoJsonGeometryCollection
@@ -21,6 +22,8 @@ from shapely.geometry import (
     Point,
     Polygon,
 )
+
+geojson_dependency.geometry.DEFAULT_PRECISION = 5
 
 
 class ShapelyGeoJsonFeature:
