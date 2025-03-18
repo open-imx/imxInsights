@@ -221,9 +221,3 @@ class ManifestBuilder:
             out_path: Output path for the manifest XML file.
         """
         zip_folder(self.folder_path, Path(out_path))
-
-
-if __name__ == "__main__":
-    tester = ManifestBuilder(r"C:\repos\imxInsights\klad\edl_km")
-    tester.create_manifest(r"C:\repos\imxInsights\klad\edl_km\manifest.xml")
-    tester.to_zip(r"C:\repos\imxInsights\klad\edl_km\imx_container.zip")
