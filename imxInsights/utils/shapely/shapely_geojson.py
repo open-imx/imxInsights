@@ -23,7 +23,7 @@ from shapely.geometry import (
     Polygon,
 )
 
-geojson_dependency.geometry.DEFAULT_PRECISION = 5
+geojson_dependency.geometry.DEFAULT_PRECISION = 16
 
 
 class ShapelyGeoJsonFeature:
