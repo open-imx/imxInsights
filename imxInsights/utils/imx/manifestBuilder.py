@@ -99,7 +99,8 @@ class ManifestBuilder:
     def _parse_xml(self, file: Path) -> str | None:
         """Parses XML and extracts the root tag safely."""
         try:
-            return f"{etree.parse(file).getroot().tag!r}"
+            tag = etree.parse(file).getroot().tag
+            return str(tag)
         except etree.XMLSyntaxError:
             logger.error(f"Invalid XML: {file}")
             return None
@@ -187,7 +188,12 @@ class ManifestBuilder:
                 and "-old" not in item.file.name
             ):
                 petal_element = etree.SubElement(
-                    im_spoor_list, "ImSpoorData", attrib=attributes
+                    im_spoor_list,
+                    "ImSpoorData",
+                    attrib={
+                        "fileName": attributes["fileName"],
+                        "hash": attributes["hash"],
+                    },
                 )
                 if item.file_type != FileType.CORE:
                     if item.parent_document_name != (
