@@ -188,7 +188,12 @@ class ManifestBuilder:
                 and "-old" not in item.file.name
             ):
                 petal_element = etree.SubElement(
-                    im_spoor_list, "ImSpoorData", attrib={"fileName": attributes["fileName"], "hash": attributes["hash"]}
+                    im_spoor_list,
+                    "ImSpoorData",
+                    attrib={
+                        "fileName": attributes["fileName"],
+                        "hash": attributes["hash"],
+                    },
                 )
                 if item.file_type != FileType.CORE:
                     if item.parent_document_name != (
