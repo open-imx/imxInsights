@@ -27,6 +27,7 @@ class ManifestFile:
         file_type: Type of file.
         parent_document_name: Name of the parent document (if applicable).
         parent_hash_code: Hash of the parent document (if applicable).
+        full_path_as_filename: Optionally stores the relative path from input folder.
     """
 
     file: Path
@@ -34,6 +35,15 @@ class ManifestFile:
     file_type: FileType
     parent_document_name: str | None = None
     parent_hash_code: str | None = None
+    full_path_as_filename: bool = False  # Flag to toggle full path in filename
+
+    def get_filename(self, input_folder: Path):
+        """Returns the file name or relative path from input folder as the filename."""
+        if self.full_path_as_filename:
+            return str(
+                self.file.relative_to(input_folder)
+            )  # Get relative path from input_folder
+        return self.file.name  # Just return the file name
 
 
 class ManifestBuilder:
@@ -99,8 +109,7 @@ class ManifestBuilder:
     def _parse_xml(self, file: Path) -> str | None:
         """Parses XML and extracts the root tag safely."""
         try:
-            tag = etree.parse(file).getroot().tag
-            return str(tag)
+            return str(etree.parse(file).getroot().tag)
         except etree.XMLSyntaxError:
             logger.error(f"Invalid XML: {file}")
             return None
@@ -126,37 +135,60 @@ class ManifestBuilder:
                 "Extensions",
             ]
         }
-
+        manifest_tag = f"{{{self.NAMESPACE}}}Manifest"
         files = []
         core_file, core_hash = None, None
 
-        for file in self.folder_path.iterdir():
-            if not file.is_file():
-                continue
+        def crawl_directory(directory: Path):
+            """Recursively crawl through all directories and treat nested files as media."""
+            nonlocal files, core_file, core_hash
 
-            file_hash = hash_sha256(file)
-            file_type, parent_name, parent_hash = FileType.MEDIA, None, None
+            for file in directory.iterdir():
+                if file.is_dir():
+                    # If it's a directory, treat all files inside as media
+                    crawl_directory(file)  # Recurse into subdirectories
+                    continue
 
-            if file.suffix.lower() == ".xml":
-                root_tag = self._parse_xml(file)
-                if root_tag:
-                    if root_tag == core_file_tag:
-                        core_file, core_hash = file, file_hash
-                        file_type = FileType.CORE
-                    elif root_tag in petal_tags:
-                        tree = etree.parse(file)
-                        base_ref = tree.find(f"*{{{self.NAMESPACE}}}BaseReference")
-                        parent_name = (
-                            base_ref.get("parentDocumentName") if base_ref else None
-                        )
-                        parent_hash = (
-                            base_ref.get("parentHashcode") if base_ref else None
-                        )
-                        file_type = FileType.PETAL
+                file_hash = hash_sha256(file)
+                file_type, parent_name, parent_hash = FileType.MEDIA, None, None
 
-            files.append(
-                ManifestFile(file, file_hash, file_type, parent_name, parent_hash)
-            )
+                if file.suffix.lower() == ".xml":
+                    root_tag = self._parse_xml(file)
+
+                    if root_tag:
+                        if manifest_tag == root_tag:
+                            continue
+                        elif root_tag == core_file_tag:
+                            core_file, core_hash = file, file_hash
+                            file_type = FileType.CORE
+                        elif root_tag in petal_tags:
+                            tree = etree.parse(file)
+                            base_ref = tree.find(f"*{{{self.NAMESPACE}}}BaseReference")
+                            parent_name = (
+                                base_ref.get("parentDocumentName")
+                                if base_ref is not None and len(base_ref) == 1
+                                else None
+                            )
+                            parent_hash = (
+                                base_ref.get("parentHashcode")
+                                if base_ref is not None and len(base_ref) == 1
+                                else None
+                            )
+                            file_type = FileType.PETAL
+
+                files.append(
+                    ManifestFile(
+                        file,
+                        file_hash,
+                        file_type,
+                        parent_name,
+                        parent_hash,
+                        full_path_as_filename=True,
+                    )
+                )
+
+        # Start crawling the folder
+        crawl_directory(self.folder_path)
 
         return files, core_hash, core_file
 
@@ -178,7 +210,9 @@ class ManifestBuilder:
 
         for item in file_list:
             attributes = {
-                "fileName": item.file.name,
+                "fileName": item.get_filename(
+                    self.folder_path
+                ),  # Use relative path or filename
                 "mediaType": get_http_content_type(item.file.name),
                 "hash": item.hash,
             }
@@ -188,12 +222,7 @@ class ManifestBuilder:
                 and "-old" not in item.file.name
             ):
                 petal_element = etree.SubElement(
-                    im_spoor_list,
-                    "ImSpoorData",
-                    attrib={
-                        "fileName": attributes["fileName"],
-                        "hash": attributes["hash"],
-                    },
+                    im_spoor_list, "ImSpoorData", attrib=attributes
                 )
                 if item.file_type != FileType.CORE:
                     if item.parent_document_name != (

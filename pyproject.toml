@@ -132,7 +132,8 @@ ignore_missing_imports = true
 omit = [
     "*/utils/version_check.py",
     "*/*Protocol.py",
-    "*/utils/imx/manifestBuilder.py"
+    "*/utils/imx/manifestBuilder.py",
+    "*/utils/imx/createFlankProtectionTable.py"
 
 ]
 [tool.coverage.report]
