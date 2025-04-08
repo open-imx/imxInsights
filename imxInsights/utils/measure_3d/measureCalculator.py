@@ -2,7 +2,10 @@ import numpy as np
 from numpy.typing import NDArray
 from shapely import LineString, Point
 
-from imxInsights.utils.measure_3d.measureEnums import ProjectionPointPosition, ProjectionStatus
+from imxInsights.utils.measure_3d.measureEnums import (
+    ProjectionPointPosition,
+    ProjectionStatus,
+)
 from imxInsights.utils.measure_3d.measureResult import MeasureResult
 
 
@@ -93,7 +96,6 @@ class MeasureLine:
     def project(
         self, point: list[float] | NDArray[np.float64] | Point
     ) -> MeasureResult:
-
         # TODO: if not 3d we should only have input 3d if 3d!
         # TODO: add threshold_distance option
 
@@ -157,7 +159,6 @@ class MeasureLine:
         return point
 
     def _shapely_projection(self, point: np.ndarray) -> tuple[Point, float, Point]:
-
         # we should make the point 2d before projection
         input_point_shapely_2d = Point(float(point[0]), float(point[1]))
         # measures in shapely are in 2d, in most GIS applications the z is 'along the ride'
@@ -303,4 +304,3 @@ class MeasureLine:
         # Check for orthogonality using the dot product.
         dot_product = np.dot(seg_unit, pt_vec)
         return abs(dot_product) < tol
-

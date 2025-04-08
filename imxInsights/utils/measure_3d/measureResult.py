@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
-from shapely import Point, LineString
+from shapely import LineString, Point
 
-from imxInsights.utils.measure_3d.measureEnums import ProjectionPointPosition, ProjectionStatus
+from imxInsights.utils.measure_3d.measureEnums import (
+    ProjectionPointPosition,
+    ProjectionStatus,
+)
 from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeature
 
 
