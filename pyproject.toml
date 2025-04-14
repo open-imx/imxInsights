@@ -106,6 +106,8 @@ dependencies = [
     "pandas",
     "pandas-stubs",
     "xlsxwriter",
+    "openpyxl",
+    "types-openpyxl",
     "networkx",
     "types-networkx",
     "dateparser",
