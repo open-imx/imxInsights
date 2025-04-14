@@ -122,8 +122,8 @@ def create_measure_check_excel(situation: ImxSituationProtocol | ImxContainer):
                 try:
                     if cell.value:
                         max_length = max(max_length, len(str(cell.value)))
-                except:
-                    pass
+                except Exception as e:
+                    print(f"Auto-adjust column widths failed {e}")
             adjusted_width = max_length + 2
             worksheet.column_dimensions[
                 get_column_letter(column)
@@ -134,7 +134,6 @@ def create_measure_check_excel(situation: ImxSituationProtocol | ImxContainer):
 
 
 if __name__ == "__main__":
-    # your existing code
     imx = ImxSingleFile("PathToImx")
     if imx.new_situation:
         create_measure_check_excel(imx.new_situation)
