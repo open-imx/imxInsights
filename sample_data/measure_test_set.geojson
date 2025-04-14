@@ -1,0 +1,45 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "description": "test simple line, center projection on line",
+        "projection_line": [
+          [0, 0, 0],
+          [10, 0, 0]
+        ],
+        "result_point": "POINT Z (5 0 0)",
+        "result_measure_3d": "5.0",
+        "result_measure_2d": "5.0",
+        "ProjectionPointPosition": "ProjectionPointPosition.ON_LINE",
+        "ProjectionStatus": "ProjectionStatus.PERPENDICULAR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5, 0, 0]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "description": "test simple line z up, center projection on line",
+        "projection_line": [
+          [0, 0, 0],
+          [10, 0, 2]
+        ],
+        "result_point": "POINT Z (5 0 1)",
+        "result_measure_3d": "5.0990195135927845",
+        "result_measure_2d": "5.0",
+        "ProjectionPointPosition": "ProjectionPointPosition.ON_LINE",
+        "ProjectionStatus": "ProjectionStatus.PERPENDICULAR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5, 0, 0]
+      }
+    }
+
+  ]
+}
