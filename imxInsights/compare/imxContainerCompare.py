@@ -15,11 +15,12 @@ from imxInsights.utils.pandas_helpers import (
     styler_highlight_changes,
 )
 from imxInsights.utils.report_helpers import (
+    REVIEW_STYLES,
     app_info_df,
     clean_diff_df,
     shorten_sheet_name,
     upper_keys_with_index,
-    write_df_to_sheet, REVIEW_STYLES,
+    write_df_to_sheet,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
