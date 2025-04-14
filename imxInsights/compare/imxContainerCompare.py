@@ -19,7 +19,7 @@ from imxInsights.utils.report_helpers import (
     clean_diff_df,
     shorten_sheet_name,
     upper_keys_with_index,
-    write_df_to_sheet,
+    write_df_to_sheet, REVIEW_STYLES,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
@@ -390,17 +390,7 @@ class ImxContainerCompare:
         if add_review_styles:
             wb = load_workbook(file_name)
 
-            styles = {
-                "OK": "80D462",
-                "OK met opm": "66FF99",
-                "NOK": "FF9999",
-                "VRAAG": "F1F98F",
-                "Bestaande fout": "FFCC66",
-                "Aannemelijk": "E4DFEC",
-                "TODO": "F2CEEF",
-            }
-
-            for name, color in styles.items():
+            for name, color in REVIEW_STYLES.items():
                 style = NamedStyle(
                     name=name,
                     fill=PatternFill(

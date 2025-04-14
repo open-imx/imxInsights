@@ -110,3 +110,14 @@ def write_df_to_sheet(
         num_cols = len(data.columns) - 1
         worksheet.autofilter(0, 0, 0, num_cols)
     return worksheet
+
+
+REVIEW_STYLES = {
+    "OK": "80D462",
+    "OK met opm": "66FF99",
+    "NOK": "FF9999",
+    "VRAAG": "F1F98F",
+    "Bestaande fout": "FFCC66",
+    "Aannemelijk": "E4DFEC",
+    "TODO": "F2CEEF",
+}
