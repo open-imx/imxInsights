@@ -1,8 +1,12 @@
 import re
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 from loguru import logger
+from openpyxl import load_workbook
+from openpyxl.styles import NamedStyle, PatternFill
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
@@ -12,6 +16,8 @@ from imxInsights.utils.pandas_helpers import (
     styler_highlight_changes,
 )
 from imxInsights.utils.report_helpers import (
+    REVIEW_STYLES,
+    app_info_df,
     clean_diff_df,
     shorten_sheet_name,
     upper_keys_with_index,
@@ -21,6 +27,14 @@ from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeatureCollection,
 )
+
+
+@dataclass
+class CompareContainerInfo:
+    file_name: str
+    file_hash: str
+    imx_version: str
+    container_type: str
 
 
 class ImxContainerCompare:
@@ -53,8 +67,18 @@ class ImxContainerCompare:
         self._repo = repo
         self.container_id_1 = container_id_1
         self.container_id_2 = container_id_2
+        self._imx_info: dict[str, CompareContainerInfo] = {}
         self.object_paths = object_paths
         self.compared_objects: list[ChangedImxObject] = self._get_compared_objects()
+
+    def _set_container_info(self, container_id, t):
+        if container_id not in self._imx_info and t:
+            self._imx_info[container_id] = CompareContainerInfo(
+                t.imx_file.path.name,
+                t.imx_file.file_hash,
+                t.imx_file.imx_version,
+                t.imx_situation or "container",
+            )
 
     def _get_compared_objects(self) -> list[ChangedImxObject]:
         compared_objects = []
@@ -68,6 +92,9 @@ class ImxContainerCompare:
         for multi_object in repo_objects:
             t1 = multi_object.get_by_container_id(self.container_id_1)
             t2 = multi_object.get_by_container_id(self.container_id_2)
+
+            self._set_container_info(self.container_id_1, t1)
+            self._set_container_info(self.container_id_2, t2)
 
             if t1 or t2:
                 compare = ChangedImxObject(t1=t1, t2=t2)
@@ -281,16 +308,30 @@ class ImxContainerCompare:
 
         logger.success("creating change excel file finished")
 
+    @staticmethod
+    def _get_imx_details(info, container_id, prefix):
+        return {
+            f"{prefix}_file_path": info[container_id].file_name,
+            f"{prefix}_file_hash": info[container_id].file_hash,
+            f"{prefix}_file_version": info[container_id].imx_version,
+            f"{prefix}_file_situation": info[container_id].container_type,
+        }
+
     def to_excel(
-        self, file_name: str | Path, add_analyse: bool = True, styled_df: bool = True
+        self,
+        file_name: str | Path,
+        add_analyse: bool = True,
+        styled_df: bool = True,
+        add_review_styles: bool = True,
     ) -> None:
         """
         Exports the overview and detailed changes to an Excel file.
 
         Args:
-            file_name (str | Path): The name or path of the Excel file to create.
-            add_analyse (bool): Whether to add analysis to the Excel output.
-            styled_df (bool): Whether to apply styling to highlight changes.
+            file_name: The name or path of the Excel file to create.
+            add_analyse: Whether to add analysis to the Excel output.
+            styled_df: Whether to apply styling to highlight changes.
+            add_review_styles: Whether to add review styles to the workbook.
         """
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
@@ -305,7 +346,34 @@ class ImxContainerCompare:
         diff_dict = dict(sorted(diff_dict.items()))
         diff_dict = upper_keys_with_index(diff_dict)
 
+        overview_df = pd.concat([styler.data for styler in diff_dict.values()], axis=0)
+        columns_to_keep = [
+            "@puic",
+            "path",
+            "tag",
+            "parent",
+            "@name",
+            "status",
+            "geometry_status",
+            "Location.GeographicLocation.@accuracy",
+            "Location.GeographicLocation.@dataAcquisitionMethod",
+            "Metadata.@isInService",
+            "Metadata.@lifeCycleStatus",
+            "Metadata.@source",
+        ]
+        diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
+
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
+            process_data = {
+                "Diff Report": "",
+                "Run Date": datetime.now().isoformat(),
+                "": "",
+                **self._get_imx_details(self._imx_info, self.container_id_1, "T1"),
+                **self._get_imx_details(self._imx_info, self.container_id_2, "T2"),
+            }
+            inf_df = app_info_df(process_data)
+            write_df_to_sheet(writer, "info", inf_df, header=False, auto_filter=False)
+
             for key, df in diff_dict.items():
                 if len(df.columns) == 0:
                     continue
@@ -326,5 +394,20 @@ class ImxContainerCompare:
 
                 except Exception as e:
                     logger.error(f"Error writing sheet {sheet_name}: {e}")
+
+        if add_review_styles:
+            wb = load_workbook(file_name)
+
+            for name, color in REVIEW_STYLES.items():
+                style = NamedStyle(
+                    name=name,
+                    fill=PatternFill(
+                        start_color=color, end_color=color, fill_type="solid"
+                    ),
+                )
+                if name not in wb.named_styles:
+                    wb.add_named_style(style)
+
+            wb.save(file_name)
 
         logger.success("creating change excel file finished")
