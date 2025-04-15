@@ -71,7 +71,7 @@ class ImxContainerCompare:
         self.object_paths = object_paths
         self.compared_objects: list[ChangedImxObject] = self._get_compared_objects()
 
-    def _set_container_info_if_missing(self, container_id, t):
+    def _set_container_info(self, container_id, t):
         if container_id not in self._imx_info and t:
             self._imx_info[container_id] = CompareContainerInfo(
                 t.imx_file.path.name,
@@ -93,8 +93,8 @@ class ImxContainerCompare:
             t1 = multi_object.get_by_container_id(self.container_id_1)
             t2 = multi_object.get_by_container_id(self.container_id_2)
 
-            self._set_container_info_if_missing(self.container_id_1, t1)
-            self._set_container_info_if_missing(self.container_id_2, t2)
+            self._set_container_info(self.container_id_1, t1)
+            self._set_container_info(self.container_id_2, t2)
 
             if t1 or t2:
                 compare = ChangedImxObject(t1=t1, t2=t2)
