@@ -364,7 +364,6 @@ class ImxContainerCompare:
         diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
 
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
-
             process_data = {
                 "Diff Report": "",
                 "Run Date": datetime.now().isoformat(),
