@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +27,14 @@ from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeatureCollection,
 )
+
+
+@dataclass
+class CompareContainerInfo:
+    file_name: str
+    file_hash: str
+    imx_version: str
+    container_type: str
 
 
 class ImxContainerCompare:
@@ -58,9 +67,18 @@ class ImxContainerCompare:
         self._repo = repo
         self.container_id_1 = container_id_1
         self.container_id_2 = container_id_2
-        self._imx_info: dict[str, list[str]] = {}
+        self._imx_info: dict[str, CompareContainerInfo] = {}
         self.object_paths = object_paths
         self.compared_objects: list[ChangedImxObject] = self._get_compared_objects()
+
+    def _set_container_info_if_missing(self, container_id, t):
+        if container_id not in self._imx_info and t:
+            self._imx_info[container_id] = CompareContainerInfo(
+                t.imx_file.path.name,
+                t.imx_file.file_hash,
+                t.imx_file.imx_version,
+                t.imx_situation or "container",
+            )
 
     def _get_compared_objects(self) -> list[ChangedImxObject]:
         compared_objects = []
@@ -75,22 +93,8 @@ class ImxContainerCompare:
             t1 = multi_object.get_by_container_id(self.container_id_1)
             t2 = multi_object.get_by_container_id(self.container_id_2)
 
-            if self.container_id_1 not in self._imx_info.keys():
-                if t1:
-                    self._imx_info[self.container_id_1] = [
-                        f"{t1.imx_file.path.name}",
-                        t1.imx_file.file_hash,
-                        t1.imx_file.imx_version,
-                        t1.imx_situation if t1.imx_situation else "container",
-                    ]
-            if self.container_id_2 not in self._imx_info.keys():
-                if t2:
-                    self._imx_info[self.container_id_2] = [
-                        f"{t2.imx_file.path.name}",
-                        t2.imx_file.file_hash,
-                        t2.imx_file.imx_version,
-                        t2.imx_situation if t2.imx_situation else "container",
-                    ]
+            self._set_container_info_if_missing(self.container_id_1, t1)
+            self._set_container_info_if_missing(self.container_id_2, t2)
 
             if t1 or t2:
                 compare = ChangedImxObject(t1=t1, t2=t2)
@@ -304,6 +308,15 @@ class ImxContainerCompare:
 
         logger.success("creating change excel file finished")
 
+    @staticmethod
+    def _get_imx_details(info, container_id, prefix):
+        return {
+            f"{prefix}_file_path": info[container_id].file_name,
+            f"{prefix}_file_hash": info[container_id].file_hash,
+            f"{prefix}_file_version": info[container_id].imx_version,
+            f"{prefix}_file_situation": info[container_id].container_type,
+        }
+
     def to_excel(
         self,
         file_name: str | Path,
@@ -351,18 +364,13 @@ class ImxContainerCompare:
         diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
 
         with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
+
             process_data = {
                 "Diff Report": "",
-                "Run Date": f"{datetime.now()}",
+                "Run Date": datetime.now().isoformat(),
                 "": "",
-                "T1_file_path": f"{self._imx_info[self.container_id_1][0]}",
-                "T1_file_hash": f"{self._imx_info[self.container_id_1][1]}",
-                "T1_file_version": f"{self._imx_info[self.container_id_1][2]}",
-                "T1_file_situation": f"{self._imx_info[self.container_id_1][3]}",
-                "T2_file_path": f"{self._imx_info[self.container_id_2][0]}",
-                "T2_file_hash": f"{self._imx_info[self.container_id_2][1]}",
-                "T2_file_version": f"{self._imx_info[self.container_id_2][2]}",
-                "T2_file_situation": f"{self._imx_info[self.container_id_2][3]}",
+                **self._get_imx_details(self._imx_info, self.container_id_1, "T1"),
+                **self._get_imx_details(self._imx_info, self.container_id_2, "T2"),
             }
             inf_df = app_info_df(process_data)
             write_df_to_sheet(writer, "info", inf_df, header=False, auto_filter=False)
