@@ -5,8 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 from loguru import logger
-from openpyxl import load_workbook
-from openpyxl.styles import NamedStyle, PatternFill
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
@@ -16,7 +14,7 @@ from imxInsights.utils.pandas_helpers import (
     styler_highlight_changes,
 )
 from imxInsights.utils.report_helpers import (
-    REVIEW_STYLES,
+    add_review_styles_to_excel,
     app_info_df,
     clean_diff_df,
     shorten_sheet_name,
@@ -396,18 +394,6 @@ class ImxContainerCompare:
                     logger.error(f"Error writing sheet {sheet_name}: {e}")
 
         if add_review_styles:
-            wb = load_workbook(file_name)
-
-            for name, color in REVIEW_STYLES.items():
-                style = NamedStyle(
-                    name=name,
-                    fill=PatternFill(
-                        start_color=color, end_color=color, fill_type="solid"
-                    ),
-                )
-                if name not in wb.named_styles:
-                    wb.add_named_style(style)
-
-            wb.save(file_name)
+            add_review_styles_to_excel(file_name)
 
         logger.success("creating change excel file finished")

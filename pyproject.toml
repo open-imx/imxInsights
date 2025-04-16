@@ -135,8 +135,9 @@ omit = [
     "*/utils/version_check.py",
     "*/*Protocol.py",
     "*/utils/imx/manifestBuilder.py",
-    "*/utils/imx/createFlankProtectionTable.py"
-
+    "*/utils/imx/create_flank_protection_table.py",
+    "*/utils/imx/calculate_measures.py",
+    "*/utils/imx/excel_comments.py"
 ]
 [tool.coverage.report]
 exclude_also = [
