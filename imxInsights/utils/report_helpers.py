@@ -1,7 +1,14 @@
 import importlib.metadata
+import os
+import tempfile
+import xml.etree.ElementTree as ET
+import zipfile
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.styles import NamedStyle, PatternFill
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
@@ -121,3 +128,56 @@ REVIEW_STYLES = {
     "Aannemelijk": "E4DFEC",
     "TODO": "F2CEEF",
 }
+
+
+def add_review_styles_to_excel(file_name: str | Path) -> None:
+    if isinstance(file_name, Path):
+        file_name = f"{file_name}"
+
+    wb = load_workbook(file_name)
+
+    for name, color in REVIEW_STYLES.items():
+        style = NamedStyle(name=name)
+        style.fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+        if name not in wb.named_styles:
+            wb.add_named_style(style)
+
+    temp_file_name = tempfile.mktemp(suffix=".xlsx")
+    wb.save(temp_file_name)
+
+    with zipfile.ZipFile(temp_file_name, "r") as zip_in:
+        with zipfile.ZipFile(file_name, "w") as zip_out:
+            for item in zip_in.infolist():
+                data = zip_in.read(item.filename)
+                if item.filename == "xl/styles.xml":
+                    tree = ET.fromstring(data)
+                    ns = {
+                        "ns": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+                    }
+
+                    idx_to_set = []
+                    for idx, cell_style in enumerate(
+                        tree.findall(".//ns:cellStyle", ns)
+                    ):
+                        if cell_style.attrib["name"] in REVIEW_STYLES.keys():
+                            idx_to_set.append(idx)
+
+                    for idx, cell_xf in enumerate(
+                        tree.findall(".//ns:cellStyleXfs/ns:xf", ns)
+                    ):
+                        if idx in idx_to_set:
+                            cell_xf.attrib["applyFont"] = "0"
+                            cell_xf.attrib["applyBorder"] = "0"
+                            cell_xf.attrib["applyAlignment"] = "0"
+                            cell_xf.attrib["applyNumberFormat"] = "0"
+                            cell_xf.attrib["applyFill"] = "1"
+
+                    updated_data = ET.tostring(
+                        tree, encoding="utf-8", xml_declaration=True
+                    )
+                    zip_out.writestr(item, updated_data)
+                else:
+                    zip_out.writestr(item, data)
+
+    if os.path.exists(temp_file_name):
+        os.remove(temp_file_name)
