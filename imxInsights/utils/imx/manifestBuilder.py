@@ -83,7 +83,9 @@ class ManifestBuilder:
     SCHEMA_LOCATION = "http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd"
 
     def __init__(self, folder_path: Path | str):
-        self.folder_path = Path(folder_path)
+        if isinstance(folder_path, str):
+            folder_path= Path(folder_path)
+        self.folder_path: Path = folder_path
 
     def _create_manifest_root(self) -> Element:
         """Creates root XML element for the manifest."""
@@ -106,7 +108,8 @@ class ManifestBuilder:
         manifest.append(etree.Comment("Manifest marked as 'FOR TEST PURPOSES'!"))
         return manifest
 
-    def _parse_xml(self, file: Path) -> str | None:
+    @staticmethod
+    def _parse_xml(file: Path) -> str | None:
         """Parses XML and extracts the root tag safely."""
         try:
             return str(etree.parse(file).getroot().tag)
@@ -221,6 +224,7 @@ class ManifestBuilder:
                 item.file_type in {FileType.CORE, FileType.PETAL}
                 and "-old" not in item.file.name
             ):
+                del attributes['mediaType']
                 petal_element = etree.SubElement(
                     im_spoor_list, "ImSpoorData", attrib=attributes
                 )
