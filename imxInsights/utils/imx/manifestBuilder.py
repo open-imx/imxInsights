@@ -84,7 +84,7 @@ class ManifestBuilder:
 
     def __init__(self, folder_path: Path | str):
         if isinstance(folder_path, str):
-            folder_path= Path(folder_path)
+            folder_path = Path(folder_path)
         self.folder_path: Path = folder_path
 
     def _create_manifest_root(self) -> Element:
@@ -224,7 +224,7 @@ class ManifestBuilder:
                 item.file_type in {FileType.CORE, FileType.PETAL}
                 and "-old" not in item.file.name
             ):
-                del attributes['mediaType']
+                del attributes["mediaType"]
                 petal_element = etree.SubElement(
                     im_spoor_list, "ImSpoorData", attrib=attributes
                 )
