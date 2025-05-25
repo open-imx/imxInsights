@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Any, Optional
+from typing import Optional
 
 from lxml.etree import _Element as Element
 from shapely import (
@@ -14,6 +14,7 @@ from shapely import (
 from shapely.geometry import GeometryCollection
 
 from imxInsights.domain.imxGeographicLocation import ImxGeographicLocation
+from imxInsights.domain.imxReferenceObjects import ImxRef
 from imxInsights.file.containerizedImx.imxDesignCoreFile import ImxDesignCoreFile
 from imxInsights.file.containerizedImx.imxDesignPetalFile import ImxDesignPetalFile
 from imxInsights.file.imxFile import ImxFile
@@ -79,7 +80,7 @@ class ImxObject:
         self.properties: dict[str, str] = self._set_properties()
         self.imx_situation: str | None = self._get_imx_situation()
         self.container_id: str | None = None
-        self.refs: list[Any] = []
+        self.refs: list[ImxRef] = []
 
     def __repr__(self) -> str:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
