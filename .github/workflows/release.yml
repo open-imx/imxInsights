@@ -112,3 +112,15 @@ jobs:
         run: |
           hatch build
           hatch publish
+
+      - name: Wait for 3 minute before dispatching
+        uses: actions/github-script@v6
+        with:
+          script: await new Promise(resolve => setTimeout(resolve, 180000))
+          
+      - name: Trigger GUI Repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT_FOR_GUI_REPO }}
+          repository: https://github.com/open-imx/imxInsightsApps
+          event-type: trigger-auto-release
