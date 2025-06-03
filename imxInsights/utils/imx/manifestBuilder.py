@@ -1,7 +1,7 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from datetime import datetime
 
 from loguru import logger
 from lxml import etree
@@ -9,8 +9,6 @@ from lxml.etree import _Element as Element
 
 from imxInsights.utils.file import get_http_content_type, zip_folder
 from imxInsights.utils.hash import hash_sha256
-
-
 
 
 class FileType(Enum):
@@ -29,7 +27,11 @@ class ManifestFile:
     full_path_as_filename: bool = False
 
     def get_filename(self, input_folder: Path) -> str:
-        return str(self.file.relative_to(input_folder)) if self.full_path_as_filename else self.file.name
+        return (
+            str(self.file.relative_to(input_folder))
+            if self.full_path_as_filename
+            else self.file.name
+        )
 
 
 class ManifestBuilder:
@@ -61,12 +63,17 @@ class ManifestBuilder:
             "coreFileName": "to_fill",
             "nidRbc": "to_fill",
             "nidC": "to_fill",
-            f"{{http://www.w3.org/2001/XMLSchema-instance}}schemaLocation": self.SCHEMA_LOCATION,
+            "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": self.SCHEMA_LOCATION,
         }
 
     def _create_manifest_root(self) -> Element:
-        nsmap = {None: self.NAMESPACE, "xsi": "http://www.w3.org/2001/XMLSchema-instance"}
-        manifest = etree.Element("Manifest", attrib=self._manifest_metadata(), nsmap=nsmap)
+        nsmap = {
+            None: self.NAMESPACE,
+            "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        }
+        manifest = etree.Element(
+            "Manifest", attrib=self._manifest_metadata(), nsmap=nsmap
+        )
         manifest.append(etree.Comment(f"Generated on {datetime.now().isoformat()}"))
         manifest.append(etree.Comment("Manifest marked as 'FOR TEST PURPOSES'!"))
         return manifest
@@ -80,11 +87,22 @@ class ManifestBuilder:
 
     def _list_folder_content(self) -> dict:
         core_tag = f"{{{self.NAMESPACE}}}SignalingDesign"
-        petal_tags = {f"{{{self.NAMESPACE}}}{tag}" for tag in [
-            "Bgt", "Furniture", "Legacy", "InstallationDesign", "ManagementAreas",
-            "NetworkConfiguration", "Observations", "RailwayElectrification",
-            "SchemaLayout", "TrainControl", "Extensions",
-        ]}
+        petal_tags = {
+            f"{{{self.NAMESPACE}}}{tag}"
+            for tag in [
+                "Bgt",
+                "Furniture",
+                "Legacy",
+                "InstallationDesign",
+                "ManagementAreas",
+                "NetworkConfiguration",
+                "Observations",
+                "RailwayElectrification",
+                "SchemaLayout",
+                "TrainControl",
+                "Extensions",
+            ]
+        }
         manifest_tag = f"{{{self.NAMESPACE}}}Manifest"
 
         all_files: list[ManifestFile] = []
@@ -116,7 +134,9 @@ class ManifestBuilder:
                     elif root_tag in petal_tags:
                         try:
                             tree = etree.parse(file)
-                            base_ref = tree.find(f".//{{{self.NAMESPACE}}}BaseReference")
+                            base_ref = tree.find(
+                                f".//{{{self.NAMESPACE}}}BaseReference"
+                            )
                             if base_ref is not None:
                                 parent_name = base_ref.get("parentDocumentName")
                                 parent_hash = base_ref.get("parentHashcode")
@@ -124,19 +144,30 @@ class ManifestBuilder:
                         except Exception as e:
                             logger.error(f"Failed parsing BaseReference in {file}: {e}")
 
-                all_files.append(ManifestFile(
-                    file=file,
-                    hash=file_hash,
-                    file_type=file_type,
-                    parent_document_name=parent_name,
-                    parent_hash_code=parent_hash,
-                    full_path_as_filename=True,
-                ))
+                all_files.append(
+                    ManifestFile(
+                        file=file,
+                        hash=file_hash,
+                        file_type=file_type,
+                        parent_document_name=parent_name,
+                        parent_hash_code=parent_hash,
+                        full_path_as_filename=True,
+                    )
+                )
 
         crawl(self.folder_path)
 
-        imspoor_files = [f for f in all_files if f.file_type in {FileType.CORE, FileType.PETAL} and not self.is_old_file(f.file)]
-        media_files = [f for f in all_files if f.file_type == FileType.MEDIA or self.is_old_file(f.file)]
+        imspoor_files = [
+            f
+            for f in all_files
+            if f.file_type in {FileType.CORE, FileType.PETAL}
+            and not self.is_old_file(f.file)
+        ]
+        media_files = [
+            f
+            for f in all_files
+            if f.file_type == FileType.MEDIA or self.is_old_file(f.file)
+        ]
 
         return {
             "core_file": core_file,
@@ -145,7 +176,9 @@ class ManifestBuilder:
             "media_files": media_files,
         }
 
-    def create_manifest(self, file_path: Path | str | None = None, dry_run: bool = False) -> Element | None:
+    def create_manifest(
+        self, file_path: Path | str | None = None, dry_run: bool = False
+    ) -> Element | None:
         manifest = self._create_manifest_root()
         data = self._list_folder_content()
 
@@ -161,7 +194,9 @@ class ManifestBuilder:
                 "hash": item.hash,
             }
             elem = etree.SubElement(imspoor_list, "ImSpoorData", attrib=attributes)
-            if item.parent_document_name != (data["core_file"].name if data["core_file"] else None):
+            if item.parent_document_name != (
+                data["core_file"].name if data["core_file"] else None
+            ):
                 elem.append(etree.Comment("Invalid CoreFile reference."))
             if item.parent_hash_code != data["core_hash"]:
                 elem.append(etree.Comment("Invalid ParentHashCode."))
@@ -177,18 +212,23 @@ class ManifestBuilder:
         if dry_run:
             return manifest
 
-        output_path = Path(file_path) if file_path else self.folder_path / "Manifest.xml"
+        output_path = (
+            Path(file_path) if file_path else self.folder_path / "Manifest.xml"
+        )
         with output_path.open("wb") as f:
-            f.write(etree.tostring(manifest, pretty_print=True, xml_declaration=True, encoding="UTF-8"))
+            f.write(
+                etree.tostring(
+                    manifest, pretty_print=True, xml_declaration=True, encoding="UTF-8"
+                )
+            )
         logger.success(f"Manifest created: {output_path}")
         return None
 
     def to_dict(self) -> dict:
         data = self._list_folder_content()
         return {
-            "manifest": self._manifest_metadata() | {
-                "coreFileName": data["core_file"].name if data["core_file"] else None
-            },
+            "manifest": self._manifest_metadata()
+            | {"coreFileName": data["core_file"].name if data["core_file"] else None},
             "imspoor_files": [asdict(f) for f in data["imspoor_files"]],
             "media_files": [asdict(f) for f in data["media_files"]],
         }
@@ -198,7 +238,7 @@ class ManifestBuilder:
 
     def validate_manifest(self) -> dict[str, list[str]]:
         manifest_path = self.folder_path / "Manifest.xml"
-        results = {
+        results: dict[str, list[str]] = {
             "missing_files": [],
             "extra_files": [],
             "hash_mismatches": [],
@@ -249,7 +289,9 @@ class ManifestBuilder:
             has_error = False
 
             if actual_hash != hashcode:
-                logger.warning(f"Hash mismatch for {filename}: expected {hashcode}, got {actual_hash}")
+                logger.warning(
+                    f"Hash mismatch for {filename}: expected {hashcode}, got {actual_hash}"
+                )
                 results["hash_mismatches"].append(filename)
                 has_error = True
 
@@ -264,9 +306,13 @@ class ManifestBuilder:
                 if filename != core_file_name and filename.endswith(".xml"):
                     try:
                         petal_tree = etree.parse(file_path)
-                        base_ref = petal_tree.find(".//ims:BaseReference", namespaces=NSMAP)
+                        base_ref = petal_tree.find(
+                            ".//ims:BaseReference", namespaces=NSMAP
+                        )
                         if base_ref is None:
-                            logger.warning(f"Petal file missing BaseReference: {filename}")
+                            logger.warning(
+                                f"Petal file missing BaseReference: {filename}"
+                            )
                             results["petal_missing_baseref"].append(filename)
                             has_error = True
                         else:
@@ -285,7 +331,9 @@ class ManifestBuilder:
                                 results["invalid_hash_references"].append(filename)
                                 has_error = True
                     except Exception as e:
-                        logger.error(f"Could not parse {filename} as XML for petal validation: {e}")
+                        logger.error(
+                            f"Could not parse {filename} as XML for petal validation: {e}"
+                        )
                         results["parse_errors"].append(filename)
                         has_error = True
 
@@ -307,13 +355,3 @@ class ManifestBuilder:
 
         logger.success("Manifest validation complete.")
         return results
-
-
-manifest = ManifestBuilder(r"C:\repos\imxInsights\klad\manifest_bug_fix")
-# manifest.create_manifest()
-result = manifest.validate_manifest()
-
-import pprint as pp
-pp.pprint(result)
-
-
