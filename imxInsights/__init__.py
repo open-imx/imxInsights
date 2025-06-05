@@ -3,7 +3,7 @@ from imxInsights.file.singleFileImx.imxSingleFile import ImxSingleFile
 from imxInsights.repo.imxMultiRepo import ImxMultiRepo
 from imxInsights.utils.version_check import check_for_updates
 
-__version__ = "0.2.1a3"
+__version__ = "0.2.1a4"
 
 check_for_updates(__version__)
 

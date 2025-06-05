@@ -217,22 +217,18 @@ class ImxContainerCompare:
 
             if styled_df:
                 excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
-                styler = df.style.applymap(  # type: ignore[attr-defined]
-                    styler_highlight_changes,
-                    subset=df.columns.difference(excluded_columns),
-                )
-                styler = styler.applymap(  # type: ignore[attr-defined]
-                    styler_highlight_change_status,
-                    subset=["status"],
-                )
+                included_columns = df.columns.difference(excluded_columns)
+                styler = df.style
+                styler = styler.map(styler_highlight_changes, subset=included_columns)
+                styler = styler.map(styler_highlight_change_status, subset=["status"])
                 styler = styler.set_properties(
-                    subset=df.columns.difference(excluded_columns),
+                    subset=included_columns,
                     **{
                         "border": "1px solid black",
                         "vertical-align": "middle",
                     },
                 )
-                df = styler
+                df = styler  # type: ignore[assignment]
 
         return df
 
