@@ -114,7 +114,7 @@ jobs:
           hatch publish
 
       - name: Wait for 3 minutes before dispatching
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             console.log("Waiting for 3 minutes...");
