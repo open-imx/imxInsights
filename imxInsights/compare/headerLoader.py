@@ -36,7 +36,7 @@ class HeaderLoader:
         if "->" in s:
             # This happens for paths that changed, for example InitialSituation->newsituation
             # We use the new situation
-            s = path.partition("->")[2].strip()
+            s = s.partition("->")[2].strip()
 
         if s.startswith("++") or s.startswith("--"):
             s = s[2:].strip()
