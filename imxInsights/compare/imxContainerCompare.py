@@ -389,7 +389,9 @@ class ImxContainerCompare:
             "Metadata.@lifeCycleStatus",
             "Metadata.@source",
         ]
-        existing_columns = [col for col in columns_to_keep if col in overview_df.columns]
+        existing_columns = [
+            col for col in columns_to_keep if col in overview_df.columns
+        ]
         diff_dict = {"meta-overview": overview_df[existing_columns]} | diff_dict
 
         with pd.ExcelWriter(
