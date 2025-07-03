@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 
 import pandas as pd
 from loguru import logger
@@ -12,6 +13,7 @@ from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_change_status,
     styler_highlight_changes,
+    styler_highlight_incorrect_uitwisselsope,
 )
 from imxInsights.utils.report_helpers import (
     add_review_styles_to_excel,
@@ -25,6 +27,7 @@ from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeatureCollection,
 )
+from imxInsights.compare.headerLoader import HeaderLoader
 
 
 @dataclass
@@ -173,6 +176,7 @@ class ImxContainerCompare:
             add_analyse (bool): Whether to add analysis to the DataFrame.
             styled_df (bool): Whether to apply styling to highlight changes.
             ref_display (bool): Whether to add reference display properties to the output.
+            fase: The phase of the project (e.g., "RVTO", "DO").
 
         Returns:
             pd.DataFrame: A DataFrame representing the changes for the specified object path.
@@ -198,6 +202,7 @@ class ImxContainerCompare:
                 [
                     "@puic",
                     "path",
+                    "path_to_root",
                     "tag",
                     "parent",
                     "children",
@@ -207,30 +212,42 @@ class ImxContainerCompare:
                 ],
                 [],
             )
-            df = df.fillna("")
 
             status_order = ["added", "changed", "unchanged", "type_change", "removed"]
             df["status"] = pd.Categorical(
                 df["status"], categories=status_order, ordered=True
             )
             df = df.sort_values(by=["path", "status"])
-
+            df["status"] = df["status"].astype("object")
             if styled_df:
-                excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
-                included_columns = df.columns.difference(excluded_columns)
-                styler = df.style
-                styler = styler.map(styler_highlight_changes, subset=included_columns)
-                styler = styler.map(styler_highlight_change_status, subset=["status"])
-                styler = styler.set_properties(
-                    subset=included_columns,
-                    **{
-                        "border": "1px solid black",
-                        "vertical-align": "middle",
-                    },
-                )
-                df = styler  # type: ignore[assignment]
+                df = self.style_pandas(df)
 
         return df
+
+    def style_pandas(self, df):
+        excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
+        styler = df.style.map(  # type: ignore[attr-defined]
+            styler_highlight_changes,
+            subset=df.columns.difference(excluded_columns),
+        )
+        styler = styler.map(  # type: ignore[attr-defined]
+            styler_highlight_change_status,
+            subset=["status"],
+        )
+        for column in df.columns:
+            styler = styler.map(
+                lambda value, col=df[column]: styler_highlight_incorrect_uitwisselsope(
+                    value, col
+                ),
+                subset=[column],
+            )
+        styler.set_properties(
+            **{
+                "border": "1px solid black",
+                "vertical-align": "middle",
+            }
+        )
+        return styler
 
     def get_geojson(
         self,
@@ -316,17 +333,23 @@ class ImxContainerCompare:
         self,
         file_name: str | Path,
         add_analyse: bool = True,
-        styled_df: bool = True,
         add_review_styles: bool = True,
+        header_file: str | None = None,
+        header_file_path_field: str = "path",
+        header_ignore_fields: tuple | list = tuple(),
+        hide_unchanged: bool = False,
     ) -> None:
         """
-        Exports the overview and detailed changes to an Excel file.
+        Exports the overview and detailed changes to an Excel file. Adds header formatting in case a specification file is provided.
 
         Args:
-            file_name: The name or path of the Excel file to create.
-            add_analyse: Whether to add analysis to the Excel output.
-            styled_df: Whether to apply styling to highlight changes.
-            add_review_styles: Whether to add review styles to the workbook.
+            file_name (str or Path): Required. The name or path of the Excel file to create.
+            add_analyse (bool, optional): Whether to add analysis columns to the Excel output. Defaults to True.
+            add_review_styles (bool, optional): Whether to add review formatting styles to the Excel workbook. Defaults to True.
+            header_file (str or None, optional): Path to the specification header file used to add column-level metadata. If None, no headers are added. Defaults to None.
+            header_file_path_field (str, optional): The column name in the header file that contains the object path. Used for aligning headers with data. Defaults to "path".
+            header_ignore_fields (tuple or list, optional): A collection of field names to ignore when applying headers. Useful for omitting metadata fields from formatting. Defaults to empty tuple.
+            hide_unchanged (bool, optional): Whether to hide unchanged rows and/or entire sheets in the Excel output. Entire sheets are hidden if all rows are unchanged; otherwise, only the unchanged rows are hidden. Defaults to False.
         """
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
@@ -334,14 +357,23 @@ class ImxContainerCompare:
 
         logger.info("create change excel file")
 
+        if header_file:
+            self.headerloader = HeaderLoader(
+                header_file, header_file_path_field, ignore=header_ignore_fields
+            )
+
         diff_dict = {
-            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=styled_df)
+            item: self.get_pandas(
+                [item],
+                add_analyse=add_analyse,
+                styled_df=False,  # We do this later
+            )
             for item in paths
         }
         diff_dict = dict(sorted(diff_dict.items()))
         diff_dict = upper_keys_with_index(diff_dict)
 
-        overview_df = pd.concat([styler.data for styler in diff_dict.values()], axis=0)
+        overview_df = pd.concat(list(diff_dict.values()), axis=0)
         columns_to_keep = [
             "@puic",
             "path",
@@ -358,7 +390,24 @@ class ImxContainerCompare:
         ]
         diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
 
-        with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
+        with pd.ExcelWriter(
+            file_name,
+            engine="xlsxwriter",
+            engine_kwargs={"options": {"strings_to_numbers": True}},
+        ) as writer:
+
+            # styling all specification rows
+            spec_format_dict = {
+                "bg_color": "#d1d1d1",
+                "valign": "top",
+                "align": "left",
+                "num_format": "@",
+                "locked": True,
+                "border": 7,
+                "text_wrap": True,
+            }
+            writer.spec_format = writer.book.add_format(spec_format_dict)
+
             process_data = {
                 "Diff Report": "",
                 "Run Date": datetime.now().isoformat(),
@@ -367,7 +416,13 @@ class ImxContainerCompare:
                 **self._get_imx_details(self._imx_info, self.container_id_2, "T2"),
             }
             inf_df = app_info_df(process_data)
-            write_df_to_sheet(writer, "info", inf_df, header=False, auto_filter=False)
+            write_df_to_sheet(
+                writer,
+                "info",
+                inf_df,
+                header=False,
+                auto_filter=False,
+            )
 
             for key, df in diff_dict.items():
                 if len(df.columns) == 0:
@@ -377,17 +432,84 @@ class ImxContainerCompare:
                 sheet_name = shorten_sheet_name(key)
 
                 try:
-                    work_sheet = write_df_to_sheet(writer, sheet_name, df)
+                    if key != "meta-overview" and header_file:
+                        df = self.headerloader.add_header_to_sheet(df)
+                    elif key == "meta-overview":
+                        df = df.reset_index(drop=True)
+                    df = df.fillna("")
+
+                    df = df.rename(columns={"path_to_root": "Locatie in XML"})
+
+                    work_sheet = write_df_to_sheet(
+                        writer, sheet_name, df, styler=self.style_pandas
+                    )
                     status_column = (
                         df["status"]
                         if isinstance(df, pd.DataFrame)
                         else df.data["status"]
                     )
 
-                    if status_column.eq("unchanged").all():
+                    # tabs met changes highlighten
+                    valid_statuses = [
+                        "added",
+                        "changed",
+                        "unchanged",
+                        "type_change",
+                        "removed",
+                    ]
+                    status_values = status_column[status_column.isin(valid_statuses)]
+
+                    if status_values.eq("unchanged").all():
                         work_sheet.set_tab_color("gray")
 
+                    workbook = writer.book
+
+                    # conditional formatting of the scope row
+                    scope_options = ["uitwisselscope_DO", "uitwisselscope_RVTO"]
+                    scope_format = workbook.add_format(
+                        {**spec_format_dict, "bold": True, "font_color": "yellow"}
+                    )
+                    for scope_option in scope_options:
+                        if scope_option in df.index:
+                            row_num = df.index.get_loc(scope_option)
+                            # iterate over each column
+                            for column in df.columns:
+                                # get scope value
+                                scope = df.iloc[row_num][column]
+                                # check if the column has empty values
+                                pd.set_option("future.no_silent_downcasting", True)
+                                df.replace("", np.nan, inplace=True)
+                                if (
+                                    df[~work_sheet.documentation_indicator][column]
+                                    .isnull()
+                                    .any()
+                                    and scope == "In scope"
+                                ):
+                                    # format scope value accordingly
+                                    col_num = df.columns.get_loc(column)
+                                    work_sheet.write(
+                                        row_num, col_num, scope, scope_format
+                                    )
+                                    work_sheet.set_tab_color("yellow")
+
+                    # hide rows that are unchanged
+                    if hide_unchanged:
+                        if status_values.eq("unchanged").all():
+                            work_sheet.hide()
+                        else:
+                            # Only hide rows in non-hidden sheets, else it is double hidden
+                            body = df[~documentation_indicator]
+                            size_body_changed = len(body[body["status"] != "unchanged"])
+                            start_unchanged = start_row + size_body_changed
+                            end_unchanged = start_row + len(body)
+                            for row in range(start_unchanged, end_unchanged):
+                                work_sheet.set_row(row, None, None, {"hidden": True})
+
                 except Exception as e:
+                    import traceback
+
+                    print(traceback.format_exc())
+                    exit()
                     logger.error(f"Error writing sheet {sheet_name}: {e}")
 
         if add_review_styles:

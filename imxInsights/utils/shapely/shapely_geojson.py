@@ -139,7 +139,7 @@ class ShapelyGeoJsonFeature:
         elif all(isinstance(geom, Point) for geom in self.geometry_list):
             return GeoJsonFeature(
                 geometry=GeoJsonMultiPoint(
-                    *[self._get_point_coordinates(_) for _ in self.geometry_list]  # type: ignore[arg-type]
+                    *[self._get_point_coordinates(_) for _ in self.geometry_list]
                 ),
                 properties=self.properties,
             )
@@ -183,7 +183,7 @@ class ShapelyGeoJsonFeature:
         elif all(isinstance(geom, Polygon) for geom in self.geometry_list):
             return GeoJsonFeature(
                 geometry=GeoJsonMultiPolygon(
-                    [*[self._get_polygon_coordinates(_) for _ in self.geometry_list]]  # type: ignore[arg-type]
+                    [*[self._get_polygon_coordinates(_) for _ in self.geometry_list]]
                 ),
                 properties=self.properties,
             )

@@ -93,8 +93,7 @@ class ImxContainerCompareChain:
         puic_values = df["@puic"].unique()
         snapshot_values = df["snapshot"].unique()
         all_combinations = pd.MultiIndex.from_product(
-            [puic_values.tolist(), snapshot_values.tolist()],
-            names=["@puic", "snapshot"],
+            [puic_values, snapshot_values], names=["@puic", "snapshot"]
         ).to_frame(index=False)
         df = all_combinations.merge(df, on=["@puic", "snapshot"], how="left")
 

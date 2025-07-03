@@ -85,7 +85,9 @@ def extend_objects(
             else:
                 # Handle the case where imx_file.root is None
                 # Perhaps raise an exception or handle differently based on your application logic
-                raise ValueError("imx_file.root is None when element is None")  # noqa: TRY003
+                raise ValueError(
+                    "imx_file.root is None when element is None"
+                )  # noqa: TRY003
         else:
             objects = [
                 ImxObject(element=element, imx_file=imx_file)

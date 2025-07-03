@@ -32,8 +32,6 @@ def calculate_measurements(
                 continue
 
             rail_con = ref.imx_object
-            if rail_con is None:
-                continue
             puic = rail_con.puic
 
             measure_line = measure_line_dict.get(puic)

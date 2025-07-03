@@ -1,5 +1,4 @@
-from dataclasses import asdict, dataclass
-from datetime import datetime
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
@@ -19,74 +18,107 @@ class FileType(Enum):
 
 @dataclass
 class ManifestFile:
+    """
+    Represents a file entry in the manifest, containing metadata.
+
+    Attributes:
+        file: Path to the file.
+        hash: SHA-256 hash of the file.
+        file_type: Type of file.
+        parent_document_name: Name of the parent document (if applicable).
+        parent_hash_code: Hash of the parent document (if applicable).
+        full_path_as_filename: Optionally stores the relative path from input folder.
+    """
+
     file: Path
     hash: str
     file_type: FileType
     parent_document_name: str | None = None
     parent_hash_code: str | None = None
-    full_path_as_filename: bool = False
+    full_path_as_filename: bool = False  # Flag to toggle full path in filename
 
-    def get_filename(self, input_folder: Path) -> str:
-        return (
-            str(self.file.relative_to(input_folder))
-            if self.full_path_as_filename
-            else self.file.name
-        )
+    def get_filename(self, input_folder: Path):
+        """Returns the file name or relative path from input folder as the filename."""
+        if self.full_path_as_filename:
+            return str(
+                self.file.relative_to(input_folder)
+            )  # Get relative path from input_folder
+        return self.file.name  # Just return the file name
 
 
 class ManifestBuilder:
-    def __init__(
-        self,
-        folder_path: Path | str,
-        imx_version: str = "12.0.0",
-        namespace: str = "http://www.prorail.nl/IMSpoor",
-        schema_location: str = "http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd",
-    ):
+    """
+    Generate an XML manifest file from the contents of a folder.
+
+    The manifest categorizes files into three types:
+
+    1. **Core Files**
+       - The primary IM Spoor file, identified by the root tag `<SignalingDesign>`.
+       - Only one core file should exist.
+
+    2. **Petal Files**
+       - Supporting XML files that reference the core file.
+       - Identified by specific root tags such as `<Bgt>`, `<Furniture>`, etc.
+       - Must contain a `<BaseReference>` element linking to the core file via `parentDocumentName` and `parentHashcode`.
+       - If a petal file references a mismatched core file or hash, a comment is added:
+         - `"Invalid CoreFile reference"` (if `parentDocumentName` doesn’t match).
+         - `"Invalid ParentHashCode"` (if `parentHashcode` doesn’t match).
+
+    2b. **Including Old Core or Petal Files**
+       - Old core or petal files can be added as media files by appending `-old.xml` to the filename.
+
+    3. **Media Files**
+       - Non-XML files (e.g., images, PDFs, other binary formats).
+       - Included under the `<MediaList>` section.
+
+    Additional Comments in the Manifest:
+    - A warning is added if a petal file's `parentDocumentName` does not match the core file.
+    - A comment is included if a petal file’s `parentHashcode` differs from the core file’s hash.
+
+    Args:
+        folder_path (str): Path to the folder containing IM Spoor files.
+    """
+
+    NAMESPACE = "http://www.prorail.nl/IMSpoor"
+    SCHEMA_LOCATION = "http://www.prorail.nl/IMSpoor IMSpoor-Manifest.xsd"
+
+    def __init__(self, folder_path: Path | str):
         self.folder_path = Path(folder_path)
-        self.NAMESPACE = namespace
-        self.SCHEMA_LOCATION = schema_location
-        self.imx_version = imx_version
-        self._file_hashes: dict[Path, str] = {}
-
-    @staticmethod
-    def is_old_file(file: Path) -> bool:
-        return file.name.endswith("-old.xml")
-
-    def _get_file_hash(self, file: Path) -> str:
-        if file not in self._file_hashes:
-            self._file_hashes[file] = hash_sha256(file)
-        return self._file_hashes[file]
-
-    def _manifest_metadata(self) -> dict:
-        return {
-            "imxVersion": self.imx_version,
-            "coreFileName": "to_fill",
-            "nidRbc": "to_fill",
-            "nidC": "to_fill",
-            "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": self.SCHEMA_LOCATION,
-        }
 
     def _create_manifest_root(self) -> Element:
+        """Creates root XML element for the manifest."""
         nsmap = {
             None: self.NAMESPACE,
             "xsi": "http://www.w3.org/2001/XMLSchema-instance",
         }
         manifest = etree.Element(
-            "Manifest", attrib=self._manifest_metadata(), nsmap=nsmap
+            "Manifest",
+            attrib={
+                "imxVersion": "12.0.0",
+                "coreFileName": "to_fill",
+                "nidRbc": "to_fill",
+                "nidC": "to_fill",
+                "{http://www.w3.org/2001/XMLSchema-instance}schemaLocation": self.SCHEMA_LOCATION,
+            },
+            nsmap=nsmap,
         )
-        manifest.append(etree.Comment(f"Generated on {datetime.now().isoformat()}"))
+        manifest.append(etree.Comment("IMX 12 manifest generated by imxInsights."))
         manifest.append(etree.Comment("Manifest marked as 'FOR TEST PURPOSES'!"))
         return manifest
 
-    def _parse_xml_root_tag(self, file: Path) -> str | None:
+    def _parse_xml(self, file: Path) -> str | None:
+        """Parses XML and extracts the root tag safely."""
         try:
             return str(etree.parse(file).getroot().tag)
         except etree.XMLSyntaxError:
             logger.error(f"Invalid XML: {file}")
             return None
 
-    def _list_folder_content(self) -> dict:
-        core_tag = f"{{{self.NAMESPACE}}}SignalingDesign"
+    def _list_folder_content(
+        self,
+    ) -> tuple[list[ManifestFile], str | None, Path | None]:
+        """Scans folder for XML and media files, determining core file and petal dependencies."""
+        core_file_tag = f"{{{self.NAMESPACE}}}SignalingDesign"
         petal_tags = {
             f"{{{self.NAMESPACE}}}{tag}"
             for tag in [
@@ -104,113 +136,105 @@ class ManifestBuilder:
             ]
         }
         manifest_tag = f"{{{self.NAMESPACE}}}Manifest"
+        files = []
+        core_file, core_hash = None, None
 
-        all_files: list[ManifestFile] = []
-        core_file = None
-        core_hash = None
+        def crawl_directory(directory: Path):
+            """Recursively crawl through all directories and treat nested files as media."""
+            nonlocal files, core_file, core_hash
 
-        def crawl(directory: Path):
-            nonlocal core_file, core_hash
             for file in directory.iterdir():
                 if file.is_dir():
-                    crawl(file)
-                    continue
-                if not file.is_file():
+                    # If it's a directory, treat all files inside as media
+                    crawl_directory(file)  # Recurse into subdirectories
                     continue
 
-                file_hash = self._get_file_hash(file)
-                file_type = FileType.MEDIA
-                parent_name = parent_hash = None
+                file_hash = hash_sha256(file)
+                file_type, parent_name, parent_hash = FileType.MEDIA, None, None
 
                 if file.suffix.lower() == ".xml":
-                    root_tag = self._parse_xml_root_tag(file)
-                    if not root_tag or root_tag == manifest_tag:
-                        continue
+                    root_tag = self._parse_xml(file)
 
-                    if root_tag == core_tag:
-                        core_file = file
-                        core_hash = file_hash
-                        file_type = FileType.CORE
-                    elif root_tag in petal_tags:
-                        try:
+                    if root_tag:
+                        if manifest_tag == root_tag:
+                            continue
+                        elif root_tag == core_file_tag:
+                            core_file, core_hash = file, file_hash
+                            file_type = FileType.CORE
+                        elif root_tag in petal_tags:
                             tree = etree.parse(file)
-                            base_ref = tree.find(
-                                f".//{{{self.NAMESPACE}}}BaseReference"
+                            base_ref = tree.find(f"*{{{self.NAMESPACE}}}BaseReference")
+                            parent_name = (
+                                base_ref.get("parentDocumentName")
+                                if base_ref is not None and len(base_ref) == 1
+                                else None
                             )
-                            if base_ref is not None:
-                                parent_name = base_ref.get("parentDocumentName")
-                                parent_hash = base_ref.get("parentHashcode")
+                            parent_hash = (
+                                base_ref.get("parentHashcode")
+                                if base_ref is not None and len(base_ref) == 1
+                                else None
+                            )
                             file_type = FileType.PETAL
-                        except Exception as e:
-                            logger.error(f"Failed parsing BaseReference in {file}: {e}")
 
-                all_files.append(
+                files.append(
                     ManifestFile(
-                        file=file,
-                        hash=file_hash,
-                        file_type=file_type,
-                        parent_document_name=parent_name,
-                        parent_hash_code=parent_hash,
+                        file,
+                        file_hash,
+                        file_type,
+                        parent_name,
+                        parent_hash,
                         full_path_as_filename=True,
                     )
                 )
 
-        crawl(self.folder_path)
+        # Start crawling the folder
+        crawl_directory(self.folder_path)
 
-        imspoor_files = [
-            f
-            for f in all_files
-            if f.file_type in {FileType.CORE, FileType.PETAL}
-            and not self.is_old_file(f.file)
-        ]
-        media_files = [
-            f
-            for f in all_files
-            if f.file_type == FileType.MEDIA or self.is_old_file(f.file)
-        ]
+        return files, core_hash, core_file
 
-        return {
-            "core_file": core_file,
-            "core_hash": core_hash,
-            "imspoor_files": imspoor_files,
-            "media_files": media_files,
-        }
+    def create_manifest(self, file_path: Path | str | None = None) -> None:
+        """
+        Generates an XML manifest file containing metadata for IM Spoor files.
 
-    def create_manifest(
-        self, file_path: Path | str | None = None, dry_run: bool = False
-    ) -> Element | None:
+        Args:
+            file_path: Output path for the manifest XML file, if not given will be generated in input folder.
+        """
         manifest = self._create_manifest_root()
-        data = self._list_folder_content()
+        file_list, core_hash, core_file = self._list_folder_content()
 
-        if data["core_file"]:
-            manifest.set("coreFileName", data["core_file"].name)
+        if core_file:
+            manifest.set("coreFileName", core_file.name)
 
-        imspoor_list = etree.SubElement(manifest, "ImSpoorDataList")
+        im_spoor_list = etree.SubElement(manifest, "ImSpoorDataList")
         media_list = etree.SubElement(manifest, "MediaList")
 
-        for item in data["imspoor_files"]:
+        for item in file_list:
             attributes = {
-                "fileName": item.get_filename(self.folder_path),
-                "hash": item.hash,
-            }
-            elem = etree.SubElement(imspoor_list, "ImSpoorData", attrib=attributes)
-            if item.parent_document_name != (
-                data["core_file"].name if data["core_file"] else None
-            ):
-                elem.append(etree.Comment("Invalid CoreFile reference."))
-            if item.parent_hash_code != data["core_hash"]:
-                elem.append(etree.Comment("Invalid ParentHashCode."))
-
-        for item in data["media_files"]:
-            attributes = {
-                "fileName": item.get_filename(self.folder_path),
-                "hash": item.hash,
+                "fileName": item.get_filename(
+                    self.folder_path
+                ),  # Use relative path or filename
                 "mediaType": get_http_content_type(item.file.name),
+                "hash": item.hash,
             }
-            etree.SubElement(media_list, "Media", attrib=attributes)
 
-        if dry_run:
-            return manifest
+            if (
+                item.file_type in {FileType.CORE, FileType.PETAL}
+                and "-old" not in item.file.name
+            ):
+                petal_element = etree.SubElement(
+                    im_spoor_list, "ImSpoorData", attrib=attributes
+                )
+                if item.file_type != FileType.CORE:
+                    if item.parent_document_name != (
+                        core_file.name if core_file else None
+                    ):
+                        petal_element.append(
+                            etree.Comment("Invalid CoreFile reference.")
+                        )
+                    if item.parent_hash_code != core_hash:
+                        petal_element.append(etree.Comment("Invalid ParentHashCode."))
+            else:
+                etree.SubElement(media_list, "Media", attrib=attributes)
 
         output_path = (
             Path(file_path) if file_path else self.folder_path / "Manifest.xml"
@@ -221,137 +245,14 @@ class ManifestBuilder:
                     manifest, pretty_print=True, xml_declaration=True, encoding="UTF-8"
                 )
             )
-        logger.success(f"Manifest created: {output_path}")
-        return None
 
-    def to_dict(self) -> dict:
-        data = self._list_folder_content()
-        return {
-            "manifest": self._manifest_metadata()
-            | {"coreFileName": data["core_file"].name if data["core_file"] else None},
-            "imspoor_files": [asdict(f) for f in data["imspoor_files"]],
-            "media_files": [asdict(f) for f in data["media_files"]],
-        }
+        logger.success(f"Manifest created: {output_path}")
 
     def to_zip(self, out_path: Path | str) -> None:
+        """
+        Generates an .zip file of the input_folder.
+
+        Args:
+            out_path: Output path for the manifest XML file.
+        """
         zip_folder(self.folder_path, Path(out_path))
-
-    def validate_manifest(self) -> dict[str, list[str]]:
-        manifest_path = self.folder_path / "Manifest.xml"
-        results: dict[str, list[str]] = {
-            "missing_files": [],
-            "extra_files": [],
-            "hash_mismatches": [],
-            "invalid_core_references": [],
-            "invalid_hash_references": [],
-            "unexpected_media_type": [],
-            "petal_missing_baseref": [],
-            "parse_errors": [],
-            "validated": [],
-        }
-
-        if not manifest_path.exists():
-            logger.error("Manifest.xml not found!")
-            return results
-
-        NSMAP = {"ims": self.NAMESPACE}
-        tree = etree.parse(str(manifest_path))
-        root = tree.getroot()
-
-        core_file_name = root.get("coreFileName")
-        if not core_file_name:
-            logger.error("No coreFileName defined in Manifest.")
-            return results
-
-        core_file_path = self.folder_path / core_file_name
-        if not core_file_path.exists():
-            logger.error(f"Core file '{core_file_name}' not found in folder.")
-            return results
-
-        core_hash = self._get_file_hash(core_file_path)
-        logger.info(f"Core file: {core_file_name} (hash: {core_hash})")
-
-        files_in_manifest: dict[str, tuple[str, str | None]] = {}
-
-        for elem in root.xpath("//ims:ImSpoorData | //ims:Media", namespaces=NSMAP):
-            filename = elem.get("fileName")
-            hashcode = elem.get("hash")
-            media_type = elem.get("mediaType")
-            files_in_manifest[filename] = (hashcode, media_type)
-
-            file_path = self.folder_path / filename
-            if not file_path.exists():
-                logger.warning(f"File listed in manifest not found: {filename}")
-                results["missing_files"].append(filename)
-                continue
-
-            actual_hash = self._get_file_hash(file_path)
-            has_error = False
-
-            if actual_hash != hashcode:
-                logger.warning(
-                    f"Hash mismatch for {filename}: expected {hashcode}, got {actual_hash}"
-                )
-                results["hash_mismatches"].append(filename)
-                has_error = True
-
-            tag_name = etree.QName(elem).localname
-
-            if tag_name == "ImSpoorData":
-                if media_type is not None:
-                    logger.warning(f"Unexpected mediaType in <ImSpoorData>: {filename}")
-                    results["unexpected_media_type"].append(filename)
-                    has_error = True
-
-                if filename != core_file_name and filename.endswith(".xml"):
-                    try:
-                        petal_tree = etree.parse(file_path)
-                        base_ref = petal_tree.find(
-                            ".//ims:BaseReference", namespaces=NSMAP
-                        )
-                        if base_ref is None:
-                            logger.warning(
-                                f"Petal file missing BaseReference: {filename}"
-                            )
-                            results["petal_missing_baseref"].append(filename)
-                            has_error = True
-                        else:
-                            ref_name = base_ref.get("parentDocumentName")
-                            ref_hash = base_ref.get("parentHashcode")
-                            if ref_name != core_file_name:
-                                logger.warning(
-                                    f"[{filename}] Invalid CoreFile reference: expected '{core_file_name}', got '{ref_name}'"
-                                )
-                                results["invalid_core_references"].append(filename)
-                                has_error = True
-                            if ref_hash != core_hash:
-                                logger.warning(
-                                    f"[{filename}] Invalid ParentHashCode: expected '{core_hash}', got '{ref_hash}'"
-                                )
-                                results["invalid_hash_references"].append(filename)
-                                has_error = True
-                    except Exception as e:
-                        logger.error(
-                            f"Could not parse {filename} as XML for petal validation: {e}"
-                        )
-                        results["parse_errors"].append(filename)
-                        has_error = True
-
-            if not has_error:
-                results["validated"].append(filename)
-
-        # Compare manifest vs. actual files
-        all_files = {
-            str(f.relative_to(self.folder_path))
-            for f in self.folder_path.rglob("*")
-            if f.is_file()
-        }
-        manifest_files = set(files_in_manifest.keys())
-
-        extra_files = all_files - manifest_files - {"Manifest.xml"}
-        for f in sorted(extra_files):
-            logger.info(f"File not listed in manifest: {f}")
-            results["extra_files"].append(f)
-
-        logger.success("Manifest validation complete.")
-        return results
