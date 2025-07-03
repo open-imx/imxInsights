@@ -2,12 +2,13 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-import numpy as np
 
+import numpy as np
 import pandas as pd
 from loguru import logger
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
+from imxInsights.compare.headerLoader import HeaderLoader
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
@@ -27,7 +28,6 @@ from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
     ShapelyGeoJsonFeatureCollection,
 )
-from imxInsights.compare.headerLoader import HeaderLoader
 
 
 @dataclass
@@ -395,7 +395,6 @@ class ImxContainerCompare:
             engine="xlsxwriter",
             engine_kwargs={"options": {"strings_to_numbers": True}},
         ) as writer:
-
             # styling all specification rows
             spec_format_dict = {
                 "bg_color": "#d1d1d1",

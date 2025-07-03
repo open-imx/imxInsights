@@ -1,22 +1,29 @@
+import math
+
 import pandas as pd
 from loguru import logger
-import math
+
 
 class HeaderLoader:
     """
     Class to handle the lookup of data for the header rows of a sheet
     """
-    
-    
+
     def __init__(self, headerfile, pathfield, ignore=tuple()):
         self.spec = pd.read_csv(
             headerfile,
             on_bad_lines="skip",
             encoding="utf-8",
         )
-        for col in self.spec.columns:    
+        for col in self.spec.columns:
             if col + "_link" in self.spec.columns:
-                self.spec[col] = '=HYPERLINK("'+self.spec[col + "_link"]+'", "'+self.spec[col]+'")'
+                self.spec[col] = (
+                    '=HYPERLINK("'
+                    + self.spec[col + "_link"]
+                    + '", "'
+                    + self.spec[col]
+                    + '")'
+                )
                 self.spec = self.spec.drop([col + "_link"], axis="columns")
 
         self.spec = self.spec.drop(
