@@ -18,10 +18,9 @@ def test_specs_on_report_v124(
         imx_v124_project_instance.new_situation.container_id
     )
 
-    #with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
-    file_path = "tester.xlsx"
-    compare.to_excel(file_path, header_file=imx_v124_specs_csv)
-    #_check_header_for_specs(file_path, ['AtpType'])
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
+        compare.to_excel(file_path, header_file=imx_v124_specs_csv)
+        _check_header_for_specs(file_path, ['AtpType'])
 
 
 def test_specs_on_report_v1200(
@@ -45,35 +44,28 @@ def test_specs_on_report_v1200(
             'L_NVKRINT', 'M_NVKRINT', 'M_NVKVINT', 'Q_NVKVINTSET', 'V_NVKVINT', 'M_LEVELTEXTDISPLAY', 'M_MODETEXTDISPLAY'
         ])
 
-def _check_header_for_specs(excel_file, column_filter):
 
-        wb = load_workbook(filename=excel_file, data_only=True)
+def _check_header_for_specs(excel_file, columns_not_to_check):
+    wb = load_workbook(filename=excel_file, data_only=True)
+    for sheet_name in wb.sheetnames:
+        if sheet_name in ['info', 'meta-overview']:
+            continue
 
-        for sheet_name in wb.sheetnames:
-            if sheet_name in ['info', 'meta-overview']:
+        sheet = wb[sheet_name]
+        tag = sheet.cell(row=1, column=1).value
+        assert tag == 'tagname', "first cell should have tag name"
+
+        max_col = 0
+        for col in range(1, sheet.max_column + 1):
+            if sheet.cell(row=2, column=col).value is not None:
+                max_col = col
+
+        for col in range(2, max_col + 1):
+            row1_value = sheet.cell(row=1, column=col).value
+            row2_value = sheet.cell(row=2, column=col).value
+            if row1_value in columns_not_to_check:
                 continue
-
-            sheet = wb[sheet_name]
-            tag = sheet.cell(row=1, column=1).value
-            assert tag == 'tagname', "first cell should have tag name"
-
-            max_col = 0
-            for col in range(1, sheet.max_column + 1):
-                if sheet.cell(row=2, column=col).value is not None:
-                    max_col = col
-
-            for col in range(2, max_col + 1):
-                row1_value = sheet.cell(row=1, column=col).value
-                row2_value = sheet.cell(row=2, column=col).value
-                if row1_value in column_filter:
-                    continue
-                elif row1_value:
-                    if row2_value.endswith(row1_value):
-                        pass
-                    else:
-                        print(row1_value)
-                    # assert row2_value.endswith(row1_value), "Value row 2 should contain value in row 1"
-
-
-
-
+            elif row1_value:
+                assert row2_value.endswith(row1_value), (
+                    f"[{sheet_name}] Column {col}: Row 2 value '{row2_value}' does not end with Row 1 value '{row1_value}'"
+                )
