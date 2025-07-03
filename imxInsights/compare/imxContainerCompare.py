@@ -357,8 +357,9 @@ class ImxContainerCompare:
 
         logger.info("create change excel file")
 
+        # todo: self should not carry the header loader.
         if header_file:
-            self.headerloader = HeaderLoader(
+            self._header_loader = HeaderLoader(
                 header_file, header_file_path_field, ignore=header_ignore_fields
             )
 
@@ -433,7 +434,7 @@ class ImxContainerCompare:
 
                 try:
                     if key != "meta-overview" and header_file:
-                        df = self.headerloader.add_header_to_sheet(df)
+                        df = self._header_loader.add_header_to_sheet(df)
                     elif key == "meta-overview":
                         df = df.reset_index(drop=True)
                     df = df.fillna("")
