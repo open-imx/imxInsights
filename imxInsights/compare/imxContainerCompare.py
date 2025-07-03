@@ -388,7 +388,8 @@ class ImxContainerCompare:
             "Metadata.@lifeCycleStatus",
             "Metadata.@source",
         ]
-        diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
+        existing_columns = [col for col in columns_to_keep if col in overview_df.columns]
+        diff_dict = {"meta-overview": overview_df[existing_columns]} | diff_dict
 
         with pd.ExcelWriter(
             file_name,
@@ -460,49 +461,6 @@ class ImxContainerCompare:
 
                     if status_values.eq("unchanged").all():
                         work_sheet.set_tab_color("gray")
-
-                    workbook = writer.book
-
-                    # conditional formatting of the scope row
-                    scope_options = ["uitwisselscope_DO", "uitwisselscope_RVTO"]
-                    scope_format = workbook.add_format(
-                        {**spec_format_dict, "bold": True, "font_color": "yellow"}
-                    )
-                    for scope_option in scope_options:
-                        if scope_option in df.index:
-                            row_num = df.index.get_loc(scope_option)
-                            # iterate over each column
-                            for column in df.columns:
-                                # get scope value
-                                scope = df.iloc[row_num][column]
-                                # check if the column has empty values
-                                pd.set_option("future.no_silent_downcasting", True)
-                                df.replace("", np.nan, inplace=True)
-                                if (
-                                    df[~work_sheet.documentation_indicator][column]
-                                    .isnull()
-                                    .any()
-                                    and scope == "In scope"
-                                ):
-                                    # format scope value accordingly
-                                    col_num = df.columns.get_loc(column)
-                                    work_sheet.write(
-                                        row_num, col_num, scope, scope_format
-                                    )
-                                    work_sheet.set_tab_color("yellow")
-
-                    # hide rows that are unchanged
-                    if hide_unchanged:
-                        if status_values.eq("unchanged").all():
-                            work_sheet.hide()
-                        else:
-                            # Only hide rows in non-hidden sheets, else it is double hidden
-                            body = df[~documentation_indicator]
-                            size_body_changed = len(body[body["status"] != "unchanged"])
-                            start_unchanged = start_row + size_body_changed
-                            end_unchanged = start_row + len(body)
-                            for row in range(start_unchanged, end_unchanged):
-                                work_sheet.set_row(row, None, None, {"hidden": True})
 
                 except Exception as e:
                     import traceback
