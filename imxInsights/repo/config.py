@@ -9,11 +9,12 @@ SupportedImxType = (
     | Literal["10.0.0"]
     | Literal["11.0.0"]
     | Literal["12.0.0"]
+    | Literal["14.0.0"]
 )
 
 
 def get_valid_version(version: str) -> SupportedImxType:
-    valid_versions = {"1.2.4", "5.0.0", "10.0.0", "11.0.0", "12.0.0"}
+    valid_versions = {"1.2.4", "5.0.0", "10.0.0", "11.0.0", "12.0.0", "14.0.0"}
     if version not in valid_versions:
         raise ValueError(f"Invalid version: {version}")  # noqa: TRY003
     return cast(SupportedImxType, version)
@@ -51,14 +52,20 @@ class Configuration(metaclass=SingletonMeta):
     @staticmethod
     @overload
     def get_object_type_to_extend_config(
+        imx_version: Literal["11.0.0"],
+    ) -> "Imx1100ExtensionMapping": ...
+
+    @staticmethod
+    @overload
+    def get_object_type_to_extend_config(
         imx_version: Literal["12.0.0"],
     ) -> "Imx1200ExtensionMapping": ...
 
     @staticmethod
     @overload
     def get_object_type_to_extend_config(
-        imx_version: Literal["11.0.0"],
-    ) -> "Imx1100ExtensionMapping": ...
+        imx_version: Literal["14.0.0"],
+    ) -> "Imx1400ExtensionMapping": ...
 
     @staticmethod
     def get_object_type_to_extend_config(imx_version: str):
@@ -69,7 +76,7 @@ class Configuration(metaclass=SingletonMeta):
             imx_version: The IMX version string.
 
         Returns:
-            (Imx124ExtensionMapping | Imx500ExtensionMapping | Imx1000ExtensionMapping | Imx1100ExtensionMapping | Imx1200ExtensionMapping): depending on imx version
+            (Imx124ExtensionMapping | Imx500ExtensionMapping | Imx1000ExtensionMapping | Imx1100ExtensionMapping | Imx1200ExtensionMapping | Imx1400ExtensionMapping): depending on imx version
 
         """
         version_map = {
@@ -78,6 +85,7 @@ class Configuration(metaclass=SingletonMeta):
             "10.0.0": Imx1000ExtensionMapping(),
             "11.0.0": Imx1100ExtensionMapping(),
             "12.0.0": Imx1200ExtensionMapping(),
+            "14.0.0": Imx1400ExtensionMapping(),
         }
 
         object_type_class = version_map.get(imx_version)
@@ -215,3 +223,20 @@ class Imx1200ExtensionMapping:
     ErtmsBaliseGroup: list[str] = field(default_factory=lambda: ["@baliseGroupRef"])
     ErtmsRoute: list[str] = field(default_factory=lambda: ["@functionalRouteRef"])
     ObservedLocation: list[str] = field(default_factory=lambda: ["@objectRef"])
+
+
+@dataclass(frozen=True)
+class Imx1400ExtensionMapping(Imx1200ExtensionMapping):
+    """
+    Contains object type extensions specific to IMX version 14.0.0.
+
+    Attributes:
+        MicroNode: Default is ```["@junctionRef"]```.
+        MicroLink: Default is ```["@implementationObjectRef"]```.
+        ConditionNotification: Default is ```["@objectRef"]```.
+        ErtmsLevelCrossing: Default is ```["@levelCrossingRef"]```.
+        ErtmsSignal: Default is ```["@signalRef"]```.
+        ErtmsBaliseGroup: Default is ```["@baliseGroupRef"]```.
+        ErtmsRoute: Default is ```["@functionalRouteRef"]```.
+        ObservedLocation: Default is ```["@objectRef"]```.
+    """
