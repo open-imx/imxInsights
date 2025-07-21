@@ -58,15 +58,14 @@ class Configuration(metaclass=SingletonMeta):
     @staticmethod
     @overload
     def get_object_type_to_extend_config(
-            imx_version: Literal["12.0.0"],
+        imx_version: Literal["12.0.0"],
     ) -> "Imx1200ExtensionMapping": ...
 
     @staticmethod
     @overload
     def get_object_type_to_extend_config(
-            imx_version: Literal["14.0.0"],
+        imx_version: Literal["14.0.0"],
     ) -> "Imx1400ExtensionMapping": ...
-
 
     @staticmethod
     def get_object_type_to_extend_config(imx_version: str):
@@ -224,6 +223,7 @@ class Imx1200ExtensionMapping:
     ErtmsBaliseGroup: list[str] = field(default_factory=lambda: ["@baliseGroupRef"])
     ErtmsRoute: list[str] = field(default_factory=lambda: ["@functionalRouteRef"])
     ObservedLocation: list[str] = field(default_factory=lambda: ["@objectRef"])
+
 
 @dataclass(frozen=True)
 class Imx1400ExtensionMapping(Imx1200ExtensionMapping):
