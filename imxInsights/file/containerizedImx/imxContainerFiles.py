@@ -83,7 +83,7 @@ class ImxContainerFiles:
         for file_path in container_path.glob("*"):
             if file_path.is_file() and file_path.suffix == ".xml":
                 imx_file = ImxFile(file_path, container_id)
-                if imx_file.imx_version != "12.0.0":
+                if imx_file.imx_version not in ["12.0.0", "14.0.0"]:
                     raise ValueError(  # noqa: TRY003
                         f"Imx version {imx_file.imx_version} not supported"
                     )
