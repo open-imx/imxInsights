@@ -8,10 +8,12 @@ from loguru import logger
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
+from imxInsights.utils.headerLoader import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_change_status,
     styler_highlight_changes,
+    styler_highlight_incorrect_uitwisselsope,
 )
 from imxInsights.utils.report_helpers import (
     add_review_styles_to_excel,
@@ -198,6 +200,7 @@ class ImxContainerCompare:
                 [
                     "@puic",
                     "path",
+                    "path_to_root",
                     "tag",
                     "parent",
                     "children",
@@ -207,30 +210,44 @@ class ImxContainerCompare:
                 ],
                 [],
             )
-            df = df.fillna("")
 
             status_order = ["added", "changed", "unchanged", "type_change", "removed"]
             df["status"] = pd.Categorical(
                 df["status"], categories=status_order, ordered=True
             )
             df = df.sort_values(by=["path", "status"])
-
+            df["status"] = df["status"].astype("object")
             if styled_df:
-                excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
-                included_columns = df.columns.difference(excluded_columns)
-                styler = df.style
-                styler = styler.map(styler_highlight_changes, subset=included_columns)
-                styler = styler.map(styler_highlight_change_status, subset=["status"])
-                styler = styler.set_properties(
-                    subset=included_columns,
-                    **{
-                        "border": "1px solid black",
-                        "vertical-align": "middle",
-                    },
-                )
-                df = styler  # type: ignore[assignment]
+                df = self.style_pandas(df)
 
         return df
+
+    def style_pandas(self, df):
+        # TODO: this should be report helper util
+
+        excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
+        styler = df.style.map(  # type: ignore[attr-defined]
+            styler_highlight_changes,
+            subset=df.columns.difference(excluded_columns),
+        )
+        styler = styler.map(  # type: ignore[attr-defined]
+            styler_highlight_change_status,
+            subset=["status"],
+        )
+        for column in df.columns:
+            styler = styler.map(
+                lambda value, col=df[column]: styler_highlight_incorrect_uitwisselsope(
+                    value, col
+                ),
+                subset=[column],
+            )
+        styler.set_properties(
+            **{
+                "border": "1px solid black",
+                "vertical-align": "middle",
+            }
+        )
+        return styler
 
     def get_geojson(
         self,
@@ -316,32 +333,42 @@ class ImxContainerCompare:
         self,
         file_name: str | Path,
         add_analyse: bool = True,
-        styled_df: bool = True,
         add_review_styles: bool = True,
+        header_spec: HeaderSpec | None = None,
     ) -> None:
         """
-        Exports the overview and detailed changes to an Excel file.
+        Exports the overview and detailed changes to an Excel file. Adds header formatting in case a specification file is provided.
 
         Args:
-            file_name: The name or path of the Excel file to create.
-            add_analyse: Whether to add analysis to the Excel output.
-            styled_df: Whether to apply styling to highlight changes.
-            add_review_styles: Whether to add review styles to the workbook.
+            file_name: Required. The name or path of the Excel file to create.
+            add_analyse: Whether to add analysis columns to the Excel output. Defaults to True.
+            add_review_styles: Whether to add review formatting styles to the Excel workbook. Defaults to True.
+            header_spec: HeaderSpec object containing header metadata.
         """
+
+        # todo: we should remove styling stuff to report utils
+
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
         paths = self._repo.get_all_paths()
 
         logger.info("create change excel file")
 
+        header_loader = header_spec.get_loader() if header_spec else None
+
         diff_dict = {
-            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=styled_df)
+            item: self.get_pandas(
+                [item],
+                add_analyse=add_analyse,
+                styled_df=False,  # We do this later
+            )
             for item in paths
         }
         diff_dict = dict(sorted(diff_dict.items()))
         diff_dict = upper_keys_with_index(diff_dict)
 
-        overview_df = pd.concat([styler.data for styler in diff_dict.values()], axis=0)
+        # todo: we should have a get overview methode to make it more clean.
+        overview_df = pd.concat(list(diff_dict.values()), axis=0)
         columns_to_keep = [
             "@puic",
             "path",
@@ -356,9 +383,29 @@ class ImxContainerCompare:
             "Metadata.@lifeCycleStatus",
             "Metadata.@source",
         ]
-        diff_dict = {"meta-overview": overview_df[columns_to_keep]} | diff_dict
+        existing_columns = [
+            col for col in columns_to_keep if col in overview_df.columns
+        ]
+        diff_dict = {"meta-overview": overview_df[existing_columns]} | diff_dict
 
-        with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
+        # todo: below should move to report utils!
+        with pd.ExcelWriter(
+            file_name,
+            engine="xlsxwriter",
+            engine_kwargs={"options": {"strings_to_numbers": True}},
+        ) as writer:
+            # styling all specification rows
+            spec_format_dict = {
+                "bg_color": "#d1d1d1",
+                "valign": "top",
+                "align": "left",
+                "num_format": "@",
+                "locked": True,
+                "border": 7,
+                "text_wrap": True,
+            }
+            writer.spec_format = writer.book.add_format(spec_format_dict)
+
             process_data = {
                 "Diff Report": "",
                 "Run Date": datetime.now().isoformat(),
@@ -367,7 +414,13 @@ class ImxContainerCompare:
                 **self._get_imx_details(self._imx_info, self.container_id_2, "T2"),
             }
             inf_df = app_info_df(process_data)
-            write_df_to_sheet(writer, "info", inf_df, header=False, auto_filter=False)
+            write_df_to_sheet(
+                writer,
+                "info",
+                inf_df,
+                header=False,
+                auto_filter=False,
+            )
 
             for key, df in diff_dict.items():
                 if len(df.columns) == 0:
@@ -377,17 +430,44 @@ class ImxContainerCompare:
                 sheet_name = shorten_sheet_name(key)
 
                 try:
-                    work_sheet = write_df_to_sheet(writer, sheet_name, df)
+                    if key != "meta-overview" and header_loader:
+                        df = header_loader.add_header_to_sheet(df)
+                    elif key == "meta-overview":
+                        df = df.reset_index(drop=True)
+                    df = df.fillna("")
+
+                    df = df.rename(columns={"path_to_root": "Locatie in XML"})
+
+                    work_sheet = write_df_to_sheet(
+                        writer, sheet_name, df, styler=self.style_pandas
+                    )
                     status_column = (
                         df["status"]
                         if isinstance(df, pd.DataFrame)
                         else df.data["status"]
                     )
 
-                    if status_column.eq("unchanged").all():
+                    # tabs met changes highlighten
+                    valid_statuses = [
+                        "added",
+                        "changed",
+                        "unchanged",
+                        "type_change",
+                        "removed",
+                    ]
+                    status_values = status_column[status_column.isin(valid_statuses)]
+
+                    if status_values.eq("unchanged").all():
                         work_sheet.set_tab_color("gray")
 
+                    # TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
+
+                # todo: we should just raise it to break, no end user will see the msg
                 except Exception as e:
+                    import traceback
+
+                    print(traceback.format_exc())
+                    exit()
                     logger.error(f"Error writing sheet {sheet_name}: {e}")
 
         if add_review_styles:

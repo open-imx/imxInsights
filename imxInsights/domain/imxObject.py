@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import Optional
+from typing import Any, Optional
 
 from lxml.etree import _Element as Element
 from shapely import (
@@ -14,7 +14,6 @@ from shapely import (
 from shapely.geometry import GeometryCollection
 
 from imxInsights.domain.imxGeographicLocation import ImxGeographicLocation
-from imxInsights.domain.imxReferenceObjects import ImxRef
 from imxInsights.file.containerizedImx.imxDesignCoreFile import ImxDesignCoreFile
 from imxInsights.file.containerizedImx.imxDesignPetalFile import ImxDesignPetalFile
 from imxInsights.file.imxFile import ImxFile
@@ -80,7 +79,7 @@ class ImxObject:
         self.properties: dict[str, str] = self._set_properties()
         self.imx_situation: str | None = self._get_imx_situation()
         self.container_id: str | None = None
-        self.refs: list[ImxRef] = []
+        self.refs: list[Any] = []
 
     def __repr__(self) -> str:
         return f"<ImxObject {self.path} puic={self.puic} name='{self.name}'/>"
@@ -170,13 +169,15 @@ class ImxObject:
     @geometry.setter
     def geometry(
         self,
-        geometry: LineString
-        | Point
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection,
+        geometry: (
+            LineString
+            | Point
+            | Polygon
+            | MultiLineString
+            | MultiPoint
+            | MultiPolygon
+            | GeometryCollection
+        ),
     ):
         self._geometry = geometry
 
@@ -206,7 +207,7 @@ class ImxObject:
             A dictionary with 'keys' 'values' of all interesting imx properties
         """
         # TODO!: find all property getters / merges for (dataframe) exports
-        result = {"tag": self.tag, "path": self.path}
+        result = {"tag": self.tag, "path": self.path, "path_to_root": self.path_to_root}
         if add_parent:
             result["parent"] = self.parent.puic if self.parent is not None else ""
         if add_children:

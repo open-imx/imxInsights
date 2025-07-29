@@ -101,21 +101,77 @@ def write_df_to_sheet(
     sheet_name: str,
     df: pd.DataFrame | Styler,
     *,
-    index: bool = False,
+    write_index: bool = False,
     header: bool = True,
     auto_filter: bool = True,
+    styler=None,
 ) -> Worksheet:
-    """Write a DataFrame or Styler object to an Excel sheet."""
-    df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
+    """
+    Write a DataFrame or Styler object to an Excel sheet, preserving documentation rows
+    at the top and optionally applying styling and autofilter.
+
+    Args:
+        writer: An ExcelWriter object used to write the Excel file.
+        sheet_name (str): Name of the worksheet where the data will be written.
+        df (pd.DataFrame or Styler): The DataFrame or Styler object to write to the sheet.
+        index (bool, optional): Whether to write row indices. Defaults to False.
+        header (bool, optional): Whether to write column headers. Defaults to True.
+        auto_filter (bool, optional): Whether to apply autofilter to the data rows. Defaults to True.
+        styler (callable, optional): Optional function to apply styling to the data (not documentation) rows. Defaults to None.
+
+    Returns:
+        Worksheet: The xlsxwriter Worksheet object for the written sheet.
+    """
+    documentation_indicator = df.index.to_series().apply(lambda x: isinstance(x, str))
+
+    documentation = df[documentation_indicator]
+    documentation_size = len(documentation)
+    documentation.to_excel(
+        writer,
+        sheet_name=sheet_name,
+        index=write_index,
+        header=False,
+    )
     worksheet = writer.sheets[sheet_name]
-    worksheet.autofit()
-    worksheet.freeze_panes(1, 0)
+    spec_format = writer.spec_format
+
+    for index, row in df[documentation_indicator].iterrows():
+        row_num = df.index.get_loc(index)
+        worksheet.set_row(row_num, 15.0001, spec_format)
+
+    # now write body
+    body = df[~documentation_indicator]
+    if styler:
+        body = styler(body)
+
+    body.to_excel(
+        writer,
+        sheet_name=sheet_name,
+        index=write_index,
+        header=header,
+        startrow=documentation_size,
+    )
+
+    worksheet.freeze_panes(documentation_size + 1, 1)
+    worksheet.documentation_size = documentation_size
+    worksheet.documentation_indicator = documentation_indicator
 
     data = df.data if isinstance(df, Styler) else df  # type: ignore
 
     if auto_filter and not data.empty:
         num_cols = len(data.columns) - 1
-        worksheet.autofilter(0, 0, 0, num_cols)
+        worksheet.autofilter(documentation_size, 0, documentation_size, num_cols)
+
+    # kolombreedte aanpassen
+    for i, column in enumerate(df.columns):
+        # Include the collumn name not rest of header, also minimal 15 chars wide
+        col_data = df[column].iloc[documentation_size:]
+        max_len_in_col = max(col_data.astype(str).map(len).max(), len(str(column)), 15)
+        # Always show the whole column name
+        max_allowed = max(80, len(str(column)))
+        new_width = min(max_len_in_col, max_allowed)
+        worksheet.set_column(i, i, new_width + 2)
+
     return worksheet
 
 
@@ -131,6 +187,15 @@ REVIEW_STYLES = {
 
 
 def add_review_styles_to_excel(file_name: str | Path) -> None:
+    """
+    Add predefined review styles as named styles to an existing Excel file.
+
+    Args:
+        file_name (str | Path): Path to the Excel file to modify.
+
+    Returns:
+        None
+    """
     if isinstance(file_name, Path):
         file_name = f"{file_name}"
 

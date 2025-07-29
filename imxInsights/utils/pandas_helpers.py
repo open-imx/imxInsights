@@ -1,9 +1,7 @@
-from typing import Any
-
 import pandas as pd
 
 
-def styler_highlight_changes(value: Any, borders=False) -> str:  # pragma: no cover
+def styler_highlight_changes(value: str, borders=False) -> str:  # pragma: no cover
     """
     Highlight changes in a DataFrame cell with different borders based on the value.
 
@@ -34,7 +32,7 @@ def styler_highlight_changes(value: Any, borders=False) -> str:  # pragma: no co
         return ""
 
 
-def styler_highlight_change_status(value: Any) -> str:  # pragma: no cover
+def styler_highlight_change_status(value: str) -> str:  # pragma: no cover
     """
     Highlight changes in a DataFrame cell with change status.
 
@@ -51,6 +49,39 @@ def styler_highlight_change_status(value: Any) -> str:  # pragma: no cover
     elif str(value) == "removed":
         return "color: blue; font-weight: bold;"
     return ""
+
+
+def styler_highlight_incorrect_uitwisselsope(
+    value: str, column: pd.Series
+) -> str:  # pragma: no cover
+    """
+    Highlight uitwisselscope in a DataFrame cell where uitwisselscope is incorrect.
+
+    Args:
+        value (str): The value of the current DataFrame cell.
+        column (pd.Series): The entire Series (column) from which the cell is taken, used to check subsequent values.
+
+    Returns:
+        The CSS style string for highlighting.
+    """
+
+    if value != "TRUE":
+        return ""
+
+    # Try to find the row position of the current cell
+    matching_indices = column.index[column == value]
+
+    # Single match — get position
+    current_idx = matching_indices[0]
+    current_pos = column.index.get_loc(current_idx)
+
+    below_values = column.iloc[current_pos + 1 :]
+    all_filled = below_values.notna().all() and (below_values != "").all()
+
+    if all_filled:
+        return "color: green; font-weight: bold;"
+    else:
+        return "color: red; font-weight: bold; background-color: LightGray;"
 
 
 def style_puic_groups(df):  # pragma: no cover
