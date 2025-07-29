@@ -1,7 +1,6 @@
-import math
+from dataclasses import dataclass, field
 
 import pandas as pd
-from loguru import logger
 
 
 class HeaderLoader:
@@ -152,3 +151,20 @@ class HeaderLoader:
         ordering_df = pd.DataFrame(columns=in_order)
 
         return pd.concat([ordering_df, info, df])
+
+
+@dataclass
+class HeaderSpec:
+    file_path: str
+    path_field: str = "path"
+
+    # TODO: tuples as a datatype are nice, but lists are used for most features... we should keep it constant
+
+    ignore_fields: tuple[str] = field(default_factory=tuple)
+
+    def get_loader(self) -> "HeaderLoader":
+        return HeaderLoader(
+            self.file_path,
+            self.path_field,
+            ignore=self.ignore_fields,
+        )

@@ -3,6 +3,8 @@ import tempfile
 from imxInsights import ImxMultiRepo, ImxContainer, ImxSingleFile
 from openpyxl import load_workbook
 
+from imxInsights.utils.headerLoader import HeaderSpec
+
 
 def test_specs_on_report_v124(
         imx_v124_project_instance: ImxSingleFile,
@@ -19,7 +21,7 @@ def test_specs_on_report_v124(
     )
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
-        compare.to_excel(file_path, header_file=imx_v124_specs_csv)
+        compare.to_excel(file_path, header_spec=HeaderSpec(imx_v124_specs_csv))
         _check_header_for_specs(file_path, ['AtpType'])
 
 
@@ -36,8 +38,9 @@ def test_specs_on_report_v1200(
     compare = multi_repo.compare(imx_v1200_zip_instance.container_id, imx_v1200_dir_instance.container_id)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
-        compare.to_excel(file_path, header_file=imx_v1200_specs_csv)
+        compare.to_excel(file_path, header_spec=HeaderSpec(imx_v1200_specs_csv))
 
+        # TODO: seems not to work for these columns.... not sure why
         _check_header_for_specs(file_path, [
             'N_ITER', 'Variable', 'PowerConnectionCableFunction', 'RelayConnectionCableFunction', 'AtpType',
             'D_STATIC', 'NC_CDDIFF', 'Q_DIFF', 'Q_FRONT', 'V_DIFF', 'V_STATIC', 'A_NVP12', 'A_NVP23', 'NID_C',

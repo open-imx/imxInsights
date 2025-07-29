@@ -3,13 +3,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 from loguru import logger
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
-from imxInsights.compare.headerLoader import HeaderLoader
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
+from imxInsights.utils.headerLoader import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_change_status,
@@ -176,7 +175,6 @@ class ImxContainerCompare:
             add_analyse (bool): Whether to add analysis to the DataFrame.
             styled_df (bool): Whether to apply styling to highlight changes.
             ref_display (bool): Whether to add reference display properties to the output.
-            fase: The phase of the project (e.g., "RVTO", "DO").
 
         Returns:
             pd.DataFrame: A DataFrame representing the changes for the specified object path.
@@ -225,6 +223,8 @@ class ImxContainerCompare:
         return df
 
     def style_pandas(self, df):
+        # TODO: this should be report helper util
+
         excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
         styler = df.style.map(  # type: ignore[attr-defined]
             styler_highlight_changes,
@@ -334,34 +334,27 @@ class ImxContainerCompare:
         file_name: str | Path,
         add_analyse: bool = True,
         add_review_styles: bool = True,
-        header_file: str | None = None,
-        header_file_path_field: str = "path",
-        header_ignore_fields: tuple | list = tuple(),
-        hide_unchanged: bool = False,
+        header_spec: HeaderSpec | None = None,
     ) -> None:
         """
         Exports the overview and detailed changes to an Excel file. Adds header formatting in case a specification file is provided.
 
         Args:
-            file_name (str or Path): Required. The name or path of the Excel file to create.
-            add_analyse (bool, optional): Whether to add analysis columns to the Excel output. Defaults to True.
-            add_review_styles (bool, optional): Whether to add review formatting styles to the Excel workbook. Defaults to True.
-            header_file (str or None, optional): Path to the specification header file used to add column-level metadata. If None, no headers are added. Defaults to None.
-            header_file_path_field (str, optional): The column name in the header file that contains the object path. Used for aligning headers with data. Defaults to "path".
-            header_ignore_fields (tuple or list, optional): A collection of field names to ignore when applying headers. Useful for omitting metadata fields from formatting. Defaults to empty tuple.
-            hide_unchanged (bool, optional): Whether to hide unchanged rows and/or entire sheets in the Excel output. Entire sheets are hidden if all rows are unchanged; otherwise, only the unchanged rows are hidden. Defaults to False.
+            file_name: Required. The name or path of the Excel file to create.
+            add_analyse: Whether to add analysis columns to the Excel output. Defaults to True.
+            add_review_styles: Whether to add review formatting styles to the Excel workbook. Defaults to True.
+            header_spec: HeaderSpec object containing header metadata.
         """
+
+        # todo: we should remove styling stuff to report utils
+
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
 
         paths = self._repo.get_all_paths()
 
         logger.info("create change excel file")
 
-        # todo: self should not carry the header loader.
-        if header_file:
-            self._header_loader = HeaderLoader(
-                header_file, header_file_path_field, ignore=header_ignore_fields
-            )
+        header_loader = header_spec.get_loader() if header_spec else None
 
         diff_dict = {
             item: self.get_pandas(
@@ -374,6 +367,7 @@ class ImxContainerCompare:
         diff_dict = dict(sorted(diff_dict.items()))
         diff_dict = upper_keys_with_index(diff_dict)
 
+        # todo: we should have a get overview methode to make it more clean.
         overview_df = pd.concat(list(diff_dict.values()), axis=0)
         columns_to_keep = [
             "@puic",
@@ -394,6 +388,7 @@ class ImxContainerCompare:
         ]
         diff_dict = {"meta-overview": overview_df[existing_columns]} | diff_dict
 
+        # todo: below should move to report utils!
         with pd.ExcelWriter(
             file_name,
             engine="xlsxwriter",
@@ -435,8 +430,8 @@ class ImxContainerCompare:
                 sheet_name = shorten_sheet_name(key)
 
                 try:
-                    if key != "meta-overview" and header_file:
-                        df = self._header_loader.add_header_to_sheet(df)
+                    if key != "meta-overview" and header_loader:
+                        df = header_loader.add_header_to_sheet(df)
                     elif key == "meta-overview":
                         df = df.reset_index(drop=True)
                     df = df.fillna("")
@@ -465,6 +460,9 @@ class ImxContainerCompare:
                     if status_values.eq("unchanged").all():
                         work_sheet.set_tab_color("gray")
 
+                    # TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
+
+                # todo: we should just raise it to break, no end user will see the msg
                 except Exception as e:
                     import traceback
 

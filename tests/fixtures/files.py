@@ -34,10 +34,10 @@ def load_test_features() -> dict:
 
 @pytest.fixture(scope="module")
 def imx_v124_specs_csv() -> str:
-    return sample_path("spec-mini-01.2.4-v4.csv")
+    return sample_path("spec-mini-01.2.4.csv")
 
 
 @pytest.fixture(scope="module")
 def imx_v1200_specs_csv() -> str:
-    return sample_path("spec-mini-12.0.0-v2.csv")
+    return sample_path("spec-mini-12.0.0.csv")
 
