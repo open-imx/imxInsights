@@ -21,6 +21,7 @@ def test_specs_on_report_v124(
     )
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
+        file_path = "tester_v124.xlsx"
         compare.to_excel(file_path, header_spec=HeaderSpec(imx_v124_specs_csv))
         _check_header_for_specs(file_path, ['AtpType'])
 
@@ -38,6 +39,7 @@ def test_specs_on_report_v1200(
     compare = multi_repo.compare(imx_v1200_zip_instance.container_id, imx_v1200_dir_instance.container_id)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as file_path:
+        file_path = "tester_v1200.xlsx"
         compare.to_excel(file_path, header_spec=HeaderSpec(imx_v1200_specs_csv))
 
         # TODO: seems not to work for these columns.... not sure why
