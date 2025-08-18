@@ -448,9 +448,6 @@ class ImxContainerCompare:
 
                     df = df.fillna("")
 
-                    # waarom nederlands, dit gaat weg
-                    df = df.rename(columns={"path_to_root": "Locatie in XML"})
-
                     work_sheet = write_df_to_sheet(
                         writer, sheet_name, df, styler=self.style_pandas
                     )
