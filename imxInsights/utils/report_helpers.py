@@ -246,3 +246,35 @@ def add_review_styles_to_excel(file_name: str | Path) -> None:
 
     if os.path.exists(temp_file_name):
         os.remove(temp_file_name)
+
+
+def add_nice_display(imx_object, props):
+    # TODO: not sure, if we overwrite the ref, or add a column...
+    add_column = True
+
+    ref_lookup_map = {
+        ref.lookup: ref.display for ref in imx_object.refs
+    }  # Create a lookup map once
+
+    result = {}
+    for key, value in props.items():
+        formatted_value = "\n".join(value.split(" "))
+        result[key] = formatted_value
+
+        if key.endswith("Ref"):
+            if value in ref_lookup_map:
+                result[f"{key}|display" if add_column else key] = ref_lookup_map[
+                    value
+                ]
+
+        elif key.endswith("Refs"):
+            ref_displays = [
+                ref_lookup_map[item]
+                for item in value.split(" ")
+                if item in ref_lookup_map
+            ]
+            if ref_displays:
+                result[f"{key}|display" if add_column else key] = "\n".join(
+                    ref_displays
+                )
+    return result
