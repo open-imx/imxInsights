@@ -388,12 +388,18 @@ class ImxContainerCompare:
         ]
         diff_dict = {"meta-overview": overview_df[existing_columns]} | diff_dict
 
+
+
+
         # todo: below should move to report utils!
         with pd.ExcelWriter(
             file_name,
             engine="xlsxwriter",
             engine_kwargs={"options": {"strings_to_numbers": True}},
         ) as writer:
+
+
+            # todo: specs header format
             # styling all specification rows
             spec_format_dict = {
                 "bg_color": "#d1d1d1",
@@ -406,6 +412,9 @@ class ImxContainerCompare:
             }
             writer.spec_format = writer.book.add_format(spec_format_dict)
 
+
+
+            # General info (keep here)
             process_data = {
                 "Diff Report": "",
                 "Run Date": datetime.now().isoformat(),
@@ -413,6 +422,7 @@ class ImxContainerCompare:
                 **self._get_imx_details(self._imx_info, self.container_id_1, "T1"),
                 **self._get_imx_details(self._imx_info, self.container_id_2, "T2"),
             }
+
             inf_df = app_info_df(process_data)
             write_df_to_sheet(
                 writer,
@@ -430,12 +440,15 @@ class ImxContainerCompare:
                 sheet_name = shorten_sheet_name(key)
 
                 try:
+                    # if not overview, add specs if specified
                     if key != "meta-overview" and header_loader:
                         df = header_loader.add_header_to_sheet(df)
                     elif key == "meta-overview":
                         df = df.reset_index(drop=True)
+
                     df = df.fillna("")
 
+                    # waarom nederlands, dit gaat weg
                     df = df.rename(columns={"path_to_root": "Locatie in XML"})
 
                     work_sheet = write_df_to_sheet(
@@ -447,7 +460,7 @@ class ImxContainerCompare:
                         else df.data["status"]
                     )
 
-                    # tabs met changes highlighten
+                    # wat doet dit??
                     valid_statuses = [
                         "added",
                         "changed",
@@ -456,9 +469,10 @@ class ImxContainerCompare:
                         "removed",
                     ]
                     status_values = status_column[status_column.isin(valid_statuses)]
-
                     if status_values.eq("unchanged").all():
                         work_sheet.set_tab_color("gray")
+
+
 
                     # TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
 
