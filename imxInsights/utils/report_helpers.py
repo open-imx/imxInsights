@@ -12,22 +12,53 @@ from openpyxl.styles import NamedStyle, PatternFill
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
+INVALID_SHEET_CHARS = set(r"[]:*?/\\")
+
+
+def sanitize_sheet_name(name: str) -> str:
+    """
+    Sanitize a string so it can be used as a valid Excel sheet name.
+
+    Rules applied:
+    - Remove invalid Excel characters (\, /, ?, *, [, ], :).
+    - Strip trailing apostrophes (Excel doesn’t allow a sheet name to end with `'`).
+    - If the result is empty, fall back to "Sheet".
+
+    Args:
+        name (str): Proposed sheet name.
+
+    Returns:
+        str: A sanitized sheet name safe for Excel.
+    """
+    name = "".join(ch for ch in name if ch not in INVALID_SHEET_CHARS)
+    name = name.rstrip("'") or "Sheet"
+    return name
+
 
 def shorten_sheet_name(sheet_name: str) -> str:
     """
-    Shorten the sheet name to fit within 30 characters, adding ellipses in the middle if needed.
+    Ensure an Excel sheet name is both valid and within the 31-character limit.
+
+    Workflow:
+    - Sanitize the name (remove invalid characters, trailing apostrophes).
+    - If the name length is <= 31, return it unchanged.
+    - If it exceeds 31 characters, shorten it by keeping:
+        * the first 14 characters,
+        * the last 14 characters,
+        * separated by "..." in the middle.
 
     Args:
-        sheet_name: The name of the sheet to shorten.
+        sheet_name (str): Proposed sheet name.
 
     Returns:
-        The shortened sheet name.
+        str: A valid sheet name that is guaranteed to fit Excel's 31-char limit.
     """
-    return (
-        f"{sheet_name[:14]}...{sheet_name[-14:]}"
-        if len(sheet_name) > 30
-        else sheet_name
-    )
+    sheet_name = sanitize_sheet_name(sheet_name)
+    if len(sheet_name) <= 31:
+        return sheet_name
+    head = 14
+    tail = 14
+    return f"{sheet_name[:head]}...{sheet_name[-tail:]}"
 
 
 def clean_diff_df(df) -> pd.DataFrame:
