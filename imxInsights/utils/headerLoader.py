@@ -268,14 +268,19 @@ class HeaderLoader:
         return metadata_header_df
 
     def _merge_metadata_and_data(
-        self, df: pd.DataFrame, metadata_header_df: pd.DataFrame
+        self, df: pd.DataFrame, metadata_header_df: pd.DataFrame, drop_empty_columns:bool = True
     ) -> pd.DataFrame:
         """
         Merge metadata info into a DataFrame and reorder columns.
 
+        The metadata rows (from `metadata_header_df`) are stacked on top of the
+        provided data (`df`) to form a consistent table with aligned columns.
+
         Args:
-            df (pd.DataFrame): The input data frame with actual values.
+            df (pd.DataFrame): The input DataFrame with actual data values.
             metadata_header_df (pd.DataFrame): Metadata header with specification info.
+            drop_empty_columns (bool, optional): If True, drop columns that are entirely
+                empty after merging. Defaults to True.
 
         Returns:
             pd.DataFrame: DataFrame containing metadata rows stacked on top
@@ -356,14 +361,25 @@ class HeaderLoader:
         empty_ordering_df = pd.DataFrame(columns=ordered_cols)
 
         # Concat ensures consistent columns + merges metadata & dataframes
-        return pd.concat([empty_ordering_df, metadata_header_df, df])
+        contacted_df = pd.concat([empty_ordering_df, metadata_header_df, df])
 
-    def apply_metadata_header(self, df: pd.DataFrame) -> pd.DataFrame:
+        # no value no specs option
+        if drop_empty_columns:
+            contacted_df = contacted_df.dropna(axis=1, how='all')
+
+        return contacted_df
+
+    def apply_metadata_header(self, df: pd.DataFrame, drop_empty_columns: bool=True) -> pd.DataFrame:
         """
-        Add a specification header block on top of the given DataFrame.
+        Add a specification metadata header block on top of the given DataFrame.
+
+        This wraps the input DataFrame with metadata information, ensuring consistent
+        column ordering and optional pruning of unused columns.
 
         Args:
             df (pd.DataFrame): DataFrame with data rows and at least a 'path_to_root' column.
+            drop_empty_columns (bool, optional): If True, drop columns that are entirely
+                empty after merging with the metadata header. Defaults to True.
 
         Returns:
             pd.DataFrame: Combined DataFrame with metadata header rows prepended.
@@ -381,7 +397,7 @@ class HeaderLoader:
         # TODO: add info for display and analyse columns
 
         df_with_header = self._merge_metadata_and_data(
-            df=df, metadata_header_df=metadata_header_df
+            df=df, metadata_header_df=metadata_header_df, drop_empty_columns=drop_empty_columns
         )
         return df_with_header
 
