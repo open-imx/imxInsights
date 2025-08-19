@@ -29,7 +29,7 @@ def test_shorten_sheet_name():
             == "Sheet_with_🚀_n...eds_shortening"
     )
 
-    assert shorten_sheet_name("") == ""
+    assert shorten_sheet_name("") == "Sheet"
 
 
 def test_df_columns_sort_start_end():
