@@ -264,7 +264,9 @@ def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Work
         work_sheet.set_tab_color("gray")
 
 
-def apply_autofilter(worksheet: Worksheet, start_row: int, data_df: pd.DataFrame) -> None:
+def apply_autofilter(
+    worksheet: Worksheet, start_row: int, data_df: pd.DataFrame
+) -> None:
     """
     Apply an autofilter to the header row of the data block.
 
