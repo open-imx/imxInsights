@@ -8,23 +8,23 @@ from xlsxwriter.worksheet import Worksheet  # type: ignore
 
 from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 
-# TODO: check if we can use pandas metadata to add column metadata!
-# TODO: add info for display and analyse columns
 
+# TODO: add info for display and analyse columns
+# TODO: write index on excel support? and rename index to write_index in write_df_to_sheet
 
 class HeaderLoader:
     """
     Class to handle the lookup and processing of metadata header rows for Excel sheets.
 
     Responsibilities:
+
     - Load a CSV specification file containing metadata about fields.
-    - Clean and normalize paths in the specification (removing indices, prefixes, diff symbols).
     - Map specification metadata onto DataFrame columns.
     - Prepend metadata rows as "header blocks" above data rows in exported Excel files.
-    - Write styled metadata + data blocks into Excel sheets.
 
-    This is typically used to enrich exported Excel reports with structured
-    documentation rows at the top, making the meaning of each column explicit.
+    !!! TODO
+            Check if we can use pandas metadata to add column metadata!
+
     """
 
     def __init__(
@@ -524,8 +524,52 @@ class HeaderSpec:
         drop_empty_columns (bool, optional): If True, drop columns that are entirely
             empty after merging with the metadata header. Defaults to True.
 
-    Methods:
-        get_loader() -> HeaderLoader: Build and return a `HeaderLoader` instance for this specification.
+    ## Specification CSV
+
+    The specification CSV provides **metadata for DataFrame columns** that are exported
+    to Excel (diff and population report). It defines a metadata block whit info about the columns.
+
+    ### File structure
+
+    The CSV must contain at least one column:
+
+    - **path** (*required*): A canonical field path this row describes.
+      - Written in dot notation, without numeric indices.
+      - Examples:
+        - ``SingleSwitch.@puic`` or ``SingleSwitch.extension.MicroNode.@railConnectionRef``.
+
+    Other columns will be rendered as **documentation rows** above the table header.
+
+    Example metadata columns include:
+
+    - **description**: Explanation of the field’s meaning.
+    - **datatype**: Expected type (e.g. ``string``, ``number``, ``enum:…``).
+    - **required**: Whether the field is mandatory (``yes``/``no``).
+    - **domain**: Controlled vocabulary or external reference.
+
+    #### Example
+
+    ```csv
+    path,label,description,datatype,required,documentation,documentation_link
+    SingleSwitch.@puic,PUIC,Unique object identifier,string,yes,PUIC spec,https://docs.example/puic
+    SingleSwitch.parent,Parent PUIC,Parent object reference,string,no,Parent ref,https://docs.example/parent
+    SingleSwitch.extension.MicroNode.@railConnectionRef,RailConn Ref,Reference to rail connection,string,no,Ext ref,https://docs.example/railconn
+    ```
+
+    ### Hyperlink support
+
+    If a column ``X`` has a companion ``X_link`` column, the loader will replace ``X`` with an Excel
+    HYPERLINK formula pointing to ``X_link``.
+
+    Example:
+
+    - ``documentation`` + ``documentation_link`` →
+      ``=HYPERLINK("https://docs.example/puic", "PUIC spec")``
+
+    ### Excel export
+    The world runs on Excel so we generate an Excel sheet where metadata rows are
+    stacked above the data rows, making the report self-documenting.
+
     """
 
     spec_csv_path: str
