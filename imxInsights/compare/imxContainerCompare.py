@@ -16,14 +16,14 @@ from imxInsights.utils.pandas_helpers import (
     styler_highlight_changes,
 )
 from imxInsights.utils.report_helpers import (
+    add_overview_df_to_diff_dict,
     add_review_styles_to_excel,
     app_info_df,
     clean_diff_df,
+    set_sheet_color_by_change_status,
     shorten_sheet_name,
     upper_keys_with_index,
     write_df_to_sheet,
-    add_overview_df_to_diff_dict,
-    set_sheet_color_by_change_status,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
@@ -361,7 +361,6 @@ class ImxContainerCompare:
             engine="xlsxwriter",
             engine_kwargs={"options": {"strings_to_numbers": True}},
         ) as writer:
-
             process_info = {
                 "Diff Report": "",
                 "Run Date": datetime.now().isoformat(),

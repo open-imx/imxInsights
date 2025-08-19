@@ -2,12 +2,10 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import pandas as pd
-from xlsxwriter.worksheet import Worksheet  # type: ignore
 from pandas.io.formats.style import Styler
-
+from xlsxwriter.worksheet import Worksheet  # type: ignore
 
 # TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
-
 
 
 class HeaderLoader:
@@ -170,7 +168,7 @@ class HeaderLoader:
         write_index: bool = False,
         header: bool = True,
         auto_filter: bool = True,
-        styler_fn: Callable | None= None
+        styler_fn: Callable | None = None,
     ) -> Worksheet:
         """
         Write a DataFrame or Styler object to an Excel sheet, preserving documentation rows
@@ -188,7 +186,9 @@ class HeaderLoader:
         Returns:
             Worksheet: The xlsxwriter Worksheet object for the written sheet.
         """
-        documentation_indicator = df.index.to_series().apply(lambda x: isinstance(x, str))
+        documentation_indicator = df.index.to_series().apply(
+            lambda x: isinstance(x, str)
+        )
 
         documentation = df[documentation_indicator]
 
@@ -247,7 +247,9 @@ class HeaderLoader:
         for i, column in enumerate(df.columns):
             # Include the collumn name not rest of header, also minimal 15 chars wide
             col_data = df[column].iloc[documentation_size:]
-            max_len_in_col = max(col_data.astype(str).map(len).max(), len(str(column)), 15)
+            max_len_in_col = max(
+                col_data.astype(str).map(len).max(), len(str(column)), 15
+            )
             # Always show the whole column name
             max_allowed = max(80, len(str(column)))
             new_width = min(max_len_in_col, max_allowed)

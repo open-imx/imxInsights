@@ -118,6 +118,7 @@ def write_df_to_sheet(
         worksheet.autofilter(0, 0, 0, num_cols)
     return worksheet
 
+
 REVIEW_STYLES = {
     "OK": "80D462",
     "OK met opm": "66FF99",
@@ -206,9 +207,7 @@ def add_nice_display(imx_object, props):
 
         if key.endswith("Ref"):
             if value in ref_lookup_map:
-                result[f"{key}|display" if add_column else key] = ref_lookup_map[
-                    value
-                ]
+                result[f"{key}|display" if add_column else key] = ref_lookup_map[value]
 
         elif key.endswith("Refs"):
             ref_displays = [
@@ -223,7 +222,9 @@ def add_nice_display(imx_object, props):
     return result
 
 
-def add_overview_df_to_diff_dict(diff_dict: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
+def add_overview_df_to_diff_dict(
+    diff_dict: dict[str, pd.DataFrame],
+) -> dict[str, pd.DataFrame]:
     overview_df = pd.concat(list(diff_dict.values()), axis=0)
     columns_to_keep = [
         "@puic",
@@ -239,18 +240,12 @@ def add_overview_df_to_diff_dict(diff_dict: dict[str, pd.DataFrame]) -> dict[str
         "Metadata.@lifeCycleStatus",
         "Metadata.@source",
     ]
-    existing_columns = [
-        col for col in columns_to_keep if col in overview_df.columns
-    ]
+    existing_columns = [col for col in columns_to_keep if col in overview_df.columns]
     return {"meta-overview": overview_df[existing_columns]} | diff_dict
 
 
 def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Worksheet):
-    status_column = (
-        df["status"]
-        if isinstance(df, pd.DataFrame)
-        else df.data["status"]
-    )
+    status_column = df["status"] if isinstance(df, pd.DataFrame) else df.data["status"]
 
     # TODO set sheet color should be report methode so we can reuse it in compare chain
     valid_statuses = [
