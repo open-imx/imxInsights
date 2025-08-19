@@ -1,6 +1,13 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import pandas as pd
+from xlsxwriter.worksheet import Worksheet  # type: ignore
+from pandas.io.formats.style import Styler
+
+
+# TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
+
 
 
 class HeaderLoader:
@@ -64,6 +71,8 @@ class HeaderLoader:
         Returns:
             pandas.DataFrame: The modified DataFrame with specification header rows prepended.
         """
+
+        # TODO: check if we can use pandas metadata to add column metadata!
 
         basepath = self.remove_extra_path(df["path_to_root"].values[0]) + "."
 
@@ -151,6 +160,100 @@ class HeaderLoader:
         ordering_df = pd.DataFrame(columns=in_order)
 
         return pd.concat([ordering_df, info, df])
+
+    @staticmethod
+    def write_df_and_header_to_sheet(
+        writer,
+        sheet_name: str,
+        df: pd.DataFrame | Styler,
+        *,
+        write_index: bool = False,
+        header: bool = True,
+        auto_filter: bool = True,
+        styler_fn: Callable | None= None
+    ) -> Worksheet:
+        """
+        Write a DataFrame or Styler object to an Excel sheet, preserving documentation rows
+        at the top and optionally applying styling and autofilter.
+
+        Args:
+            writer: An ExcelWriter object used to write the Excel file.
+            sheet_name (str): Name of the worksheet where the data will be written.
+            df (pd.DataFrame or Styler): The DataFrame or Styler object to write to the sheet.
+            index (bool, optional): Whether to write row indices. Defaults to False.
+            header (bool, optional): Whether to write column headers. Defaults to True.
+            auto_filter (bool, optional): Whether to apply autofilter to the data rows. Defaults to True.
+            styler_fn (callable, optional): Optional function to apply styling to the data (not documentation) rows. Defaults to None.
+
+        Returns:
+            Worksheet: The xlsxwriter Worksheet object for the written sheet.
+        """
+        documentation_indicator = df.index.to_series().apply(lambda x: isinstance(x, str))
+
+        documentation = df[documentation_indicator]
+
+        documentation_size = len(documentation)
+        documentation.to_excel(
+            writer,
+            sheet_name=sheet_name,
+            index=write_index,
+            header=False,
+        )
+        worksheet = writer.sheets[sheet_name]
+
+        # styling all specification rows
+        spec_format_dict = {
+            "bg_color": "#d1d1d1",
+            "valign": "top",
+            "align": "left",
+            "num_format": "@",
+            "locked": True,
+            "border": 7,
+            "text_wrap": True,
+        }
+        writer.spec_format = writer.book.add_format(spec_format_dict)
+
+        spec_format = writer.spec_format
+
+        for index, row in df[documentation_indicator].iterrows():
+            row_num = df.index.get_loc(index)
+            worksheet.set_row(row_num, 15.0001, spec_format)
+
+        # now write body
+        body = df[~documentation_indicator]
+
+        styler = styler_fn(body)
+
+        styler.to_excel(
+            writer,
+            sheet_name=sheet_name,
+            index=write_index,
+            header=header,
+            startrow=documentation_size,
+        )
+
+        worksheet.freeze_panes(documentation_size + 1, 1)
+        worksheet.documentation_size = documentation_size
+        worksheet.documentation_indicator = documentation_indicator
+
+        data = df.data if isinstance(df, Styler) else df  # type: ignore
+
+        # TODO: should be report helper
+        if auto_filter and not data.empty:
+            num_cols = len(data.columns) - 1
+            worksheet.autofilter(documentation_size, 0, documentation_size, num_cols)
+
+        # TODO: should be report helper
+        for i, column in enumerate(df.columns):
+            # Include the collumn name not rest of header, also minimal 15 chars wide
+            col_data = df[column].iloc[documentation_size:]
+            max_len_in_col = max(col_data.astype(str).map(len).max(), len(str(column)), 15)
+            # Always show the whole column name
+            max_allowed = max(80, len(str(column)))
+            new_width = min(max_len_in_col, max_allowed)
+            worksheet.set_column(i, i, new_width + 2)
+
+        return worksheet
 
 
 @dataclass
