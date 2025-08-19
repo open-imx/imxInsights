@@ -6,7 +6,7 @@ import pandas as pd
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
-from imxInsights.utils.report_helpers import autosize_columns, apply_autofilter
+from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 
 
 class HeaderLoader:
@@ -46,7 +46,9 @@ class HeaderLoader:
         self.metadata_label_col = "Tester"
 
         # Load specification table
-        self.spec_df = pd.read_csv(self.spec_csv_path, on_bad_lines="skip", encoding="utf-8")
+        self.spec_df = pd.read_csv(
+            self.spec_csv_path, on_bad_lines="skip", encoding="utf-8"
+        )
 
         # Normalize spec file by applying transformations
         self._apply_hyperlink_columns()
@@ -126,7 +128,9 @@ class HeaderLoader:
         )
         return object_specs_df
 
-    def _build_column_path_map(self, df: pd.DataFrame, object_base_path: str) -> pd.DataFrame:
+    def _build_column_path_map(
+        self, df: pd.DataFrame, object_base_path: str
+    ) -> pd.DataFrame:
         """
         Construct paths for each DataFrame column relative to a base path.
 
@@ -138,9 +142,9 @@ class HeaderLoader:
             pd.DataFrame: Mapping of DataFrame columns to normalized spec paths.
         """
         column_path_map_df = pd.DataFrame({"field": df.columns})
-        column_path_map_df["path"] = (object_base_path + column_path_map_df["field"]).map(
-            self._normalize_path_without_indices
-        )
+        column_path_map_df["path"] = (
+            object_base_path + column_path_map_df["field"]
+        ).map(self._normalize_path_without_indices)
         return column_path_map_df
 
     def _build_metadata_header(
@@ -164,7 +168,9 @@ class HeaderLoader:
         )
 
         # Prefer 'field' from actual data when available, else fall back to spec-derived field
-        merged_specs_df["field"] = merged_specs_df["field_y"].fillna(merged_specs_df["field_x"])
+        merged_specs_df["field"] = merged_specs_df["field_y"].fillna(
+            merged_specs_df["field_x"]
+        )
 
         # Index by 'field' for alignment
         merged_specs_df = merged_specs_df.set_index("field", drop=False)
@@ -196,8 +202,10 @@ class HeaderLoader:
         )
 
         # Combine both results, transpose so fields become columns, and drop all-NaN rows
-        metadata_header_df = pd.concat([merged_specs_df, direct_match_specs_df]).transpose().dropna(
-            how="all"
+        metadata_header_df = (
+            pd.concat([merged_specs_df, direct_match_specs_df])
+            .transpose()
+            .dropna(how="all")
         )
 
         return metadata_header_df
@@ -267,11 +275,17 @@ class HeaderLoader:
                 return (is_extension_code, str(colname), 0)
 
         # Build the metadata dataframe with the label as both index and column
-        metadata_label_df = pd.DataFrame({self.metadata_label_col: metadata_header_df.index})
-        metadata_label_df = metadata_label_df.set_index(metadata_label_df[self.metadata_label_col])
+        metadata_label_df = pd.DataFrame(
+            {self.metadata_label_col: metadata_header_df.index}
+        )
+        metadata_label_df = metadata_label_df.set_index(
+            metadata_label_df[self.metadata_label_col]
+        )
 
         # Prepend the labels to the metadata header (ensures label column is present)
-        metadata_header_df = pd.concat([metadata_label_df, metadata_header_df], axis="columns")
+        metadata_header_df = pd.concat(
+            [metadata_label_df, metadata_header_df], axis="columns"
+        )
 
         # Compute the complete set of columns from both metadata and dataframes
         combined_cols = list(
@@ -299,7 +313,9 @@ class HeaderLoader:
         """
         object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
         object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
-        column_path_map_df = self._build_column_path_map(df=df, object_base_path=object_base_path)
+        column_path_map_df = self._build_column_path_map(
+            df=df, object_base_path=object_base_path
+        )
         metadata_header_df = self._build_metadata_header(
             object_specs_df=object_specs_df, column_path_map_df=column_path_map_df
         )
@@ -307,7 +323,9 @@ class HeaderLoader:
         # TODO: check if we can use pandas metadata to add column metadata!
         # TODO: add info for display and analyse columns
 
-        df_with_header = self._merge_metadata_and_data(df=df, metadata_header_df=metadata_header_df)
+        df_with_header = self._merge_metadata_and_data(
+            df=df, metadata_header_df=metadata_header_df
+        )
         return df_with_header
 
     @staticmethod
