@@ -61,12 +61,39 @@ def shorten_sheet_name(sheet_name: str) -> str:
     return f"{sheet_name[:head]}...{sheet_name[-tail:]}"
 
 
-def clean_diff_df(df) -> pd.DataFrame:
-    df["@puic"] = df["@puic"].str.lstrip("+-")
-    df["tag"] = df["tag"].str.lstrip("+-")
-    df["path"] = df["path"].str.lstrip("+-")
-    df["parent"] = df["parent"].replace({"++": "", "--": ""})
-    df["children"] = df["children"].replace({"++": "", "--": ""})
+def clean_diff_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean a diff-report DataFrame by removing diff markers from specific columns.
+
+    This function standardizes fields that may contain diff artifacts
+    (e.g., `+`, `-`, `++`, `--`) introduced during change comparisons.
+
+    Cleaning rules:
+    - For columns `@puic`, `tag`, and `path`:
+      * Convert values to strings.
+      * Strip leading '+' or '-' characters.
+    - For columns `parent` and `children`:
+      * Replace `"++"` and `"--"` markers with empty strings.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing diff results.
+
+    Returns:
+        pd.DataFrame: A cleaned copy of the DataFrame with markers removed.
+    """
+    df = df.copy()
+
+    # Columns that need lstrip
+    for col in ["@puic", "tag", "path"]:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.lstrip("+-")
+
+    # Columns that need replacement
+    replacements = {"++": "", "--": ""}
+    for col in ["parent", "children"]:
+        if col in df.columns:
+            df[col] = df[col].replace(replacements)
+
     return df
 
 
