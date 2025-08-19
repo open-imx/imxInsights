@@ -28,7 +28,7 @@ class HeaderLoader:
         self,
         spec_csv_path: str | Path,
         spec_path_col: str,
-        spec_ignore_cols: list[str] = [],
+        spec_ignore_cols: list[str] | None = None,
     ):
         """
         Initialize a HeaderLoader.
@@ -42,7 +42,7 @@ class HeaderLoader:
             spec_csv_path if isinstance(spec_csv_path, Path) else Path(spec_csv_path)
         )
         self.spec_path_col = spec_path_col
-        self.spec_ignore_cols: list[str] = spec_ignore_cols
+        self.spec_ignore_cols = spec_ignore_cols or []
         self.metadata_label_col = "Tester"
 
         # Load specification table
