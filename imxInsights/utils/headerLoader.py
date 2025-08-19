@@ -8,6 +8,9 @@ from xlsxwriter.worksheet import Worksheet  # type: ignore
 
 from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 
+# TODO: check if we can use pandas metadata to add column metadata!
+# TODO: add info for display and analyse columns
+
 
 class HeaderLoader:
     """
@@ -30,7 +33,6 @@ class HeaderLoader:
         spec_path_col: str,
         drop_empty_columns: bool,
         spec_ignore_cols: list[str] | None = None,
-
     ):
         """
         Initialize a HeaderLoader.
@@ -46,11 +48,17 @@ class HeaderLoader:
         self.spec_path_col = spec_path_col
         self.drop_empty_columns = drop_empty_columns
         self.spec_ignore_cols = spec_ignore_cols or []
-        self.metadata_label_col = "Tester"
+        self.metadata_label_col = "IndexInfo"
 
         # Load specification table
         self.spec_df = pd.read_csv(
             self.spec_csv_path, on_bad_lines="skip", encoding="utf-8"
+        )
+
+        ## TODO: BUG IN SPECS SHOULD BE FIXED
+        #   - extension is named extention in specs so we should replace
+        self.spec_df[self.spec_path_col] = self.spec_df[self.spec_path_col].str.replace(
+            "extention", "extension", regex=False
         )
 
         # Normalize spec file by applying transformations
@@ -114,7 +122,9 @@ class HeaderLoader:
         return ".".join(part for part in s.split(".") if not part.isnumeric())
 
     @staticmethod
-    def _filter_out_nested_puic_objects(df: pd.DataFrame, path_col: str = "path") -> pd.DataFrame:
+    def _filter_out_nested_puic_objects(
+        df: pd.DataFrame, path_col: str = "path"
+    ) -> pd.DataFrame:
         """
         Filter a diff DataFrame to keep only the topmost objects that have a ``@puic``.
 
@@ -140,35 +150,38 @@ class HeaderLoader:
         paths = df[path_col].astype(str)
 
         # Collect all object bases that have a @puic (strip the trailing ".@puic")
-        puic_bases = {
-            p.rsplit(".", 1)[0]
-            for p in paths
-            if p.endswith(".@puic")
-        }
+        puic_bases = {p.rsplit(".", 1)[0] for p in paths if p.endswith(".@puic")}
 
         # Keep only topmost puic bases:
         #    - Sort bases by length (shortest first = higher in hierarchy)
         #    - Discard bases that are descendants of already selected bases
         sorted_bases = sorted(puic_bases, key=len)  # shortest first
-        topmost_bases = []
+        topmost_bases: list[str] = []
         for b in sorted_bases:
             if not any(b.startswith(tb + ".") for tb in topmost_bases):
                 topmost_bases.append(b)
 
         # Identify nested puic bases (descendants of a topmost base, not equal to it)
-        nested_puic_bases = {b for b in puic_bases if any(b.startswith(tb + ".") for tb in topmost_bases if tb != b)}
+        nested_puic_bases = {
+            b
+            for b in puic_bases
+            if any(b.startswith(tb + ".") for tb in topmost_bases if tb != b)
+        }
 
         # Keep rows:
         #    - that are under a topmost puic base
         #    - but exclude rows under nested puic bases
         def keep_path(p: str) -> bool:
-            starts_with_any = any(p.startswith(tb + ".") or p == tb for tb in topmost_bases)
-            under_nested_puic = any(p.startswith(nb + ".") or p == nb for nb in nested_puic_bases)
+            starts_with_any = any(
+                p.startswith(tb + ".") or p == tb for tb in topmost_bases
+            )
+            under_nested_puic = any(
+                p.startswith(nb + ".") or p == nb for nb in nested_puic_bases
+            )
             return starts_with_any and not under_nested_puic
 
         mask = paths.map(keep_path)
         return df[mask].copy()
-
 
     def _get_specs_for_object(self, object_base_path: str) -> pd.DataFrame:
         """
@@ -361,7 +374,11 @@ class HeaderLoader:
         # - else keep everything
         if self.drop_empty_columns:
             data_cols = set(df.columns)
-            final_cols = [c for c in ordered_cols if (c in data_cols) or (c == self.metadata_label_col)]
+            final_cols = [
+                c
+                for c in ordered_cols
+                if (c in data_cols) or (c == self.metadata_label_col)
+            ]
         else:
             final_cols = ordered_cols
 
@@ -377,8 +394,7 @@ class HeaderLoader:
 
         return contacted_df
 
-
-    def apply_metadata_header(self, df: pd.DataFrame, drop_empty_columns: bool=True) -> pd.DataFrame:
+    def apply_metadata_header(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Add a specification metadata header block on top of the given DataFrame.
 
@@ -400,10 +416,9 @@ class HeaderLoader:
             object_specs_df=object_specs_df, column_path_map_df=column_path_map_df
         )
 
-        # TODO: check if we can use pandas metadata to add column metadata!
-        # TODO: add info for display and analyse columns
-
-        df_with_header = self._merge_metadata_and_data(df=df, metadata_header_df=metadata_header_df)
+        df_with_header = self._merge_metadata_and_data(
+            df=df, metadata_header_df=metadata_header_df
+        )
         del df_with_header["path_to_root"]
 
         return df_with_header
@@ -414,7 +429,7 @@ class HeaderLoader:
         sheet_name: str,
         df: pd.DataFrame,
         *,
-        write_index: bool = False,
+        index: bool = False,
         header: bool = True,
         auto_filter: bool = True,
         styler_fn: Callable | None = None,
@@ -429,7 +444,7 @@ class HeaderLoader:
             writer: An ExcelWriter object.
             sheet_name (str): Target worksheet name.
             df (pd.DataFrame | Styler): Data or styled DataFrame including metadata rows.
-            write_index (bool, optional): Write index column. Default False.
+            index (bool, optional): Write index column. Default False.
             header (bool, optional): Write column headers. Default True.
             auto_filter (bool, optional): Add an autofilter. Default True.
             styler_fn (Callable, optional): Function applied to style the body rows.
@@ -444,7 +459,7 @@ class HeaderLoader:
         metadata_block_df.to_excel(
             writer,
             sheet_name=sheet_name,
-            index=write_index,
+            index=index,
             header=False,
         )
         worksheet = writer.sheets[sheet_name]
@@ -472,7 +487,7 @@ class HeaderLoader:
         data_block.to_excel(
             writer,
             sheet_name=sheet_name,
-            index=write_index,
+            index=index,
             header=header,
             startrow=metadata_rows,
         )
@@ -510,12 +525,11 @@ class HeaderSpec:
             empty after merging with the metadata header. Defaults to True.
 
     Methods:
-        get_loader() -> HeaderLoader:
-            Build and return a `HeaderLoader` instance for this specification.
+        get_loader() -> HeaderLoader: Build and return a `HeaderLoader` instance for this specification.
     """
 
     spec_csv_path: str
-    drop_empty_columns: bool = True
+    drop_empty_columns: bool = False
     spec_path_col: str = "path"
     spec_ignore_cols: list[str] = field(default_factory=list)
 

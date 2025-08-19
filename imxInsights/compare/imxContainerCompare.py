@@ -392,7 +392,10 @@ class ImxContainerCompare:
                         work_sheet = write_df_to_sheet(writer, sheet_name, styled_df)
                     else:
                         work_sheet = header_loader.to_excel_with_metadata(
-                            writer, sheet_name, df, styler_fn=self._style_diff_pandas
+                            writer,
+                            sheet_name,
+                            df,
+                            styler_fn=self._style_diff_pandas,
                         )
 
                     if key != "meta-overview":
