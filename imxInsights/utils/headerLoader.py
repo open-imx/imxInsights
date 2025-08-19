@@ -28,7 +28,9 @@ class HeaderLoader:
         self,
         spec_csv_path: str | Path,
         spec_path_col: str,
+        drop_empty_columns: bool,
         spec_ignore_cols: list[str] | None = None,
+
     ):
         """
         Initialize a HeaderLoader.
@@ -42,6 +44,7 @@ class HeaderLoader:
             spec_csv_path if isinstance(spec_csv_path, Path) else Path(spec_csv_path)
         )
         self.spec_path_col = spec_path_col
+        self.drop_empty_columns = drop_empty_columns
         self.spec_ignore_cols = spec_ignore_cols or []
         self.metadata_label_col = "Tester"
 
@@ -268,7 +271,7 @@ class HeaderLoader:
         return metadata_header_df
 
     def _merge_metadata_and_data(
-        self, df: pd.DataFrame, metadata_header_df: pd.DataFrame, drop_empty_columns:bool = True
+        self, df: pd.DataFrame, metadata_header_df: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Merge metadata info into a DataFrame and reorder columns.
@@ -279,8 +282,6 @@ class HeaderLoader:
         Args:
             df (pd.DataFrame): The input DataFrame with actual data values.
             metadata_header_df (pd.DataFrame): Metadata header with specification info.
-            drop_empty_columns (bool, optional): If True, drop columns that are entirely
-                empty after merging. Defaults to True.
 
         Returns:
             pd.DataFrame: DataFrame containing metadata rows stacked on top
@@ -350,36 +351,42 @@ class HeaderLoader:
         )
 
         # Compute the complete set of columns from both metadata and dataframes
-        combined_cols = list(
-            set(metadata_header_df.columns.to_list()) | set(df.columns.to_list())
-        )
+        combined_cols = list(set(metadata_header_df.columns) | set(df.columns))
 
         # Apply the custom sorting logic
         ordered_cols = sorted(combined_cols, key=col_key)
 
+        # Decide final columns:
+        # - if dropping "empty" columns, keep only data columns (+ the label column)
+        # - else keep everything
+        if self.drop_empty_columns:
+            data_cols = set(df.columns)
+            final_cols = [c for c in ordered_cols if (c in data_cols) or (c == self.metadata_label_col)]
+        else:
+            final_cols = ordered_cols
+
+        # Reindex to ensure both frames have the same columns, in the same order
+        metadata_header_df = metadata_header_df.reindex(columns=final_cols)
+        df = df.reindex(columns=final_cols)
+
         # Prepare an empty dataframe to enforce column ordering
-        empty_ordering_df = pd.DataFrame(columns=ordered_cols)
+        empty_ordering_df = pd.DataFrame(columns=final_cols)
 
         # Concat ensures consistent columns + merges metadata & dataframes
-        contacted_df = pd.concat([empty_ordering_df, metadata_header_df, df])
-
-        # no value no specs option
-        if drop_empty_columns:
-            contacted_df = contacted_df.dropna(axis=1, how='all')
+        contacted_df = pd.concat([empty_ordering_df, metadata_header_df, df], axis=0)
 
         return contacted_df
+
 
     def apply_metadata_header(self, df: pd.DataFrame, drop_empty_columns: bool=True) -> pd.DataFrame:
         """
         Add a specification metadata header block on top of the given DataFrame.
 
         This wraps the input DataFrame with metadata information, ensuring consistent
-        column ordering and optional pruning of unused columns.
+        column ordering.
 
         Args:
             df (pd.DataFrame): DataFrame with data rows and at least a 'path_to_root' column.
-            drop_empty_columns (bool, optional): If True, drop columns that are entirely
-                empty after merging with the metadata header. Defaults to True.
 
         Returns:
             pd.DataFrame: Combined DataFrame with metadata header rows prepended.
@@ -396,9 +403,9 @@ class HeaderLoader:
         # TODO: check if we can use pandas metadata to add column metadata!
         # TODO: add info for display and analyse columns
 
-        df_with_header = self._merge_metadata_and_data(
-            df=df, metadata_header_df=metadata_header_df, drop_empty_columns=drop_empty_columns
-        )
+        df_with_header = self._merge_metadata_and_data(df=df, metadata_header_df=metadata_header_df)
+        del df_with_header["path_to_root"]
+
         return df_with_header
 
     @staticmethod
@@ -499,6 +506,8 @@ class HeaderSpec:
         spec_csv_path (str): Path to the CSV file with header metadata.
         spec_path_col (str): Column name used as path field in the spec file. Default "path".
         spec_ignore_cols (list[str]): List of fields to ignore when loading.
+        drop_empty_columns (bool, optional): If True, drop columns that are entirely
+            empty after merging with the metadata header. Defaults to True.
 
     Methods:
         get_loader() -> HeaderLoader:
@@ -506,6 +515,7 @@ class HeaderSpec:
     """
 
     spec_csv_path: str
+    drop_empty_columns: bool = True
     spec_path_col: str = "path"
     spec_ignore_cols: list[str] = field(default_factory=list)
 
@@ -514,5 +524,6 @@ class HeaderSpec:
         return HeaderLoader(
             self.spec_csv_path,
             self.spec_path_col,
+            self.drop_empty_columns,
             spec_ignore_cols=self.spec_ignore_cols,
         )
