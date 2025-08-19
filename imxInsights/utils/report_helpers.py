@@ -244,10 +244,14 @@ def add_overview_df_to_diff_dict(
     return {"meta-overview": overview_df[existing_columns]} | diff_dict
 
 
-def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Worksheet):
-    status_column = df["status"] if isinstance(df, pd.DataFrame) else df.data["status"]
+def unwrap_df(df: pd.DataFrame | pd.io.formats.style.Styler) -> pd.DataFrame:
+    if isinstance(df, pd.DataFrame):
+        return df
+    return getattr(df, "data")
 
-    # TODO set sheet color should be report methode so we can reuse it in compare chain
+
+def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Worksheet):
+    status_column = unwrap_df(df)["status"]
     valid_statuses = [
         "added",
         "changed",

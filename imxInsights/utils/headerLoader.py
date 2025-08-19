@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import pandas as pd
 from pandas.io.formats.style import Styler
@@ -13,12 +14,20 @@ class HeaderLoader:
     Class to handle the lookup of data for the header rows of a sheet
     """
 
-    def __init__(self, headerfile, pathfield, ignore=tuple()):
-        self.spec = pd.read_csv(
-            headerfile,
-            on_bad_lines="skip",
-            encoding="utf-8",
+    def __init__(
+        self, header_file: str | Path, path_field: str, ignore_columns: list[str] = []
+    ):
+        self.header_file: Path = (
+            header_file if isinstance(header_file, Path) else Path(header_file)
         )
+        self.path_field = path_field
+        self.ignore_columns: list[str] = ignore_columns
+        self.field_column_name = "Tester"
+        self.spec = pd.read_csv(header_file, on_bad_lines="skip", encoding="utf-8")
+        self._create_hyperlink()
+        self._remove_ignored_columns()
+
+    def _create_hyperlink(self):
         for col in self.spec.columns:
             if col + "_link" in self.spec.columns:
                 self.spec[col] = (
@@ -30,29 +39,187 @@ class HeaderLoader:
                 )
                 self.spec = self.spec.drop([col + "_link"], axis="columns")
 
+    def _remove_ignored_columns(self):
         self.spec = self.spec.drop(
-            ignore, axis="columns", errors="ignore"
+            self.ignore_columns, axis="columns", errors="ignore"
         ).drop_duplicates()
-        self.pathfield = pathfield
 
     @staticmethod
-    def remove_extra_path(s):
+    def _clean_path(s):
+        """We need to remove imspoor root, `->`, `++` or `--` (used in diff reports) and get the new value"""
         if "->" in s:
-            # This happens for paths that changed, for example InitialSituation->newsituation
-            # We use the new situation
             s = s.partition("->")[2].strip()
-
         if s.startswith("++") or s.startswith("--"):
             s = s[2:].strip()
-
         if s.lower().startswith("imspoor"):
             s = ".".join(s.split(".")[1:])
-
         return s
 
     @staticmethod
-    def remove_numeric(s):
+    def _remove_numeric_from_path(s):
+        """We do not have indexes in the specification path, we need to remove them to get the correct specs."""
         return ".".join(part for part in s.split(".") if not part.isnumeric())
+
+    def _get_object_specs(self, base_path: str) -> pd.DataFrame:
+        rel_spec = self.spec[
+            self.spec[self.path_field].str.startswith(base_path)
+        ].copy()
+        rel_spec["field"] = rel_spec[self.path_field].str.slice(start=len(base_path))
+        return rel_spec
+
+    def _get_columns_spec_paths(self, df: pd.DataFrame, base_path: str):
+        from_frame = pd.DataFrame({"field": df.columns})
+        from_frame["path"] = (base_path + from_frame.field).map(
+            self._remove_numeric_from_path
+        )
+        return from_frame
+
+    def _map_specs_on_df_get_metadata_header(
+        self, object_specs: pd.DataFrame, from_frame: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        Map the object specifications onto an existing dataframe to produce a metadata header dataframe.
+
+        Workflow:
+        - Start from two sources:
+            * `object_specs`: expected specification of fields (paths without numeric indices).
+            * `from_frame`: dataframe extracted from actual input data (fields may include numbers).
+        - Merge them to align paths, but keep original field names with numbers if present.
+        - Handle extension objects separately (they may only appear in `spec`).
+        - Combine both results into a single metadata header dataframe.
+
+        Returns:
+            A transposed dataframe where columns correspond to metadata attributes for each field in the dataset.
+        """
+
+        # merge object specs with actual frame
+        #  - Match on `path_field` vs. `path`.
+        #  - This ensures we align specification paths with actual data paths.
+        info1 = pd.merge(
+            object_specs,
+            from_frame,
+            how="left",
+            left_on=self.path_field,
+            right_on="path",
+        )
+
+        # If the merge produced both field_x and field_y:
+        # - field_y comes from `from_frame` (actual CSV/Excel input)
+        # - field_x comes from `object_specs` (reference spec)
+        # Use field_y if available, otherwise fall back to field_x
+        info1["field"] = info1["field_y"].fillna(info1["field_x"])
+
+        # Make 'field' the index for easy alignment later
+        info1 = info1.set_index("field", drop=False)
+
+        # Drop redundant merge helper columns we don’t need anymore
+        info1 = info1.drop(
+            ["field_x", "field_y", "field", self.path_field, "path"],
+            axis="columns",
+            errors="ignore",
+        )
+
+        # handle extension objects
+        #  - Some fields may not be in object_specs but exist as full paths in self.spec.
+        #  - For those, merge from_frame with self.spec on field vs. path_field.
+        info2 = pd.merge(
+            from_frame,
+            self.spec,
+            how="inner",
+            left_on="field",
+            right_on=self.path_field,
+        )
+
+        # index by field for alignment
+        info2 = info2.set_index("field", drop=False)
+
+        # Drop unnecessary merge helper columns
+        info2 = info2.drop(
+            ["field", "path_y", "path_x", self.path_field, "path"],
+            axis="columns",
+            errors="ignore",
+        )
+
+        # --- Combine both results ---
+        # Concatenate metadata from both merges along the rows,
+        # then transpose so that fields become columns.
+        # Drop columns where all values are NaN (useless metadata).
+        info = pd.concat([info1, info2]).transpose().dropna(how="all")
+
+        return info
+
+    def _add_info_to_df(self, df: pd.DataFrame, info: pd.DataFrame) -> pd.DataFrame:
+        """Merge metadata info into a dataframe and ensure consistent column ordering."""
+
+        def col_key(colname: str):
+            """
+            Define a custom sort order for DataFrame columns.
+
+            Ordering rules (priority-based):
+            1. The 'field' column (self.field_column_name) always comes first.
+            2. Standard base fields (e.g. puic, parent, children, etc.) come next,
+               in the order they are listed.
+            3. Columns automatically added by imxInsights (containing '|') come after base fields.
+            4. Extension fields (starting with '.extension') follow after regular fields.
+            5. Any completely unknown/unmatched fields get pushed to the end.
+            6. Finally, "path_to_root" is explicitly placed at the very end.
+            """
+            base_fields = [
+                "@puic",
+                "parent",
+                "children",
+                "@name",
+                "path",
+                "tag",
+                "status",
+                "geometry_status",
+            ]
+
+            # Ensure the field column is always first
+            if colname == self.field_column_name:
+                return (0, colname)
+
+            # Handle empty column names (rare case, force to the end)
+            if not colname.strip():
+                return (5, 0)
+
+            # Base fields in defined order
+            if colname in base_fields:
+                return (1, base_fields.index(colname))
+
+            # path_to_root is always last
+            if colname == "path_to_root":
+                return (99, colname)
+
+            # Distinguish between extension and regular fields
+            is_extension_code = 3 if colname.startswith(".extension") else 2
+
+            # If the field contains a "|" it means it is an "augmented" or derived column
+            if "|" in colname:
+                return (is_extension_code, colname.partition("|")[0], 1)
+            else:
+                return (is_extension_code, colname, 0)
+
+        # Build the metadata dataframe with the 'field' as both index and column
+
+        # Create a labels dataframe with the index (fields) as an explicit column.
+        labels = pd.DataFrame({self.field_column_name: info.index})
+        labels = labels.set_index(labels[self.field_column_name])
+
+        # Prepend the labels to the info dataframe (ensures field column is present)
+        info = pd.concat([labels, info], axis="columns")
+
+        # Compute the complete set of columns from both info and dataframes
+        all_columns = list(set(info.columns.to_list()) | set(df.columns.to_list()))
+
+        # Apply the custom sorting logic
+        in_order = sorted(all_columns, key=col_key)
+
+        # Prepare an empty dataframe to enforce column ordering
+        ordering_df = pd.DataFrame(columns=in_order)
+
+        # concat: ensures consistent columns + merges metadata & dataframes
+        return pd.concat([ordering_df, info, df])
 
     def add_header_to_sheet(self, df):
         """
@@ -70,100 +237,25 @@ class HeaderLoader:
             pandas.DataFrame: The modified DataFrame with specification header rows prepended.
         """
 
+        base_path = self._clean_path(df["path_to_root"].values[0]) + "."
+        object_specs = self._get_object_specs(base_path=base_path)
+        from_frame = self._get_columns_spec_paths(df=df, base_path=base_path)
+        info = self._map_specs_on_df_get_metadata_header(
+            object_specs=object_specs, from_frame=from_frame
+        )
+
         # TODO: check if we can use pandas metadata to add column metadata!
 
-        basepath = self.remove_extra_path(df["path_to_root"].values[0]) + "."
+        # TODO: add info for display and analyse columns
 
-        # Info values that are relavent for this frame
-        rel_spec = self.spec[self.spec[self.pathfield].str.startswith(basepath)].copy()
-        rel_spec["field"] = rel_spec[self.pathfield].str.slice(start=len(basepath))
-
-        # Column names as present in the frame
-        from_frame = pd.DataFrame({"field": df.columns})
-        from_frame["path"] = (basepath + from_frame.field).map(self.remove_numeric)
-
-        # We match on path, as this is the path without numeric parts
-        # However, we keep the field names with the numeric part if present.
-        # If a field is not present then it will be filled form the CSV file.
-
-        info1 = pd.merge(
-            rel_spec, from_frame, how="left", left_on=self.pathfield, right_on="path"
-        )
-        info1["field"] = info1["field_y"].fillna(info1["field_x"])
-        info1.index = info1.field
-        info1 = info1.drop(
-            ["field_x", "field_y", "field", self.pathfield, "path"],
-            axis="columns",
-            errors="ignore",
-        )
-
-        # At this point all normal fields should be populated in the info frame.
-        # We might be missing extention objects
-        # for this we check if any of the field names are present as full paths in the spec
-        # TODO test with big file
-        info2 = pd.merge(
-            from_frame, self.spec, how="inner", left_on="field", right_on=self.pathfield
-        )
-        info2.index = info2.field
-        info2 = info2.drop(
-            ["field", "path_y", "path_x", self.pathfield, "path"],
-            axis="columns",
-            errors="ignore",
-        )
-
-        info = pd.concat([info1, info2]).transpose().dropna(how="all")
-
-        # TODO: add info for display and analyse collumns
-
-        # Add the index as an actual collumn at the start
-        labels = pd.DataFrame({"Field": info.index})
-        labels = labels.set_index(labels.Field)
-        info = pd.concat([labels, info], axis="columns")
-
-        # Ordering:
-        # 1. Fields
-        # 2. Added by imxInsights != |display
-        # 3. all fields in order
-        # 4. all extentions
-        # 5. path to root
-        def col_key(colname):
-            base_fields = [
-                "@puic",
-                "parent",
-                "children",
-                "@name",
-                "path",
-                "tag",
-                "status",
-                "geometry_status",
-            ]
-            if colname == "Field":
-                return (0, colname)
-            if not colname.strip():
-                return (5, 0)
-            if colname in base_fields:
-                return (1, base_fields.index(colname))
-            if colname == "path_to_root":
-                return (99, colname)
-            is_extention_code = 3 if colname.startswith(".extension") else 2
-            if "|" in colname:
-                return (is_extention_code, colname.partition("|")[0], 1)
-            else:
-                return (is_extention_code, colname, 0)
-
-        all_columns = list(set(info.columns.to_list()) | set(df.columns.to_list()))
-        in_order = sorted(all_columns, key=col_key)
-
-        # Hack together the order
-        ordering_df = pd.DataFrame(columns=in_order)
-
-        return pd.concat([ordering_df, info, df])
+        full_df = self._add_info_to_df(df=df, info=info)
+        return full_df
 
     @staticmethod
     def write_df_and_header_to_sheet(
         writer,
         sheet_name: str,
-        df: pd.DataFrame | Styler,
+        df: pd.DataFrame,
         *,
         write_index: bool = False,
         header: bool = True,
@@ -219,12 +311,12 @@ class HeaderLoader:
             row_num = df.index.get_loc(index)
             worksheet.set_row(row_num, 15.0001, spec_format)
 
-        # now write body
         body = df[~documentation_indicator]
 
-        styler = styler_fn(body)
+        if styler_fn:
+            body = styler_fn(body)
 
-        styler.to_excel(
+        body.to_excel(
             writer,
             sheet_name=sheet_name,
             index=write_index,
@@ -262,14 +354,11 @@ class HeaderLoader:
 class HeaderSpec:
     file_path: str
     path_field: str = "path"
-
-    # TODO: tuples as a datatype are nice, but lists are used for most features... we should keep it constant
-
-    ignore_fields: tuple[str] = field(default_factory=tuple)
+    ignore_fields: list[str] = field(default_factory=list)
 
     def get_loader(self) -> "HeaderLoader":
         return HeaderLoader(
             self.file_path,
             self.path_field,
-            ignore=self.ignore_fields,
+            ignore_columns=self.ignore_fields,
         )

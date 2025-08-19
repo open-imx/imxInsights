@@ -221,7 +221,8 @@ class ImxContainerCompare:
             df["status"] = df["status"].astype("object")
 
             if styled_df:
-                df = self._style_diff_pandas(df)
+                # TODO: return styler or dataframe, probly give type errors all over the place...
+                df = self._style_diff_pandas(df)  # type: ignore[assignment]
 
         return df
 
@@ -229,19 +230,17 @@ class ImxContainerCompare:
     def _style_diff_pandas(df: pd.DataFrame) -> Styler:
         excluded_columns = df.filter(regex=r"(\.display|\|analyse)$").columns
         styler = df.style.map(  # type: ignore[attr-defined]
-            styler_highlight_changes,
+            styler_highlight_changes,  # type: ignore[arg-type]
             subset=df.columns.difference(excluded_columns),
         )
         styler = styler.map(  # type: ignore[attr-defined]
-            styler_highlight_change_status,
+            styler_highlight_change_status,  # type: ignore[arg-type]
             subset=["status"],
         )
 
         styler.set_properties(
-            **{
-                "border": "1px solid black",
-                "vertical-align": "middle",
-            }
+            border="1px solid black",
+            vertical_align="middle",
         )
         return styler
 
@@ -396,7 +395,7 @@ class ImxContainerCompare:
                             writer, sheet_name, df, styler_fn=self._style_diff_pandas
                         )
 
-                    if key == "meta-overview":
+                    if key != "meta-overview":
                         set_sheet_color_by_change_status(df, work_sheet)
 
                 except Exception as e:
