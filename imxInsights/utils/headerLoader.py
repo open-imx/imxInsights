@@ -110,6 +110,63 @@ class HeaderLoader:
         """
         return ".".join(part for part in s.split(".") if not part.isnumeric())
 
+    @staticmethod
+    def _filter_out_nested_puic_objects(df: pd.DataFrame, path_col: str = "path") -> pd.DataFrame:
+        """
+        Filter a diff DataFrame to keep only the topmost objects that have a ``@puic``.
+
+        In hierarchical IMX-like data, objects are identified by a ``@puic`` attribute.
+        If an object contains a nested object that also has its own ``@puic``, that
+        nested subtree is considered independent and should not be included under the
+        parent in the filtered view.
+
+        This function:
+          1. Identifies all paths ending with ``.@puic``.
+          2. Keeps only the *topmost* puic objects (shortest paths not nested under others).
+          3. Excludes any rows belonging to nested puic subtrees.
+          4. Returns a cleaned DataFrame containing only rows under the topmost puic objects.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame with hierarchical paths and ``@puic`` markers.
+            path_col (str, optional): Column containing the hierarchical path. Defaults to "path".
+
+        Returns:
+            pd.DataFrame: A filtered DataFrame containing only the rows under topmost
+                          puic objects, with nested puic subtrees excluded.
+        """
+        paths = df[path_col].astype(str)
+
+        # Collect all object bases that have a @puic (strip the trailing ".@puic")
+        puic_bases = {
+            p.rsplit(".", 1)[0]
+            for p in paths
+            if p.endswith(".@puic")
+        }
+
+        # Keep only topmost puic bases:
+        #    - Sort bases by length (shortest first = higher in hierarchy)
+        #    - Discard bases that are descendants of already selected bases
+        sorted_bases = sorted(puic_bases, key=len)  # shortest first
+        topmost_bases = []
+        for b in sorted_bases:
+            if not any(b.startswith(tb + ".") for tb in topmost_bases):
+                topmost_bases.append(b)
+
+        # Identify nested puic bases (descendants of a topmost base, not equal to it)
+        nested_puic_bases = {b for b in puic_bases if any(b.startswith(tb + ".") for tb in topmost_bases if tb != b)}
+
+        # Keep rows:
+        #    - that are under a topmost puic base
+        #    - but exclude rows under nested puic bases
+        def keep_path(p: str) -> bool:
+            starts_with_any = any(p.startswith(tb + ".") or p == tb for tb in topmost_bases)
+            under_nested_puic = any(p.startswith(nb + ".") or p == nb for nb in nested_puic_bases)
+            return starts_with_any and not under_nested_puic
+
+        mask = paths.map(keep_path)
+        return df[mask].copy()
+
+
     def _get_specs_for_object(self, object_base_path: str) -> pd.DataFrame:
         """
         Extract a subset of the specification relevant to a given object base path.
@@ -126,7 +183,7 @@ class HeaderLoader:
         object_specs_df["field"] = object_specs_df[self.spec_path_col].str.slice(
             start=len(object_base_path)
         )
-        return object_specs_df
+        return self._filter_out_nested_puic_objects(object_specs_df)
 
     def _build_column_path_map(
         self, df: pd.DataFrame, object_base_path: str
