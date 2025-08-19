@@ -381,7 +381,7 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:
-                        df = header_loader.add_header_to_sheet(df)
+                        df = header_loader.apply_metadata_header(df)
 
                     df = df.fillna("")
 
@@ -391,7 +391,7 @@ class ImxContainerCompare:
                         styled_df = self._style_diff_pandas(df)
                         work_sheet = write_df_to_sheet(writer, sheet_name, styled_df)
                     else:
-                        work_sheet = header_loader.write_df_and_header_to_sheet(
+                        work_sheet = header_loader.to_excel_with_metadata(
                             writer, sheet_name, df, styler_fn=self._style_diff_pandas
                         )
 

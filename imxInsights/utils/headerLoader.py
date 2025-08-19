@@ -6,47 +6,89 @@ import pandas as pd
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
-# TODO: first column is now Field, we should rename it to Column metadata and fill all row in table gray to make clear we not filling the rows.
+from imxInsights.utils.report_helpers import autosize_columns, apply_autofilter
 
 
 class HeaderLoader:
     """
-    Class to handle the lookup of data for the header rows of a sheet
+    Class to handle the lookup and processing of metadata header rows for Excel sheets.
+
+    Responsibilities:
+    - Load a CSV specification file containing metadata about fields.
+    - Clean and normalize paths in the specification (removing indices, prefixes, diff symbols).
+    - Map specification metadata onto DataFrame columns.
+    - Prepend metadata rows as "header blocks" above data rows in exported Excel files.
+    - Write styled metadata + data blocks into Excel sheets.
+
+    This is typically used to enrich exported Excel reports with structured
+    documentation rows at the top, making the meaning of each column explicit.
     """
 
     def __init__(
-        self, header_file: str | Path, path_field: str, ignore_columns: list[str] = []
+        self,
+        spec_csv_path: str | Path,
+        spec_path_col: str,
+        spec_ignore_cols: list[str] = [],
     ):
-        self.header_file: Path = (
-            header_file if isinstance(header_file, Path) else Path(header_file)
-        )
-        self.path_field = path_field
-        self.ignore_columns: list[str] = ignore_columns
-        self.field_column_name = "Tester"
-        self.spec = pd.read_csv(header_file, on_bad_lines="skip", encoding="utf-8")
-        self._create_hyperlink()
-        self._remove_ignored_columns()
+        """
+        Initialize a HeaderLoader.
 
-    def _create_hyperlink(self):
-        for col in self.spec.columns:
-            if col + "_link" in self.spec.columns:
-                self.spec[col] = (
+        Args:
+            spec_csv_path (str | Path): Path to a CSV file containing header specifications.
+            spec_path_col (str): Column name in the spec file containing path references.
+            spec_ignore_cols (list[str], optional): List of columns to ignore and drop from the specification.
+        """
+        self.spec_csv_path: Path = (
+            spec_csv_path if isinstance(spec_csv_path, Path) else Path(spec_csv_path)
+        )
+        self.spec_path_col = spec_path_col
+        self.spec_ignore_cols: list[str] = spec_ignore_cols
+        self.metadata_label_col = "Tester"
+
+        # Load specification table
+        self.spec_df = pd.read_csv(self.spec_csv_path, on_bad_lines="skip", encoding="utf-8")
+
+        # Normalize spec file by applying transformations
+        self._apply_hyperlink_columns()
+        self._drop_ignored_and_duplicates()
+
+    def _apply_hyperlink_columns(self):
+        """
+        Convert any pair of (column, column_link) into Excel HYPERLINK formulas.
+
+        Example:
+            If spec has columns `name` and `name_link`, then replace `name`
+            with =HYPERLINK(name_link, name) and drop `name_link`.
+        """
+        for col in self.spec_df.columns:
+            link_col = f"{col}_link"
+            if link_col in self.spec_df.columns:
+                self.spec_df[col] = (
                     '=HYPERLINK("'
-                    + self.spec[col + "_link"]
+                    + self.spec_df[link_col]
                     + '", "'
-                    + self.spec[col]
+                    + self.spec_df[col]
                     + '")'
                 )
-                self.spec = self.spec.drop([col + "_link"], axis="columns")
+                self.spec_df = self.spec_df.drop([link_col], axis="columns")
 
-    def _remove_ignored_columns(self):
-        self.spec = self.spec.drop(
-            self.ignore_columns, axis="columns", errors="ignore"
+    def _drop_ignored_and_duplicates(self):
+        """
+        Drop ignored columns from the spec file and remove duplicate rows.
+        """
+        self.spec_df = self.spec_df.drop(
+            self.spec_ignore_cols, axis="columns", errors="ignore"
         ).drop_duplicates()
 
     @staticmethod
-    def _clean_path(s):
-        """We need to remove imspoor root, `->`, `++` or `--` (used in diff reports) and get the new value"""
+    def _clean_path(s: str) -> str:
+        """
+        Clean a path string for comparison with the specification.
+
+        Removes:
+        - Diff symbols ('->', '++', '--').
+        - Leading 'imspoor' root.
+        """
         if "->" in s:
             s = s.partition("->")[2].strip()
         if s.startswith("++") or s.startswith("--"):
@@ -56,107 +98,131 @@ class HeaderLoader:
         return s
 
     @staticmethod
-    def _remove_numeric_from_path(s):
-        """We do not have indexes in the specification path, we need to remove them to get the correct specs."""
+    def _normalize_path_without_indices(s: str) -> str:
+        """
+        Remove numeric indices from a dotted path string.
+
+        Example:
+            'extension.MicroNode.0.@railConnectionRef'
+            -> 'extension.MicroNode.@railConnectionRef'
+        """
         return ".".join(part for part in s.split(".") if not part.isnumeric())
 
-    def _get_object_specs(self, base_path: str) -> pd.DataFrame:
-        rel_spec = self.spec[
-            self.spec[self.path_field].str.startswith(base_path)
-        ].copy()
-        rel_spec["field"] = rel_spec[self.path_field].str.slice(start=len(base_path))
-        return rel_spec
-
-    def _get_columns_spec_paths(self, df: pd.DataFrame, base_path: str):
-        from_frame = pd.DataFrame({"field": df.columns})
-        from_frame["path"] = (base_path + from_frame.field).map(
-            self._remove_numeric_from_path
-        )
-        return from_frame
-
-    def _map_specs_on_df_get_metadata_header(
-        self, object_specs: pd.DataFrame, from_frame: pd.DataFrame
-    ) -> pd.DataFrame:
+    def _get_specs_for_object(self, object_base_path: str) -> pd.DataFrame:
         """
-        Map the object specifications onto an existing dataframe to produce a metadata header dataframe.
+        Extract a subset of the specification relevant to a given object base path.
 
-        Workflow:
-        - Start from two sources:
-            * `object_specs`: expected specification of fields (paths without numeric indices).
-            * `from_frame`: dataframe extracted from actual input data (fields may include numbers).
-        - Merge them to align paths, but keep original field names with numbers if present.
-        - Handle extension objects separately (they may only appear in `spec`).
-        - Combine both results into a single metadata header dataframe.
+        Args:
+            object_base_path (str): Path prefix to filter specification rows.
 
         Returns:
-            A transposed dataframe where columns correspond to metadata attributes for each field in the dataset.
+            pd.DataFrame: Specification rows starting with the given path.
         """
+        object_specs_df = self.spec_df[
+            self.spec_df[self.spec_path_col].str.startswith(object_base_path)
+        ].copy()
+        object_specs_df["field"] = object_specs_df[self.spec_path_col].str.slice(
+            start=len(object_base_path)
+        )
+        return object_specs_df
 
-        # merge object specs with actual frame
-        #  - Match on `path_field` vs. `path`.
-        #  - This ensures we align specification paths with actual data paths.
-        info1 = pd.merge(
-            object_specs,
-            from_frame,
+    def _build_column_path_map(self, df: pd.DataFrame, object_base_path: str) -> pd.DataFrame:
+        """
+        Construct paths for each DataFrame column relative to a base path.
+
+        Args:
+            df (pd.DataFrame): DataFrame with actual data columns.
+            object_base_path (str): Path prefix to prepend to columns.
+
+        Returns:
+            pd.DataFrame: Mapping of DataFrame columns to normalized spec paths.
+        """
+        column_path_map_df = pd.DataFrame({"field": df.columns})
+        column_path_map_df["path"] = (object_base_path + column_path_map_df["field"]).map(
+            self._normalize_path_without_indices
+        )
+        return column_path_map_df
+
+    def _build_metadata_header(
+        self, object_specs_df: pd.DataFrame, column_path_map_df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        Map specification metadata onto DataFrame columns to build a metadata header.
+
+        See workflow in code comments for merge logic.
+
+        Returns:
+            pd.DataFrame: Transposed metadata header with fields as columns.
+        """
+        # Merge object specs with actual frame (align spec paths with actual data paths)
+        merged_specs_df = pd.merge(
+            object_specs_df,
+            column_path_map_df,
             how="left",
-            left_on=self.path_field,
+            left_on=self.spec_path_col,
             right_on="path",
         )
 
-        # If the merge produced both field_x and field_y:
-        # - field_y comes from `from_frame` (actual CSV/Excel input)
-        # - field_x comes from `object_specs` (reference spec)
-        # Use field_y if available, otherwise fall back to field_x
-        info1["field"] = info1["field_y"].fillna(info1["field_x"])
+        # Prefer 'field' from actual data when available, else fall back to spec-derived field
+        merged_specs_df["field"] = merged_specs_df["field_y"].fillna(merged_specs_df["field_x"])
 
-        # Make 'field' the index for easy alignment later
-        info1 = info1.set_index("field", drop=False)
+        # Index by 'field' for alignment
+        merged_specs_df = merged_specs_df.set_index("field", drop=False)
 
-        # Drop redundant merge helper columns we don’t need anymore
-        info1 = info1.drop(
-            ["field_x", "field_y", "field", self.path_field, "path"],
+        # Drop redundant merge helper columns
+        merged_specs_df = merged_specs_df.drop(
+            ["field_x", "field_y", "field", self.spec_path_col, "path"],
             axis="columns",
             errors="ignore",
         )
 
-        # handle extension objects
-        #  - Some fields may not be in object_specs but exist as full paths in self.spec.
-        #  - For those, merge from_frame with self.spec on field vs. path_field.
-        info2 = pd.merge(
-            from_frame,
-            self.spec,
+        # Handle extension objects via direct matches on full paths in the spec
+        direct_match_specs_df = pd.merge(
+            column_path_map_df,
+            self.spec_df,
             how="inner",
             left_on="field",
-            right_on=self.path_field,
+            right_on=self.spec_path_col,
         )
 
-        # index by field for alignment
-        info2 = info2.set_index("field", drop=False)
+        # Index by 'field' for alignment
+        direct_match_specs_df = direct_match_specs_df.set_index("field", drop=False)
 
         # Drop unnecessary merge helper columns
-        info2 = info2.drop(
-            ["field", "path_y", "path_x", self.path_field, "path"],
+        direct_match_specs_df = direct_match_specs_df.drop(
+            ["field", "path_y", "path_x", self.spec_path_col, "path"],
             axis="columns",
             errors="ignore",
         )
 
-        # --- Combine both results ---
-        # Concatenate metadata from both merges along the rows,
-        # then transpose so that fields become columns.
-        # Drop columns where all values are NaN (useless metadata).
-        info = pd.concat([info1, info2]).transpose().dropna(how="all")
+        # Combine both results, transpose so fields become columns, and drop all-NaN rows
+        metadata_header_df = pd.concat([merged_specs_df, direct_match_specs_df]).transpose().dropna(
+            how="all"
+        )
 
-        return info
+        return metadata_header_df
 
-    def _add_info_to_df(self, df: pd.DataFrame, info: pd.DataFrame) -> pd.DataFrame:
-        """Merge metadata info into a dataframe and ensure consistent column ordering."""
+    def _merge_metadata_and_data(
+        self, df: pd.DataFrame, metadata_header_df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        Merge metadata info into a DataFrame and reorder columns.
+
+        Args:
+            df (pd.DataFrame): The input data frame with actual values.
+            metadata_header_df (pd.DataFrame): Metadata header with specification info.
+
+        Returns:
+            pd.DataFrame: DataFrame containing metadata rows stacked on top
+            of the original data rows, with consistent column ordering.
+        """
 
         def col_key(colname: str):
             """
             Define a custom sort order for DataFrame columns.
 
             Ordering rules (priority-based):
-            1. The 'field' column (self.field_column_name) always comes first.
+            1. The label column (self.metadata_label_col) always comes first.
             2. Standard base fields (e.g. puic, parent, children, etc.) come next,
                in the order they are listed.
             3. Columns automatically added by imxInsights (containing '|') come after base fields.
@@ -175,12 +241,12 @@ class HeaderLoader:
                 "geometry_status",
             ]
 
-            # Ensure the field column is always first
-            if colname == self.field_column_name:
+            # Ensure the label column is always first
+            if colname == self.metadata_label_col:
                 return (0, colname)
 
             # Handle empty column names (rare case, force to the end)
-            if not colname.strip():
+            if not str(colname).strip():
                 return (5, 0)
 
             # Base fields in defined order
@@ -192,67 +258,60 @@ class HeaderLoader:
                 return (99, colname)
 
             # Distinguish between extension and regular fields
-            is_extension_code = 3 if colname.startswith(".extension") else 2
+            is_extension_code = 3 if str(colname).startswith(".extension") else 2
 
             # If the field contains a "|" it means it is an "augmented" or derived column
-            if "|" in colname:
-                return (is_extension_code, colname.partition("|")[0], 1)
+            if "|" in str(colname):
+                return (is_extension_code, str(colname).partition("|")[0], 1)
             else:
-                return (is_extension_code, colname, 0)
+                return (is_extension_code, str(colname), 0)
 
-        # Build the metadata dataframe with the 'field' as both index and column
+        # Build the metadata dataframe with the label as both index and column
+        metadata_label_df = pd.DataFrame({self.metadata_label_col: metadata_header_df.index})
+        metadata_label_df = metadata_label_df.set_index(metadata_label_df[self.metadata_label_col])
 
-        # Create a labels dataframe with the index (fields) as an explicit column.
-        labels = pd.DataFrame({self.field_column_name: info.index})
-        labels = labels.set_index(labels[self.field_column_name])
+        # Prepend the labels to the metadata header (ensures label column is present)
+        metadata_header_df = pd.concat([metadata_label_df, metadata_header_df], axis="columns")
 
-        # Prepend the labels to the info dataframe (ensures field column is present)
-        info = pd.concat([labels, info], axis="columns")
-
-        # Compute the complete set of columns from both info and dataframes
-        all_columns = list(set(info.columns.to_list()) | set(df.columns.to_list()))
+        # Compute the complete set of columns from both metadata and dataframes
+        combined_cols = list(
+            set(metadata_header_df.columns.to_list()) | set(df.columns.to_list())
+        )
 
         # Apply the custom sorting logic
-        in_order = sorted(all_columns, key=col_key)
+        ordered_cols = sorted(combined_cols, key=col_key)
 
         # Prepare an empty dataframe to enforce column ordering
-        ordering_df = pd.DataFrame(columns=in_order)
+        empty_ordering_df = pd.DataFrame(columns=ordered_cols)
 
-        # concat: ensures consistent columns + merges metadata & dataframes
-        return pd.concat([ordering_df, info, df])
+        # Concat ensures consistent columns + merges metadata & dataframes
+        return pd.concat([empty_ordering_df, metadata_header_df, df])
 
-    def add_header_to_sheet(self, df):
+    def apply_metadata_header(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Adds a specification header block to the top of the given DataFrame for Excel export.
-
-        The final DataFrame includes:
-        - A header block containing specification information.
-        - The original DataFrame rows.
-        - Columns are reordered based on predefined logic.
+        Add a specification header block on top of the given DataFrame.
 
         Args:
-            df (pandas.DataFrame): The DataFrame to which the header information should be added.
+            df (pd.DataFrame): DataFrame with data rows and at least a 'path_to_root' column.
 
         Returns:
-            pandas.DataFrame: The modified DataFrame with specification header rows prepended.
+            pd.DataFrame: Combined DataFrame with metadata header rows prepended.
         """
-
-        base_path = self._clean_path(df["path_to_root"].values[0]) + "."
-        object_specs = self._get_object_specs(base_path=base_path)
-        from_frame = self._get_columns_spec_paths(df=df, base_path=base_path)
-        info = self._map_specs_on_df_get_metadata_header(
-            object_specs=object_specs, from_frame=from_frame
+        object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
+        object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
+        column_path_map_df = self._build_column_path_map(df=df, object_base_path=object_base_path)
+        metadata_header_df = self._build_metadata_header(
+            object_specs_df=object_specs_df, column_path_map_df=column_path_map_df
         )
 
         # TODO: check if we can use pandas metadata to add column metadata!
-
         # TODO: add info for display and analyse columns
 
-        full_df = self._add_info_to_df(df=df, info=info)
-        return full_df
+        df_with_header = self._merge_metadata_and_data(df=df, metadata_header_df=metadata_header_df)
+        return df_with_header
 
     @staticmethod
-    def write_df_and_header_to_sheet(
+    def to_excel_with_metadata(
         writer,
         sheet_name: str,
         df: pd.DataFrame,
@@ -263,29 +322,28 @@ class HeaderLoader:
         styler_fn: Callable | None = None,
     ) -> Worksheet:
         """
-        Write a DataFrame or Styler object to an Excel sheet, preserving documentation rows
-        at the top and optionally applying styling and autofilter.
+        Write a DataFrame or Styler to an Excel worksheet, including metadata header rows.
+
+        The header rows are styled in gray and frozen, while the data block
+        may have styling applied through a custom styler function.
 
         Args:
-            writer: An ExcelWriter object used to write the Excel file.
-            sheet_name (str): Name of the worksheet where the data will be written.
-            df (pd.DataFrame or Styler): The DataFrame or Styler object to write to the sheet.
-            index (bool, optional): Whether to write row indices. Defaults to False.
-            header (bool, optional): Whether to write column headers. Defaults to True.
-            auto_filter (bool, optional): Whether to apply autofilter to the data rows. Defaults to True.
-            styler_fn (callable, optional): Optional function to apply styling to the data (not documentation) rows. Defaults to None.
+            writer: An ExcelWriter object.
+            sheet_name (str): Target worksheet name.
+            df (pd.DataFrame | Styler): Data or styled DataFrame including metadata rows.
+            write_index (bool, optional): Write index column. Default False.
+            header (bool, optional): Write column headers. Default True.
+            auto_filter (bool, optional): Add an autofilter. Default True.
+            styler_fn (Callable, optional): Function applied to style the body rows.
 
         Returns:
-            Worksheet: The xlsxwriter Worksheet object for the written sheet.
+            Worksheet: The created xlsxwriter worksheet object.
         """
-        documentation_indicator = df.index.to_series().apply(
-            lambda x: isinstance(x, str)
-        )
+        is_metadata_row = df.index.to_series().apply(lambda x: isinstance(x, str))
+        metadata_block_df = df[is_metadata_row]
 
-        documentation = df[documentation_indicator]
-
-        documentation_size = len(documentation)
-        documentation.to_excel(
+        metadata_rows = len(metadata_block_df)
+        metadata_block_df.to_excel(
             writer,
             sheet_name=sheet_name,
             index=write_index,
@@ -293,8 +351,8 @@ class HeaderLoader:
         )
         worksheet = writer.sheets[sheet_name]
 
-        # styling all specification rows
-        spec_format_dict = {
+        # Style all specification rows
+        metadata_cell_format = {
             "bg_color": "#d1d1d1",
             "valign": "top",
             "align": "left",
@@ -303,62 +361,67 @@ class HeaderLoader:
             "border": 7,
             "text_wrap": True,
         }
-        writer.spec_format = writer.book.add_format(spec_format_dict)
+        metadata_format = writer.book.add_format(metadata_cell_format)
 
-        spec_format = writer.spec_format
+        for _, _row in df[is_metadata_row].iterrows():
+            xlsx_row_idx = df.index.get_loc(_row.name)
+            worksheet.set_row(xlsx_row_idx, 15.0001, metadata_format)
 
-        for index, row in df[documentation_indicator].iterrows():
-            row_num = df.index.get_loc(index)
-            worksheet.set_row(row_num, 15.0001, spec_format)
-
-        body = df[~documentation_indicator]
-
+        data_block = df[~is_metadata_row]
         if styler_fn:
-            body = styler_fn(body)
+            data_block = styler_fn(data_block)
 
-        body.to_excel(
+        data_block.to_excel(
             writer,
             sheet_name=sheet_name,
             index=write_index,
             header=header,
-            startrow=documentation_size,
+            startrow=metadata_rows,
         )
 
-        worksheet.freeze_panes(documentation_size + 1, 1)
-        worksheet.documentation_size = documentation_size
-        worksheet.documentation_indicator = documentation_indicator
+        worksheet.freeze_panes(metadata_rows + 1, 1)
 
-        data = df.data if isinstance(df, Styler) else df  # type: ignore
+        # Calculate widths and apply filter only to the data area
+        data_df = df.data if isinstance(df, Styler) else df  # type: ignore
 
-        # TODO: should be report helper
-        if auto_filter and not data.empty:
-            num_cols = len(data.columns) - 1
-            worksheet.autofilter(documentation_size, 0, documentation_size, num_cols)
+        if auto_filter and not data_df.empty:
+            apply_autofilter(worksheet, start_row=metadata_rows, data_df=data_df)
 
-        # TODO: should be report helper
-        for i, column in enumerate(df.columns):
-            # Include the collumn name not rest of header, also minimal 15 chars wide
-            col_data = df[column].iloc[documentation_size:]
-            max_len_in_col = max(
-                col_data.astype(str).map(len).max(), len(str(column)), 15
-            )
-            # Always show the whole column name
-            max_allowed = max(80, len(str(column)))
-            new_width = min(max_len_in_col, max_allowed)
-            worksheet.set_column(i, i, new_width + 2)
+        autosize_columns(
+            worksheet=worksheet,
+            full_df=df,
+            data_start_row=metadata_rows,
+            min_width=15,
+            header_min_width=80,
+            padding=2,
+        )
 
         return worksheet
 
 
 @dataclass
 class HeaderSpec:
-    file_path: str
-    path_field: str = "path"
-    ignore_fields: list[str] = field(default_factory=list)
+    """
+    Dataclass wrapper for header specification files.
+
+    Attributes:
+        spec_csv_path (str): Path to the CSV file with header metadata.
+        spec_path_col (str): Column name used as path field in the spec file. Default "path".
+        spec_ignore_cols (list[str]): List of fields to ignore when loading.
+
+    Methods:
+        get_loader() -> HeaderLoader:
+            Build and return a `HeaderLoader` instance for this specification.
+    """
+
+    spec_csv_path: str
+    spec_path_col: str = "path"
+    spec_ignore_cols: list[str] = field(default_factory=list)
 
     def get_loader(self) -> "HeaderLoader":
+        """Return a `HeaderLoader` configured with this spec."""
         return HeaderLoader(
-            self.file_path,
-            self.path_field,
-            ignore_columns=self.ignore_fields,
+            self.spec_csv_path,
+            self.spec_path_col,
+            spec_ignore_cols=self.spec_ignore_cols,
         )

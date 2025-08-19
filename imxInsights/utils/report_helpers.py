@@ -262,3 +262,60 @@ def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Work
     status_values = status_column[status_column.isin(valid_statuses)]
     if status_values.eq("unchanged").all():
         work_sheet.set_tab_color("gray")
+
+
+def apply_autofilter(worksheet: Worksheet, start_row: int, data_df: pd.DataFrame) -> None:
+    """
+    Apply an autofilter to the header row of the data block.
+
+    Args:
+        worksheet (Worksheet): Target worksheet.
+        start_row (int): Zero-based row where the data header (column names) is written.
+        data_df (pd.DataFrame): The *data* part (not including metadata rows).
+    """
+    if data_df is None or data_df.empty:
+        return
+    # Columns are written starting at col 0; last data col index:
+    last_col_idx = max(0, len(data_df.columns) - 1)
+    worksheet.autofilter(start_row, 0, start_row, last_col_idx)
+
+
+def autosize_columns(
+    worksheet: Worksheet,
+    full_df: pd.DataFrame,
+    data_start_row: int,
+    *,
+    min_width: int = 15,
+    header_min_width: int = 80,
+    padding: int = 2,
+) -> None:
+    """
+    Autosize columns based on the visible (non-metadata) cell contents and header text.
+
+    Args:
+        worksheet (Worksheet): Target worksheet.
+        full_df (pd.DataFrame): Full DataFrame written to the sheet (metadata + data).
+        data_start_row (int): First row index where data (not metadata) starts.
+        min_width (int, optional): Minimum width per column (characters). Default 15.
+        header_min_width (int, optional): Minimum width cap based on the header length. Default 80.
+        padding (int, optional): Extra width padding (characters). Default 2.
+    """
+    if full_df is None or full_df.empty:
+        return
+
+    for col_idx, col_name in enumerate(full_df.columns):
+        visible_values = full_df[col_name].iloc[data_start_row:]
+        # Compute max content length among visible values
+        if not visible_values.empty:
+            max_content_len = visible_values.astype(str).map(len).max()
+        else:
+            max_content_len = 0
+
+        # Ensure we show the full header name; use a reasonable cap for huge columns
+        # We cap to max(header_min_width, header_len) to keep long headers readable.
+        header_len = len(str(col_name))
+        header_cap = max(header_min_width, header_len)
+
+        target_len = max(max_content_len, header_len, min_width)
+        final_width = min(target_len, header_cap) + padding
+        worksheet.set_column(col_idx, col_idx, final_width)
