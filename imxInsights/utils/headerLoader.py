@@ -8,9 +8,9 @@ from xlsxwriter.worksheet import Worksheet  # type: ignore
 
 from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 
-
 # TODO: add info for display and analyse columns
 # TODO: write index on excel support? and rename index to write_index in write_df_to_sheet
+
 
 class HeaderLoader:
     """
