@@ -12,7 +12,7 @@ from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 # TODO: write index on excel support? and rename index to write_index in write_df_to_sheet
 
 
-class HeaderLoader:
+class HeaderAnnotator:
     """
     Class to handle the lookup and processing of metadata header rows for Excel sheets.
 
@@ -577,9 +577,9 @@ class HeaderSpec:
     spec_path_col: str = "path"
     spec_ignore_cols: list[str] = field(default_factory=list)
 
-    def get_loader(self) -> "HeaderLoader":
+    def get_loader(self) -> "HeaderAnnotator":
         """Return a `HeaderLoader` configured with this spec."""
-        return HeaderLoader(
+        return HeaderAnnotator(
             self.spec_csv_path,
             self.spec_path_col,
             self.drop_empty_columns,

@@ -3,7 +3,7 @@ import tempfile
 from imxInsights import ImxMultiRepo, ImxContainer, ImxSingleFile
 from openpyxl import load_workbook
 
-from imxInsights.utils.headerLoader import HeaderSpec
+from imxInsights.utils.headerAnnotator import HeaderSpec
 
 
 def test_specs_on_report_v124(

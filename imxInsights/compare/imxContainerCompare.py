@@ -9,7 +9,7 @@ from pandas.io.formats.style import Styler
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
-from imxInsights.utils.headerLoader import HeaderSpec
+from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_change_status,

@@ -124,7 +124,7 @@ nav:
             - ShapelyGml: reference/utils/shapley_gml.md
             - ShapelyGeojson: reference/utils/shapley_geojson.md
             - ShapelyTransform: reference/utils/shapley_transform.md
-            - HeaderLoader: reference/utils/header_loader.md
+            - HeaderLoader: reference/utils/header_annotator.md
     - Contributing: contribution.md
     - Code of conduct: code_of_conduct.md
     - License: license.md
