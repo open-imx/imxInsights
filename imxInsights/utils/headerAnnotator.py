@@ -10,20 +10,25 @@ from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 
 # TODO: add info for display and analyse columns
 # TODO: write index on excel support? and rename index to write_index in write_df_to_sheet
+# TODO: Check if we can use pandas metadata to add column metadata!
 
-
-class HeaderLoader:
+class HeaderAnnotator:
     """
-    Class to handle the lookup and processing of metadata header rows for Excel sheets.
+    Annotates DataFrame exports with metadata headers for Excel reports.
+
+    This class reads a CSV "specification" file describing metadata for fields
+    and applies that metadata as annotated header rows when exporting DataFrames
+    to Excel. It ensures consistent column ordering and makes reports
+    self-documenting.
+
+    !!! danger "Experimental feature"
+        HeaderAnnotator and HeaderSpec are experimental and may change without warning.
 
     Responsibilities:
 
-    - Load a CSV specification file containing metadata about fields.
+    - Parse a CSV specification file that defines metadata for fields.
     - Map specification metadata onto DataFrame columns.
-    - Prepend metadata rows as "header blocks" above data rows in exported Excel files.
-
-    !!! TODO
-            Check if we can use pandas metadata to add column metadata!
+    - Prepend metadata rows (header blocks) above data rows in exported Excel files.
 
     """
 
@@ -35,12 +40,19 @@ class HeaderLoader:
         spec_ignore_cols: list[str] | None = None,
     ):
         """
-        Initialize a HeaderLoader.
+        Initialize a HeaderAnnotator.
 
         Args:
-            spec_csv_path (str | Path): Path to a CSV file containing header specifications.
-            spec_path_col (str): Column name in the spec file containing path references.
-            spec_ignore_cols (list[str], optional): List of columns to ignore and drop from the specification.
+            spec_csv_path: Path to the CSV file containing header specifications.
+            spec_path_col: Column name in the spec that defines the canonical field paths.
+            drop_empty_columns: If True, columns with no matching data will be dropped
+                from the annotated DataFrame.
+            spec_ignore_cols: Optional list of spec columns to ignore and drop.
+
+        Notes:
+            - The specification CSV is normalized automatically (duplicate rows dropped,
+              hyperlinks applied if *_link columns are present, and known typos corrected).
+            - The spec_path_col must contain canonical dot-notation paths (without indices).
         """
         self.spec_csv_path: Path = (
             spec_csv_path if isinstance(spec_csv_path, Path) else Path(spec_csv_path)
@@ -396,16 +408,17 @@ class HeaderLoader:
 
     def apply_metadata_header(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Add a specification metadata header block on top of the given DataFrame.
+        Annotate a DataFrame with specification metadata.
 
-        This wraps the input DataFrame with metadata information, ensuring consistent
-        column ordering.
+        Prepends one or more metadata rows (from the spec CSV) above the actual
+        data rows, ensuring consistent column ordering. The result is ready to
+        export directly to Excel with self-documenting headers.
 
         Args:
-            df (pd.DataFrame): DataFrame with data rows and at least a 'path_to_root' column.
+            df: Input DataFrame. Must contain a 'path_to_root' column.
 
         Returns:
-            pd.DataFrame: Combined DataFrame with metadata header rows prepended.
+            DataFrame with metadata rows stacked on top of the original data rows.
         """
         object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
         object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
@@ -517,12 +530,20 @@ class HeaderSpec:
     """
     Dataclass wrapper for header specification files.
 
+    !!! danger "Experimental feature"
+        HeaderSpec is considered experimental and WILL change without warning.
+
+    Encapsulates configuration for creating a HeaderAnnotator. Use this
+    class when you want to bundle spec file location and options together.
+
     Attributes:
-        spec_csv_path (str): Path to the CSV file with header metadata.
-        spec_path_col (str): Column name used as path field in the spec file. Default "path".
-        spec_ignore_cols (list[str]): List of fields to ignore when loading.
-        drop_empty_columns (bool, optional): If True, drop columns that are entirely
-            empty after merging with the metadata header. Defaults to True.
+        spec_csv_path: Path to the CSV file with header metadata.
+        spec_path_col: Column in the spec that defines canonical paths. Default "path".
+        spec_ignore_cols: List of spec fields to ignore when loading.
+        drop_empty_columns: If True, drop columns that are empty after merging.
+
+    Methods:
+        get_annotator(): Create a HeaderAnnotator configured with this spec.
 
     ## Specification CSV
 
@@ -577,9 +598,9 @@ class HeaderSpec:
     spec_path_col: str = "path"
     spec_ignore_cols: list[str] = field(default_factory=list)
 
-    def get_loader(self) -> "HeaderLoader":
-        """Return a `HeaderLoader` configured with this spec."""
-        return HeaderLoader(
+    def get_annotator(self) -> "HeaderAnnotator":
+        """Return a `HeaderAnnotator` configured with this spec."""
+        return HeaderAnnotator(
             self.spec_csv_path,
             self.spec_path_col,
             self.drop_empty_columns,

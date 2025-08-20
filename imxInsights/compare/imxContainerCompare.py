@@ -9,7 +9,7 @@ from pandas.io.formats.style import Styler
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
-from imxInsights.utils.headerLoader import HeaderSpec
+from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
     styler_highlight_change_status,
@@ -342,7 +342,7 @@ class ImxContainerCompare:
         """
 
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
-        header_loader = header_spec.get_loader() if header_spec else None
+        header_loader = header_spec.get_annotator() if header_spec else None
 
         logger.info("create change excel file")
 
