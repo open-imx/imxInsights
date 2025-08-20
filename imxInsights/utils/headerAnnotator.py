@@ -12,6 +12,7 @@ from imxInsights.utils.report_helpers import apply_autofilter, autosize_columns
 # TODO: write index on excel support? and rename index to write_index in write_df_to_sheet
 # TODO: Check if we can use pandas metadata to add column metadata!
 
+
 class HeaderAnnotator:
     """
     Annotates DataFrame exports with metadata headers for Excel reports.
