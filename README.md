@@ -50,18 +50,6 @@ This initiative aims to provide a collaborative environment for developers, data
 
 💥 We invite you to join the [👉 open-imx community on Discord](https://discord.gg/wBses7bPFg). 
 
-
-## This repository host the imx 12.0 implementation     
-
-Transitioning from version 1.2.4 / 5.0.0 to 12.0.0 of this library necessitates extensive changes and significant code 
-rewriting due to fundamental shifts in how imx files are utilized. 
-
-!!! danger "New concept, breaking changes!"  
-    ***This project is currently under active development and is not yet in its final form.***
-    ***As such, there may be frequent changes, incomplete features, or potential instability.***
-
-    ***-   We recommend using the stable and feature richer 0.1.0 release on for imx versions "1.2.4" and "5.0.0".***
-
 ## Backlog and Roadmap
 <a href="https://github.com/orgs/open-imx/projects/5/" target="_blank">https://github.com/orgs/open-imx/projects/5/</a>
 
