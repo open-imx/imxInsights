@@ -6,7 +6,7 @@ extend-select = ["I", "TRY", "UP"]
 ignore = ["TRY003"]
 
 [tool.pytest.ini_options]
-addopts = "--cov=imxInsights --cov-report=term-missing --ignore=test_build.py"
+# addopts = "--cov=imxInsights --cov-report=term-missing --ignore=test_build.py"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope="function"
 markers = [
@@ -117,6 +117,13 @@ dependencies = [
     "geojson",
     "packaging",
     "content-types",
+]
+
+[project.optional-dependencies]
+test = [
+    "pyinstaller==6.13.0",
+    "pyinstaller-hooks-contrib==2025.4",
+    "ttkthemes"
 ]
 
 [project.urls]

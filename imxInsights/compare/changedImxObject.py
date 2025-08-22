@@ -64,7 +64,9 @@ class ChangedImxObject:
 
     def _determine_object_overall_status(self) -> ChangeStatusEnum:
         unique_statuses = {
-            change.status for key, change in self.changes.items() if key != "parentRef"
+            change.status
+            for key, change in self.changes.items()
+            if key != "parentRef" and key != "path_to_root"
         }
         if unique_statuses in [{ChangeStatusEnum.UNCHANGED}, set()]:
             return ChangeStatusEnum.UNCHANGED

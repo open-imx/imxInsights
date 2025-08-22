@@ -13,6 +13,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.report_helpers import (
+    add_nice_display,
     app_info_df,
     shorten_sheet_name,
     upper_keys_with_index,
@@ -164,38 +165,6 @@ class ImxRepo:
         return self._tree.build_exceptions.exceptions
 
     @staticmethod
-    def _add_nice_display(imx_object, props):
-        # TODO: not sure, if we overwrite the ref, or add a column...
-        add_column = True
-
-        ref_lookup_map = {
-            ref.lookup: ref.display for ref in imx_object.refs
-        }  # Create a lookup map once
-
-        result = {}
-        for key, value in props.items():
-            formatted_value = "\n".join(value.split(" "))
-            result[key] = formatted_value
-
-            if key.endswith("Ref"):
-                if value in ref_lookup_map:
-                    result[f"{key}|display" if add_column else key] = ref_lookup_map[
-                        value
-                    ]
-
-            elif key.endswith("Refs"):
-                ref_displays = [
-                    ref_lookup_map[item]
-                    for item in value.split(" ")
-                    if item in ref_lookup_map
-                ]
-                if ref_displays:
-                    result[f"{key}|display" if add_column else key] = "\n".join(
-                        ref_displays
-                    )
-        return result
-
-    @staticmethod
     def _extract_overview_properties(
         imx_object, input_props=None, nice_display_ref=False
     ):
@@ -210,7 +179,7 @@ class ImxRepo:
         )
 
         if nice_display_ref:
-            props = ImxRepo._add_nice_display(imx_object, props)
+            props = add_nice_display(imx_object, props)
 
         return props
 

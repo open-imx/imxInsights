@@ -12,30 +12,88 @@ from openpyxl.styles import NamedStyle, PatternFill
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
+INVALID_SHEET_CHARS = set(r"[]:*?/\\")
+
+
+def sanitize_sheet_name(name: str) -> str:
+    """
+    Sanitize a string so it can be used as a valid Excel sheet name.
+
+    Rules applied:
+    - Remove invalid Excel characters (\, /, ?, *, [, ], :).
+    - Strip trailing apostrophes (Excel doesn’t allow a sheet name to end with `'`).
+    - If the result is empty, fall back to "Sheet".
+
+    Args:
+        name (str): Proposed sheet name.
+
+    Returns:
+        str: A sanitized sheet name safe for Excel.
+    """
+    name = "".join(ch for ch in name if ch not in INVALID_SHEET_CHARS)
+    name = name.rstrip("'") or "Sheet"
+    return name
+
 
 def shorten_sheet_name(sheet_name: str) -> str:
     """
-    Shorten the sheet name to fit within 30 characters, adding ellipses in the middle if needed.
+    Ensure an Excel sheet name is both valid and within the 31-character limit.
+
+    Workflow:
+    - Sanitize the name (remove invalid characters, trailing apostrophes).
+    - If the name length is <= 31, return it unchanged.
+    - If it exceeds 31 characters, shorten it by keeping:
+        * the first 14 characters,
+        * the last 14 characters,
+        * separated by "..." in the middle.
 
     Args:
-        sheet_name: The name of the sheet to shorten.
+        sheet_name (str): Proposed sheet name.
 
     Returns:
-        The shortened sheet name.
+        str: A valid sheet name that is guaranteed to fit Excel's 31-char limit.
     """
-    return (
-        f"{sheet_name[:14]}...{sheet_name[-14:]}"
-        if len(sheet_name) > 30
-        else sheet_name
-    )
+    sheet_name = sanitize_sheet_name(sheet_name)
+    if len(sheet_name) <= 31:
+        return sheet_name
+    head = 14
+    tail = 14
+    return f"{sheet_name[:head]}...{sheet_name[-tail:]}"
 
 
-def clean_diff_df(df) -> pd.DataFrame:
-    df["@puic"] = df["@puic"].str.lstrip("+-")
-    df["tag"] = df["tag"].str.lstrip("+-")
-    df["path"] = df["path"].str.lstrip("+-")
-    df["parent"] = df["parent"].replace({"++": "", "--": ""})
-    df["children"] = df["children"].replace({"++": "", "--": ""})
+def clean_diff_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean a diff-report DataFrame by removing diff markers from specific columns.
+
+    This function standardizes fields that may contain diff artifacts
+    (e.g., `+`, `-`, `++`, `--`) introduced during change comparisons.
+
+    Cleaning rules:
+    - For columns `@puic`, `tag`, and `path`:
+      * Convert values to strings.
+      * Strip leading '+' or '-' characters.
+    - For columns `parent` and `children`:
+      * Replace `"++"` and `"--"` markers with empty strings.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing diff results.
+
+    Returns:
+        pd.DataFrame: A cleaned copy of the DataFrame with markers removed.
+    """
+    df = df.copy()
+
+    # Columns that need lstrip
+    for col in ["@puic", "tag", "path"]:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.lstrip("+-")
+
+    # Columns that need replacement
+    replacements = {"++": "", "--": ""}
+    for col in ["parent", "children"]:
+        if col in df.columns:
+            df[col] = df[col].replace(replacements)
+
     return df
 
 
@@ -131,6 +189,15 @@ REVIEW_STYLES = {
 
 
 def add_review_styles_to_excel(file_name: str | Path) -> None:
+    """
+    Add predefined review styles as named styles to an existing Excel file.
+
+    Args:
+        file_name (str | Path): Path to the Excel file to modify.
+
+    Returns:
+        None
+    """
     if isinstance(file_name, Path):
         file_name = f"{file_name}"
 
@@ -181,3 +248,134 @@ def add_review_styles_to_excel(file_name: str | Path) -> None:
 
     if os.path.exists(temp_file_name):
         os.remove(temp_file_name)
+
+
+def add_nice_display(imx_object, props):
+    # TODO: not sure, if we overwrite the ref, or add a column...
+    add_column = True
+
+    ref_lookup_map = {
+        ref.lookup: ref.display for ref in imx_object.refs
+    }  # Create a lookup map once
+
+    result = {}
+    for key, value in props.items():
+        formatted_value = "\n".join(value.split(" "))
+        result[key] = formatted_value
+
+        if key.endswith("Ref"):
+            if value in ref_lookup_map:
+                result[f"{key}|display" if add_column else key] = ref_lookup_map[value]
+
+        elif key.endswith("Refs"):
+            ref_displays = [
+                ref_lookup_map[item]
+                for item in value.split(" ")
+                if item in ref_lookup_map
+            ]
+            if ref_displays:
+                result[f"{key}|display" if add_column else key] = "\n".join(
+                    ref_displays
+                )
+    return result
+
+
+def add_overview_df_to_diff_dict(
+    diff_dict: dict[str, pd.DataFrame],
+) -> dict[str, pd.DataFrame]:
+    overview_df = pd.concat(list(diff_dict.values()), axis=0)
+    columns_to_keep = [
+        "@puic",
+        "path",
+        "tag",
+        "parent",
+        "@name",
+        "status",
+        "geometry_status",
+        "Location.GeographicLocation.@accuracy",
+        "Location.GeographicLocation.@dataAcquisitionMethod",
+        "Metadata.@isInService",
+        "Metadata.@lifeCycleStatus",
+        "Metadata.@source",
+    ]
+    existing_columns = [col for col in columns_to_keep if col in overview_df.columns]
+    return {"meta-overview": overview_df[existing_columns]} | diff_dict
+
+
+def unwrap_df(df: pd.DataFrame | pd.io.formats.style.Styler) -> pd.DataFrame:
+    if isinstance(df, pd.DataFrame):
+        return df
+    return getattr(df, "data")
+
+
+def set_sheet_color_by_change_status(df: pd.DataFrame | Styler, work_sheet: Worksheet):
+    status_column = unwrap_df(df)["status"]
+    valid_statuses = [
+        "added",
+        "changed",
+        "unchanged",
+        "type_change",
+        "removed",
+    ]
+    status_values = status_column[status_column.isin(valid_statuses)]
+    if status_values.eq("unchanged").all():
+        work_sheet.set_tab_color("gray")
+
+
+def apply_autofilter(
+    worksheet: Worksheet, start_row: int, data_df: pd.DataFrame
+) -> None:
+    """
+    Apply an autofilter to the header row of the data block.
+
+    Args:
+        worksheet (Worksheet): Target worksheet.
+        start_row (int): Zero-based row where the data header (column names) is written.
+        data_df (pd.DataFrame): The *data* part (not including metadata rows).
+    """
+    if data_df is None or data_df.empty:
+        return
+    # Columns are written starting at col 0; last data col index:
+    last_col_idx = max(0, len(data_df.columns) - 1)
+    worksheet.autofilter(start_row, 0, start_row, last_col_idx)
+
+
+def autosize_columns(
+    worksheet: Worksheet,
+    full_df: pd.DataFrame,
+    data_start_row: int,
+    *,
+    min_width: int = 15,
+    header_min_width: int = 80,
+    padding: int = 2,
+) -> None:
+    """
+    Autosize columns based on the visible (non-metadata) cell contents and header text.
+
+    Args:
+        worksheet (Worksheet): Target worksheet.
+        full_df (pd.DataFrame): Full DataFrame written to the sheet (metadata + data).
+        data_start_row (int): First row index where data (not metadata) starts.
+        min_width (int, optional): Minimum width per column (characters). Default 15.
+        header_min_width (int, optional): Minimum width cap based on the header length. Default 80.
+        padding (int, optional): Extra width padding (characters). Default 2.
+    """
+    if full_df is None or full_df.empty:
+        return
+
+    for col_idx, col_name in enumerate(full_df.columns):
+        visible_values = full_df[col_name].iloc[data_start_row:]
+        # Compute max content length among visible values
+        if not visible_values.empty:
+            max_content_len = visible_values.astype(str).map(len).max()
+        else:
+            max_content_len = 0
+
+        # Ensure we show the full header name; use a reasonable cap for huge columns
+        # We cap to max(header_min_width, header_len) to keep long headers readable.
+        header_len = len(str(col_name))
+        header_cap = max(header_min_width, header_len)
+
+        target_len = max(max_content_len, header_len, min_width)
+        final_width = min(target_len, header_cap) + padding
+        worksheet.set_column(col_idx, col_idx, final_width)

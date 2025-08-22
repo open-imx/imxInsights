@@ -1,9 +1,7 @@
-from typing import Any
-
 import pandas as pd
 
 
-def styler_highlight_changes(value: Any, borders=False) -> str:  # pragma: no cover
+def styler_highlight_changes(value: str, borders=False) -> str:  # pragma: no cover
     """
     Highlight changes in a DataFrame cell with different borders based on the value.
 
@@ -34,7 +32,7 @@ def styler_highlight_changes(value: Any, borders=False) -> str:  # pragma: no co
         return ""
 
 
-def styler_highlight_change_status(value: Any) -> str:  # pragma: no cover
+def styler_highlight_change_status(value: str) -> str:  # pragma: no cover
     """
     Highlight changes in a DataFrame cell with change status.
 
