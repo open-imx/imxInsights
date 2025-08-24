@@ -20,7 +20,7 @@ def sanitize_sheet_name(name: str) -> str:
     Sanitize a string so it can be used as a valid Excel sheet name.
 
     Rules applied:
-    - Remove invalid Excel characters (\, /, ?, *, [, ], :).
+    - Remove invalid Excel characters (\ , /, ?, *, [, ], :).
     - Strip trailing apostrophes (Excel doesn’t allow a sheet name to end with `'`).
     - If the result is empty, fall back to "Sheet".
 
