@@ -202,6 +202,7 @@ class ImxContainerCompare:
                 [
                     "@puic",
                     "path",
+                    "ImxArea",
                     "path_to_root",
                     "tag",
                     "parent",
