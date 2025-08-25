@@ -6,6 +6,7 @@ from lxml.etree import _Element as Element
 from lxml.etree import _ElementTree as ElementTree
 
 from imxInsights.domain.areas import ImxAreas
+from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.xml_helpers import parse_date
 
 
@@ -18,6 +19,7 @@ class SingleImxMetadata:
     created_date: datetime | None = None
     planned_delivery_date: datetime | None = None
     areas: ImxAreas | None = None
+    area_classifier: AreaClassifier | None = None
 
     @staticmethod
     def from_element(
@@ -57,3 +59,7 @@ class SingleImxMetadata:
             self.areas = ImxAreas.from_element(element)
 
         return self
+
+    def get_area_classifier(self) -> "AreaClassifier":
+        return AreaClassifier([self.areas.user_area, self.areas.work_area, self.areas.context_area])
+

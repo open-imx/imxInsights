@@ -10,6 +10,7 @@ from imxInsights.domain.imxEnums import (
     Imx12DataExchangePhaseEnum,
     Imx12ProjectDisciplineEnum,
 )
+from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.xml_helpers import parse_date
 
 
@@ -78,3 +79,6 @@ class ImxContainerMetadata:
             self.areas = ImxAreas.from_element(element)
 
         return self
+
+    def get_area_classifier(self) -> "AreaClassifier":
+        return AreaClassifier([self.areas.user_area, self.areas.work_area, self.areas.context_area])
