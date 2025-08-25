@@ -16,7 +16,7 @@ INVALID_SHEET_CHARS = set(r"[]:*?/\\")
 
 
 def sanitize_sheet_name(name: str) -> str:
-    """
+    r"""
     Sanitize a string so it can be used as a valid Excel sheet name.
 
     Rules applied:

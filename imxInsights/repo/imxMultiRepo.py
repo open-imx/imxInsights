@@ -315,6 +315,15 @@ class ImxMultiRepo(ImxMultiRepoProtocol):
             feature_collection.to_geojson_file(file_name)
             logger.success(f"GeoJSON file created and saved at {file_name}.")
 
+        for container in self.containers:
+            if container.project_metadata:
+                feature_collection = container.project_metadata.get_geojson(
+                    as_wgs=as_wgs
+                )
+                file_name = f"{directory_path}\\ProjectMetadata_{container.container_id}.geojson"
+                feature_collection.to_geojson_file(file_name)
+                logger.success(f"GeoJSON file created and saved at {file_name}.")
+
     def compare(
         self,
         container_id_1: str,

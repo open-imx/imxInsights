@@ -330,7 +330,6 @@ class ImxRepo:
         self,
         object_path: list[str],
         to_wgs: bool = True,
-        extension_properties: bool = False,
         nice_display_ref: bool = False,
     ) -> ShapelyGeoJsonFeatureCollection:
         """
@@ -339,7 +338,6 @@ class ImxRepo:
         Args:
             object_path: A list of object paths used to fetch the corresponding data.
             to_wgs: convert to WGS84
-            extension_properties: add extension properties to geojson
             nice_display_ref: add nice display refs
 
         Returns:
@@ -382,7 +380,6 @@ class ImxRepo:
         self,
         directory_path: str | Path,
         to_wgs: bool = True,
-        extension_properties: bool = False,
         nice_display_ref: bool = True,
     ):
         """
@@ -391,7 +388,6 @@ class ImxRepo:
         Args:
             directory_path: The directory where the GeoJSON files will be created.
             to_wgs: convert to WGS84
-            extension_properties: add extension properties to geojson
             nice_display_ref: add nice display refs
 
         """
@@ -401,7 +397,6 @@ class ImxRepo:
             geojson_feature_collection = self.get_geojson(
                 [path],
                 to_wgs=to_wgs,
-                extension_properties=extension_properties,
                 nice_display_ref=nice_display_ref,
             )
             geojson_file_path = dir_path / f"{path}.geojson"

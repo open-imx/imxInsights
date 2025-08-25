@@ -11,6 +11,10 @@ from imxInsights.domain.imxEnums import (
     Imx12ProjectDisciplineEnum,
 )
 from imxInsights.utils.areaClassifier import AreaClassifier
+from imxInsights.utils.shapely.shapely_geojson import (
+    CrsEnum,
+    ShapelyGeoJsonFeatureCollection,
+)
 from imxInsights.utils.xml_helpers import parse_date
 
 
@@ -93,3 +97,30 @@ class ImxContainerMetadata:
             valid_areas = []
 
         return AreaClassifier(valid_areas)
+
+    def get_geojson(self, as_wgs: bool = True) -> ShapelyGeoJsonFeatureCollection:
+        if not self.areas:
+            return ShapelyGeoJsonFeatureCollection(
+                [], crs=CrsEnum.WGS84 if as_wgs else CrsEnum.RD_NEW_NAP
+            )
+
+        base_props = {
+            "projectName": self.project_name,
+            "externalProjectReference": self.external_project_reference,
+            "plannedDeliveryDate": self.planned_delivery_date.isoformat()
+            if self.planned_delivery_date
+            else None,
+            "projectDiscipline": self.project_discipline.value
+            if self.project_discipline
+            else None,
+            "dataExchangePhase": self.data_exchange_phase.value
+            if self.data_exchange_phase
+            else None,
+            "createdDate": self.created_date.isoformat() if self.created_date else None,
+        }
+
+        collection = self.areas.get_geojson(
+            as_wgs=as_wgs,
+            base_props=base_props,
+        )
+        return collection
