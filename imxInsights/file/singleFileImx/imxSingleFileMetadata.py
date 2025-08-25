@@ -7,6 +7,10 @@ from lxml.etree import _ElementTree as ElementTree
 
 from imxInsights.domain.areas import ImxAreas
 from imxInsights.utils.areaClassifier import AreaClassifier
+from imxInsights.utils.shapely.shapely_geojson import (
+    CrsEnum,
+    ShapelyGeoJsonFeatureCollection,
+)
 from imxInsights.utils.xml_helpers import parse_date
 
 
@@ -73,3 +77,30 @@ class SingleImxMetadata:
             valid_areas = []
 
         return AreaClassifier(valid_areas)
+
+    def get_geojson(self, as_wgs: bool = True) -> ShapelyGeoJsonFeatureCollection:
+        if not self.areas:
+            return ShapelyGeoJsonFeatureCollection(
+                [], crs=CrsEnum.WGS84 if as_wgs else CrsEnum.RD_NEW_NAP
+            )
+
+        base_props = {
+            "projectPuic": self.project_puic,
+            "projectName": self.project_name,
+        }
+        # per your requirement: project metadata only on UserArea
+        user_props = {
+            "projectType": self.project_type,
+            "externalProjectReference": self.external_project_reference,
+            "createdDate": self.created_date.isoformat() if self.created_date else None,
+            "plannedDeliveryDate": self.planned_delivery_date.isoformat()
+            if self.planned_delivery_date
+            else None,
+        }
+
+        collection = self.areas.get_geojson(
+            to_wgs=as_wgs,
+            base_props=base_props,
+            user_props=user_props,
+        )
+        return collection
