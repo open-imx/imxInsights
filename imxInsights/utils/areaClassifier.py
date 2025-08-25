@@ -1,9 +1,8 @@
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import (
     Any,
-    Callable,
     Generic,
-    Iterable,
     Literal,
     Protocol,
     TypeVar,
