@@ -196,13 +196,14 @@ class ImxRepo:
             for item in value:
                 found_areas = area_classifier.flags_by_name(item.geometry)
                 if found_areas["UserArea"]:
-                    item.properties["area"] = "UserArea"
+                    item.properties["ImxArea"] = "UserArea"
                 elif found_areas["WorkArea"]:
-                    item.properties["area"] = "WorkArea"
+                    item.properties["ImxArea"] = "WorkArea"
                 elif found_areas["ContextArea"]:
-                    item.properties["area"] = "ContextArea"
-                else:
-                    item.properties["area"] = "Unclassified"
+                    item.properties["ImxArea"] = "ContextArea"
+
+                if "ImxArea" not in item.properties:
+                    item.properties["ImxArea"] = "Unclassified"
 
     def get_pandas_df(
         self,
@@ -236,6 +237,7 @@ class ImxRepo:
                 "Metadata.@isInService",
                 "Metadata.@lifeCycleStatus",
                 "Metadata.@source",
+                "ImxArea",
             ]
             records = [
                 self._extract_overview_properties(
@@ -301,6 +303,7 @@ class ImxRepo:
             "Metadata.@originType",
             "Metadata.@registrationTime",
             "Metadata.@source",
+            "ImxArea",
         ]
         properties = [
             self._extract_overview_properties(
