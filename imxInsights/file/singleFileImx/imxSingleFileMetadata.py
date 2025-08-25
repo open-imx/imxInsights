@@ -61,5 +61,15 @@ class SingleImxMetadata:
         return self
 
     def get_area_classifier(self) -> "AreaClassifier":
-        return AreaClassifier([self.areas.user_area, self.areas.work_area, self.areas.context_area])
+        if self.areas:
+            areas = [
+                self.areas.user_area,
+                self.areas.work_area,
+                self.areas.context_area,
+            ]
 
+            valid_areas = [a for a in areas if a is not None]
+        else:
+            valid_areas = []
+
+        return AreaClassifier(valid_areas)
