@@ -99,7 +99,7 @@ class SingleImxMetadata:
         }
 
         collection = self.areas.get_geojson(
-            to_wgs=as_wgs,
+            as_wgs=as_wgs,
             base_props=base_props,
             user_props=user_props,
         )
