@@ -8,6 +8,7 @@ import pandas as pd
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
+from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
@@ -44,6 +45,10 @@ class ImxRepoProtocol(Protocol):
 
     def get_keys(self) -> list[str]:
         """Returns the set of keys currently in the tree dictionary."""
+        ...
+
+    def classify_areas(self, area_classifier: AreaClassifier) -> None:
+        """Classify Areas in props..."""
         ...
 
     def get_build_exceptions(self) -> defaultdict[str, list[ImxException]]:

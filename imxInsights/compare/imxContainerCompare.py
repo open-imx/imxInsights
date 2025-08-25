@@ -202,15 +202,15 @@ class ImxContainerCompare:
                 [
                     "@puic",
                     "path",
-                    "path_to_root",
                     "tag",
+                    "ImxArea",
                     "parent",
                     "children",
                     "status",
                     "geometry_status",
                     "@name",
                 ],
-                [],
+                ["path_to_root"],
             )
 
             status_order = ["added", "changed", "unchanged", "type_change", "removed"]

@@ -32,6 +32,7 @@ class ImxContainer(ImxRepo):
         self.imx_version = self._get_imx_version()
         self.project_metadata = self._populate_project_metadata()
         self._populate_tree()
+        self._classify_ares()
 
         logger.success(f"Finished processing {self._input_file_path.name}")
         # self.dataframes = ContainerImxPandasGenerator(self)
@@ -89,3 +90,8 @@ class ImxContainer(ImxRepo):
             imx_file = getattr(self.files, petal)
             if imx_file is not None:
                 self._tree.add_imx_file(imx_file, self.container_id)
+
+    def _classify_ares(self):
+        if self.project_metadata:
+            area_classifier = self.project_metadata.get_area_classifier()
+            self.classify_areas(area_classifier)

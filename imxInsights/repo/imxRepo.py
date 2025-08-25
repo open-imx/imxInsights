@@ -12,6 +12,7 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
+from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.report_helpers import (
     add_nice_display,
     app_info_df,
@@ -183,6 +184,29 @@ class ImxRepo:
 
         return props
 
+    def classify_areas(self, area_classifier: AreaClassifier) -> None:
+        expected_areas = ["UserArea", "WorkArea", "ContextArea"]
+        actual_areas = [item.name for item in area_classifier.areas]
+
+        missing_areas = [a for a in expected_areas if a not in actual_areas]
+        extra_areas = [a for a in actual_areas if a not in expected_areas]
+
+        if missing_areas or extra_areas:
+            logger.warning(
+                f"AreaClassifier mismatch: missing={missing_areas}, unexpected={extra_areas}"
+            )
+
+        for key, value in self._tree.tree_dict.items():
+            for item in value:
+                found_areas = area_classifier.flags_by_name(item.geometry)
+
+                for area in expected_areas:
+                    if found_areas.get(area):
+                        item.properties["ImxArea"] = area
+                        break
+                else:
+                    item.properties["ImxArea"] = "Unclassified"
+
     def get_pandas_df(
         self,
         object_type_or_path: list[str] | None = None,
@@ -208,6 +232,7 @@ class ImxRepo:
             props_in_overview = [
                 "@puic",
                 "tag",
+                "ImxArea",
                 "path",
                 "@name",
                 "Location.GeographicLocation.@accuracy",
@@ -274,6 +299,7 @@ class ImxRepo:
             "parentRef",
             "@puic",
             "@name",
+            "ImxArea",
             "status",
             "Metadata.@isInService",
             "Metadata.@lifeCycleStatus",

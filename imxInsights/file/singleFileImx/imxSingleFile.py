@@ -49,7 +49,20 @@ class ImxSingleFile:
                     )
                     setattr(self, attribute_name, imx_situation)
 
+        self._classify_ares()
+
         logger.success(f"finished processing {self.file.path.name}")
 
     def _populate_project_metadata(self):
         self.project_metadata = SingleImxMetadata.from_element(self.file.root)
+
+    def _classify_ares(self):
+        if self.project_metadata:
+            area_classifier = self.project_metadata.get_area_classifier()
+
+            if self.situation:
+                self.situation.classify_areas(area_classifier)
+            if self.new_situation:
+                self.new_situation.classify_areas(area_classifier)
+            if self.initial_situation:
+                self.initial_situation.classify_areas(area_classifier)
