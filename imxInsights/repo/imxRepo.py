@@ -185,24 +185,26 @@ class ImxRepo:
         return props
 
     def classify_areas(self, area_classifier: AreaClassifier) -> None:
-        if [item.name for item in area_classifier.areas] != [
-            "UserArea",
-            "WorkArea",
-            "ContextArea",
-        ]:
-            raise ValueError("Imx Areas not present in AreaClassifier")
+        expected_areas = ["UserArea", "WorkArea", "ContextArea"]
+        actual_areas = [item.name for item in area_classifier.areas]
+
+        missing_areas = [a for a in expected_areas if a not in actual_areas]
+        extra_areas = [a for a in actual_areas if a not in expected_areas]
+
+        if missing_areas or extra_areas:
+            logger.warning(
+                f"AreaClassifier mismatch: missing={missing_areas}, unexpected={extra_areas}"
+            )
 
         for key, value in self._tree.tree_dict.items():
             for item in value:
                 found_areas = area_classifier.flags_by_name(item.geometry)
-                if found_areas["UserArea"]:
-                    item.properties["ImxArea"] = "UserArea"
-                elif found_areas["WorkArea"]:
-                    item.properties["ImxArea"] = "WorkArea"
-                elif found_areas["ContextArea"]:
-                    item.properties["ImxArea"] = "ContextArea"
 
-                if "ImxArea" not in item.properties:
+                for area in expected_areas:
+                    if found_areas.get(area):
+                        item.properties["ImxArea"] = area
+                        break
+                else:
                     item.properties["ImxArea"] = "Unclassified"
 
     def get_pandas_df(
@@ -230,6 +232,7 @@ class ImxRepo:
             props_in_overview = [
                 "@puic",
                 "tag",
+                "ImxArea",
                 "path",
                 "@name",
                 "Location.GeographicLocation.@accuracy",
@@ -237,7 +240,6 @@ class ImxRepo:
                 "Metadata.@isInService",
                 "Metadata.@lifeCycleStatus",
                 "Metadata.@source",
-                "ImxArea",
             ]
             records = [
                 self._extract_overview_properties(
@@ -297,13 +299,13 @@ class ImxRepo:
             "parentRef",
             "@puic",
             "@name",
+            "ImxArea",
             "status",
             "Metadata.@isInService",
             "Metadata.@lifeCycleStatus",
             "Metadata.@originType",
             "Metadata.@registrationTime",
             "Metadata.@source",
-            "ImxArea",
         ]
         properties = [
             self._extract_overview_properties(
