@@ -1,3 +1,5 @@
+from typing import overload  # NEW
+
 import pyproj
 from shapely import Geometry
 from shapely.geometry import (
@@ -19,110 +21,86 @@ class ShapelyTransform:
     _transformer_to_wgs = pyproj.Transformer.from_crs(rd, wgs, always_xy=True)
     _transformer_to_rd = pyproj.Transformer.from_crs(wgs, rd, always_xy=True)
 
+    @overload
     @classmethod
-    def rd_to_wgs(
-        cls,
-        geometry: Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection,
-    ) -> (
-        Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection
-    ):
+    def rd_to_wgs(cls, geometry: Point) -> Point: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: LineString) -> LineString: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: Polygon) -> Polygon: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: MultiPoint) -> MultiPoint: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: MultiLineString) -> MultiLineString: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: MultiPolygon) -> MultiPolygon: ...
+    @overload
+    @classmethod
+    def rd_to_wgs(cls, geometry: GeometryCollection) -> GeometryCollection: ...
+
+    @classmethod
+    def rd_to_wgs(cls, geometry: Geometry) -> Geometry:  # CHANGED: uses broad type
         """
         Convert a Shapely geometry from RD (EPSG:28992) to WGS84 (EPSG:4326).
-
-        Args:
-            geometry: A Shapely geometry in RD coordinates.
-
-        Returns:
-            A Shapely geometry in WGS84 coordinates.
         """
         return cls._transform(geometry, cls._transformer_to_wgs)
 
+    @overload
     @classmethod
-    def wgs_to_rd(
-        cls,
-        geometry: Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection,
-    ) -> (
-        Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection
-    ):
+    def wgs_to_rd(cls, geometry: Point) -> Point: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: LineString) -> LineString: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: Polygon) -> Polygon: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: MultiPoint) -> MultiPoint: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: MultiLineString) -> MultiLineString: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: MultiPolygon) -> MultiPolygon: ...
+    @overload
+    @classmethod
+    def wgs_to_rd(cls, geometry: GeometryCollection) -> GeometryCollection: ...
+
+    @classmethod
+    def wgs_to_rd(cls, geometry: Geometry) -> Geometry:  # CHANGED: uses broad type
         """
         Convert a Shapely geometry from WGS84 (EPSG:4326) to RD (EPSG:28992).
-
-        Args:
-            geometry: A Shapely geometry in WGS84 coordinates.
-
-        Returns:
-            A Shapely geometry in RD coordinates.
         """
         return cls._transform(geometry, cls._transformer_to_rd)
 
     @classmethod
-    def _transform(
+    def _transform(  # CHANGED: arg/return use Geometry (broad)
         cls,
-        geometry: Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection
-        | Geometry,
+        geometry: Geometry,
         transformer: pyproj.Transformer,
-    ) -> (
-        Point
-        | LineString
-        | Polygon
-        | MultiLineString
-        | MultiPoint
-        | MultiPolygon
-        | GeometryCollection
-    ):
+    ) -> Geometry:
         if isinstance(geometry, Point):
             return cls._transform_point(geometry, transformer)
-
         elif isinstance(geometry, LineString):
             return cls._transform_linestring(geometry, transformer)
-
         elif isinstance(geometry, Polygon):
             return cls._transform_polygon(geometry, transformer)
-
         elif isinstance(geometry, MultiLineString):
             return cls._transform_multilinestring(geometry, transformer)
-
         elif isinstance(geometry, MultiPoint):
             return cls._transform_multipoint(geometry, transformer)
-
         elif isinstance(geometry, MultiPolygon):
             return cls._transform_multipolygon(geometry, transformer)
-
         elif isinstance(geometry, GeometryCollection):
             return cls._transform_geometrycollection(geometry, transformer)
-
         else:
-            raise TypeError(f"Unsupported geometry type: {type(geometry).__name__}")  # NOQA TRY003
+            raise TypeError(f"Unsupported geometry type: {type(geometry).__name__}")  # NOQA: TRY003
 
     @classmethod
     def _transform_coords(cls, coords, transformer):
@@ -135,7 +113,7 @@ class ShapelyTransform:
                 x, y, z = coord
                 transformed_coord = transformer.transform(x, y) + (z,)
             else:
-                raise ValueError(  # NOQA TRY003
+                raise ValueError(  # NOQA: TRY003
                     "Coordinate must have either 2 (x, y) or 3 (x, y, z) elements"
                 )
             transformed_coords.append(transformed_coord)
