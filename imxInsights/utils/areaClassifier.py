@@ -27,7 +27,7 @@ TreeQueryRelation = Literal[
 @runtime_checkable
 class AreaLike(Protocol):
     name: str | None
-    shapely: base.BaseGeometry
+    geometry: base.BaseGeometry
 
 
 TArea = TypeVar("TArea", bound=AreaLike)
@@ -43,7 +43,7 @@ class AreaHit(Generic[TArea]):
 class AreaClassifier(Generic[TArea]):
     def __init__(self, areas: Iterable[TArea]) -> None:
         self._areas: list[TArea] = list(areas or [])
-        self._geoms: list[base.BaseGeometry] = [item.shapely for item in self._areas]
+        self._geoms: list[base.BaseGeometry] = [item.geometry for item in self._areas]
         self._tree: STRtree = STRtree(self._geoms)
 
     @property

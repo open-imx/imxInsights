@@ -12,7 +12,7 @@ from imxInsights.utils.areaClassifier import AreaClassifier, AreaLike
 @dataclass(frozen=True)
 class Area(AreaLike):
     name: str | None
-    shapely: shapely_base.BaseGeometry
+    geometry: shapely_base.BaseGeometry
 
 
 @pytest.fixture

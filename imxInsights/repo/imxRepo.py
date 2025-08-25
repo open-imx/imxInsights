@@ -12,6 +12,7 @@ from loguru import logger
 from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
+from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.report_helpers import (
     add_nice_display,
     app_info_df,
@@ -182,6 +183,26 @@ class ImxRepo:
             props = add_nice_display(imx_object, props)
 
         return props
+
+    def classify_areas(self, area_classifier: AreaClassifier) -> None:
+        if [item.name for item in area_classifier.areas] != [
+            "UserArea",
+            "WorkArea",
+            "ContextArea",
+        ]:
+            raise ValueError("Imx Areas not present in AreaClassifier")
+
+        for key, value in self._tree.tree_dict.items():
+            for item in value:
+                found_areas = area_classifier.flags_by_name(item.geometry)
+                if found_areas["UserArea"]:
+                    item.properties["area"] = "UserArea"
+                elif found_areas["WorkArea"]:
+                    item.properties["area"] = "WorkArea"
+                elif found_areas["ContextArea"]:
+                    item.properties["area"] = "ContextArea"
+                else:
+                    item.properties["area"] = "Unclassified"
 
     def get_pandas_df(
         self,
