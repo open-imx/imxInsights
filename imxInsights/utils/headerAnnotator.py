@@ -421,6 +421,7 @@ class HeaderAnnotator:
         Returns:
             DataFrame with metadata rows stacked on top of the original data rows.
         """
+        original_order = df.columns.tolist()
         object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
         object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
         column_path_map_df = self._build_column_path_map(
@@ -435,6 +436,9 @@ class HeaderAnnotator:
         )
         del df_with_header["path_to_root"]
 
+        original_order.insert(0, "IndexInfo")
+        original_order.remove("path_to_root")
+        df_with_header = df_with_header[original_order]
         return df_with_header
 
     @staticmethod
@@ -506,7 +510,7 @@ class HeaderAnnotator:
             startrow=metadata_rows,
         )
 
-        worksheet.freeze_panes(metadata_rows + 1, 1)
+        worksheet.freeze_panes(metadata_rows + 1, 2)
 
         # Calculate widths and apply filter only to the data area
         data_df = df.data if isinstance(df, Styler) else df  # type: ignore
@@ -514,6 +518,7 @@ class HeaderAnnotator:
         if auto_filter and not data_df.empty:
             apply_autofilter(worksheet, start_row=metadata_rows, data_df=data_df)
 
+        # TODO: refactor below
         autosize_columns(
             worksheet=worksheet,
             full_df=df,
@@ -522,6 +527,8 @@ class HeaderAnnotator:
             header_min_width=80,
             padding=2,
         )
+        worksheet.set_column("A:A", options={'level': 1, 'hidden': True})
+        worksheet.set_column("H:I", options={'level': 1, 'hidden': True})
 
         return worksheet
 

@@ -177,7 +177,7 @@ def write_df_to_sheet(
 
     if grouped_columns:
         for grouped_column in grouped_columns:
-            worksheet.set_column(grouped_column, options={'level': 1, 'hidden': False})
+            worksheet.set_column(grouped_column, options={'level': 1, 'hidden': True})
 
     worksheet.autofit()
     return worksheet
