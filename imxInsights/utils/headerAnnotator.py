@@ -527,8 +527,8 @@ class HeaderAnnotator:
             header_min_width=80,
             padding=2,
         )
-        worksheet.set_column("A:A", options={'level': 1, 'hidden': True})
-        worksheet.set_column("H:I", options={'level': 1, 'hidden': True})
+        worksheet.set_column("A:A", options={"level": 1, "hidden": True})
+        worksheet.set_column("H:I", options={"level": 1, "hidden": True})
 
         return worksheet
 

@@ -162,7 +162,7 @@ def write_df_to_sheet(
     index: bool = False,
     header: bool = True,
     auto_filter: bool = True,
-    grouped_columns: list[str] | None = None
+    grouped_columns: list[str] | None = None,
 ) -> Worksheet:
     """Write a DataFrame or Styler object to an Excel sheet."""
     df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
@@ -177,7 +177,7 @@ def write_df_to_sheet(
 
     if grouped_columns:
         for grouped_column in grouped_columns:
-            worksheet.set_column(grouped_column, options={'level': 1, 'hidden': True})
+            worksheet.set_column(grouped_column, options={"level": 1, "hidden": True})
 
     worksheet.autofit()
     return worksheet

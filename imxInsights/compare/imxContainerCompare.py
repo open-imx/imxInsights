@@ -391,7 +391,9 @@ class ImxContainerCompare:
                     elif not header_loader:
                         del df["path_to_root"]
                         styled_df = self._style_diff_pandas(df)
-                        work_sheet = write_df_to_sheet(writer, sheet_name, styled_df, grouped_columns=["G:H"])
+                        work_sheet = write_df_to_sheet(
+                            writer, sheet_name, styled_df, grouped_columns=["G:H"]
+                        )
                     else:
                         work_sheet = header_loader.to_excel_with_metadata(
                             writer,

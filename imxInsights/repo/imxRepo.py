@@ -478,5 +478,5 @@ class ImxRepo:
                     index=False,
                     header=True,
                     auto_filter=True,
-                    grouped_columns=["G:H"]
+                    grouped_columns=["G:H"],
                 )
