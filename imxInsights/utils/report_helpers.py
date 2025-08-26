@@ -288,6 +288,7 @@ def add_overview_df_to_diff_dict(
         "@puic",
         "path",
         "tag",
+        "ImxArea",
         "parent",
         "@name",
         "status",
