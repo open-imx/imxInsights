@@ -197,23 +197,23 @@ class ImxContainerCompare:
         if not df.empty:
             df = clean_diff_df(df)
 
+            # TODO: remove path_to_root
             df = df_columns_sort_start_end(
                 df,
                 [
                     "@puic",
                     "path",
                     "tag",
+                    "status",
+                    "geometry_status",
                     "ImxArea",
                     "parent",
                     "children",
-                    "status",
-                    "geometry_status",
                     "@name",
                 ],
                 ["path_to_root"],
             )
-
-            status_order = ["added", "changed", "unchanged", "type_change", "removed"]
+            status_order = ["added", "changed", "type_change", "removed", "unchanged"]
             df["status"] = pd.Categorical(
                 df["status"], categories=status_order, ordered=True
             )
@@ -381,6 +381,7 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:
+                        # TODO: this will fuk up column order
                         df = header_loader.apply_metadata_header(df)
 
                     df = df.fillna("")
@@ -388,8 +389,11 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         work_sheet = write_df_to_sheet(writer, sheet_name, df)
                     elif not header_loader:
+                        del df["path_to_root"]
                         styled_df = self._style_diff_pandas(df)
-                        work_sheet = write_df_to_sheet(writer, sheet_name, styled_df)
+                        work_sheet = write_df_to_sheet(
+                            writer, sheet_name, styled_df, grouped_columns=["G:H"]
+                        )
                     else:
                         work_sheet = header_loader.to_excel_with_metadata(
                             writer,

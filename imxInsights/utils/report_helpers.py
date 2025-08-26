@@ -162,11 +162,11 @@ def write_df_to_sheet(
     index: bool = False,
     header: bool = True,
     auto_filter: bool = True,
+    grouped_columns: list[str] | None = None,
 ) -> Worksheet:
     """Write a DataFrame or Styler object to an Excel sheet."""
     df.to_excel(writer, sheet_name=sheet_name, index=index, header=header)
     worksheet = writer.sheets[sheet_name]
-    worksheet.autofit()
     worksheet.freeze_panes(1, 0)
 
     data = df.data if isinstance(df, Styler) else df  # type: ignore
@@ -174,6 +174,12 @@ def write_df_to_sheet(
     if auto_filter and not data.empty:
         num_cols = len(data.columns) - 1
         worksheet.autofilter(0, 0, 0, num_cols)
+
+    if grouped_columns:
+        for grouped_column in grouped_columns:
+            worksheet.set_column(grouped_column, options={"level": 1, "hidden": True})
+
+    worksheet.autofit()
     return worksheet
 
 
@@ -288,6 +294,7 @@ def add_overview_df_to_diff_dict(
         "@puic",
         "path",
         "tag",
+        "ImxArea",
         "parent",
         "@name",
         "status",

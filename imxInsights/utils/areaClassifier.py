@@ -54,7 +54,7 @@ class AreaClassifier(Generic[TArea]):
         self,
         obj: Any,
         *,
-        relation: TreeQueryRelation = "within",
+        relation: TreeQueryRelation = "intersects",
         geometry_getter: Callable[[Any], base.BaseGeometry] | None = None,
     ) -> list[AreaHit[TArea]]:
         if not self._areas:
@@ -67,7 +67,7 @@ class AreaClassifier(Generic[TArea]):
         self,
         objs: Iterable[Any],
         *,
-        relation: TreeQueryRelation = "within",
+        relation: TreeQueryRelation = "intersects",
         geometry_getter: Callable[[Any], base.BaseGeometry] | None = None,
     ) -> list[list[AreaHit[TArea]]]:
         objs_list = list(objs)
@@ -105,7 +105,7 @@ class AreaClassifier(Generic[TArea]):
         self,
         obj: Any,
         *,
-        relation: TreeQueryRelation = "within",
+        relation: TreeQueryRelation = "intersects",
         geometry_getter: Callable[[Any], base.BaseGeometry] | None = None,
     ) -> dict[str, bool]:
         hits = self.classify(obj, relation=relation, geometry_getter=geometry_getter)
