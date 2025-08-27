@@ -4,11 +4,16 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+import shapely
+from deepdiff import DeepDiff
 from loguru import logger
 from pandas.io.formats.style import Styler
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
+from imxInsights.compare.changes import Change, process_deep_diff
+from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
+from imxInsights.utils.flatten_unflatten import flatten_dict
 from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
@@ -27,6 +32,7 @@ from imxInsights.utils.report_helpers import (
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
+    ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
 
@@ -282,6 +288,92 @@ class ImxContainerCompare:
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
         )
 
+    def get_project_metadata_geojson(
+        self, to_wgs: bool = True
+    ) -> ShapelyGeoJsonFeatureCollection:
+        areas: dict = {
+            "UserArea": {"t1": {}, "t2": {}},
+            "WorkArea": {"t1": {}, "t2": {}},
+        }
+        id_map = {self.container_id_1: "t1", self.container_id_2: "t2"}
+
+        for container in self._repo.containers:
+            version = id_map.get(container.container_id)
+            if not version or not container.project_metadata:
+                continue
+
+            for feature in container.project_metadata.get_geojson(to_wgs).features:
+                area = feature.properties.get("area")
+                if area in areas and feature.geometry_list:
+                    areas[area][version] = {
+                        "props": feature.properties,
+                        "geo": feature.geometry_list[0].wkt,
+                    }
+
+        features: list[ShapelyGeoJsonFeature] = []
+
+        for area_name, versions in areas.items():
+            dd = DeepDiff(
+                versions["t1"],
+                versions["t2"],
+                ignore_order=True,
+                verbose_level=2,
+                cutoff_distance_for_pairs=1,
+                cutoff_intersection_for_pairs=1,
+                report_repetition=True,
+            )
+            changes = process_deep_diff(dd)
+
+            # Add unchanged keys from t1
+            for k, v in flatten_dict(versions["t1"]).items():
+                changes.setdefault(
+                    k,
+                    Change(
+                        ChangeStatusEnum.UNCHANGED,
+                        t1=v,
+                        t2=v,
+                        diff_string=str(v),
+                        analyse=None,
+                    ),
+                )
+
+            changed = any(
+                ch.status != ChangeStatusEnum.UNCHANGED for ch in changes.values()
+            )
+            geometry_changes = {
+                k: ch for k, ch in changes.items() if k.startswith("geo")
+            }
+            geometry_changed = any(
+                ch.status != ChangeStatusEnum.UNCHANGED
+                for ch in geometry_changes.values()
+            )
+            geometry_1 = next(
+                (ch.t1 for ch in geometry_changes.values() if ch.t1),
+                versions["t1"].get("geo"),
+            )
+            geometry_2 = next(
+                (ch.t2 for ch in geometry_changes.values() if ch.t2),
+                versions["t2"].get("geo"),
+            )
+
+            props = {
+                k.removeprefix("props."): ch.diff_string
+                for k, ch in changes.items()
+                if k != "geo"
+            }
+            props.update({"changed": changed, "geometry_changed": geometry_changed})
+
+            for wkt in [geometry_1, geometry_2] if geometry_changed else [geometry_1]:
+                if wkt:
+                    try:
+                        features.append(
+                            ShapelyGeoJsonFeature([shapely.from_wkt(wkt)], props)
+                        )
+                    except Exception as e:
+                        logger.warning(e)
+
+        return ShapelyGeoJsonFeatureCollection(features)
+
     def create_geojson_files(
         self, directory_path: str | Path, to_wgs: bool = True
     ) -> None:
@@ -312,6 +404,10 @@ class ImxContainerCompare:
                 logger.info(f"create geojson file {path}")
                 file_name = f"{directory_path}\\{path}.geojson"
                 geojson_collection.to_geojson_file(file_name)
+
+        feature_collection = self.get_project_metadata_geojson(to_wgs=to_wgs)
+        file_name = f"{directory_path}\\ProjectMetadataAreas.geojson"
+        feature_collection.to_geojson_file(file_name)
 
         logger.success("creating change excel file finished")
 
@@ -373,11 +469,10 @@ class ImxContainerCompare:
             for key, df in diff_dict.items():
                 if df.empty or df.shape[1] == 0:
                     continue
-
-                sheet_name = shorten_sheet_name(key)
-                logger.debug(f"processing {key}")
-
                 try:
+                    sheet_name = shorten_sheet_name(key)
+                    logger.debug(f"processing {key}")
+
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:

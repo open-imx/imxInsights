@@ -13,8 +13,10 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.areaClassifier import AreaClassifier
+from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.report_helpers import (
     add_nice_display,
+    add_review_styles_to_excel,
     app_info_df,
     shorten_sheet_name,
     upper_keys_with_index,
@@ -391,8 +393,8 @@ class ImxRepo:
             nice_display_ref: add nice display refs
 
         """
+        dir_path = Path(directory_path)
         for path in self.get_all_paths():
-            dir_path = Path(directory_path)
             dir_path.mkdir(parents=True, exist_ok=True)
             geojson_feature_collection = self.get_geojson(
                 [path],
@@ -415,8 +417,17 @@ class ImxRepo:
         path.append(node.path)
         return path
 
-    def to_excel(self, file_path: str | Path):
+    def to_excel(
+        self,
+        file_path: str | Path,
+        add_review_styles: bool = True,
+        header_spec: HeaderSpec | None = None,
+    ):
         """Writes the comparison results to an Excel file, applying formatting."""
+        file_name = Path(file_path) if isinstance(file_path, str) else file_path
+        header_loader = header_spec.get_annotator() if header_spec else None
+        logger.info("create change excel file")
+
         pandas_dict = dict(sorted(self.get_pandas_df_dict().items()))
         pandas_dict = upper_keys_with_index(pandas_dict)
 
@@ -470,13 +481,30 @@ class ImxRepo:
             )
 
             for key, df in pandas_dict.items():
-                sheet_name = shorten_sheet_name(key)
-                write_df_to_sheet(
-                    writer,
-                    sheet_name,
-                    df,
-                    index=False,
-                    header=True,
-                    auto_filter=True,
-                    grouped_columns=["G:H"],
-                )
+                try:
+                    sheet_name = shorten_sheet_name(key)
+                    logger.debug(f"processing {key}")
+
+                    if header_loader:
+                        df = header_loader.apply_metadata_header(df)
+                        header_loader.to_excel_with_metadata(
+                            writer,
+                            sheet_name,
+                            df,
+                        )
+                    else:
+                        write_df_to_sheet(
+                            writer,
+                            sheet_name,
+                            df,
+                            index=False,
+                            header=True,
+                            auto_filter=True,
+                        )
+                except Exception as e:
+                    logger.exception(f"Error writing sheet '{sheet_name}': {e}")
+
+        if add_review_styles:
+            add_review_styles_to_excel(file_name)
+
+        logger.success("creating change excel file finished")
