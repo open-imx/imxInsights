@@ -10,7 +10,7 @@ from loguru import logger
 from pandas.io.formats.style import Styler
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
-from imxInsights.compare.changes import Change, get_object_changes, process_deep_diff
+from imxInsights.compare.changes import Change, process_deep_diff
 from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
 from imxInsights.utils.flatten_unflatten import flatten_dict
@@ -288,8 +288,13 @@ class ImxContainerCompare:
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
         )
 
-    def get_project_metadata_geojson(self, to_wgs: bool = True) -> ShapelyGeoJsonFeatureCollection:
-        areas = {"UserArea": {"t1": {}, "t2": {}}, "WorkArea": {"t1": {}, "t2": {}}}
+    def get_project_metadata_geojson(
+        self, to_wgs: bool = True
+    ) -> ShapelyGeoJsonFeatureCollection:
+        areas: dict = {
+            "UserArea": {"t1": {}, "t2": {}},
+            "WorkArea": {"t1": {}, "t2": {}},
+        }
         id_map = {self.container_id_1: "t1", self.container_id_2: "t2"}
 
         for container in self._repo.containers:
@@ -309,9 +314,12 @@ class ImxContainerCompare:
 
         for area_name, versions in areas.items():
             dd = DeepDiff(
-                versions["t1"], versions["t2"],
-                ignore_order=True, verbose_level=2,
-                cutoff_distance_for_pairs=1, cutoff_intersection_for_pairs=1,
+                versions["t1"],
+                versions["t2"],
+                ignore_order=True,
+                verbose_level=2,
+                cutoff_distance_for_pairs=1,
+                cutoff_intersection_for_pairs=1,
                 report_repetition=True,
             )
             changes = process_deep_diff(dd)
@@ -320,22 +328,47 @@ class ImxContainerCompare:
             for k, v in flatten_dict(versions["t1"]).items():
                 changes.setdefault(
                     k,
-                    Change(ChangeStatusEnum.UNCHANGED, t1=v, t2=v, diff_string=str(v), analyse=None),
+                    Change(
+                        ChangeStatusEnum.UNCHANGED,
+                        t1=v,
+                        t2=v,
+                        diff_string=str(v),
+                        analyse=None,
+                    ),
                 )
 
-            changed = any(ch.status != ChangeStatusEnum.UNCHANGED for ch in changes.values())
-            geometry_changes = {k: ch for k, ch in changes.items() if k.startswith("geo")}
-            geometry_changed = any(ch.status != ChangeStatusEnum.UNCHANGED for ch in geometry_changes.values())
-            geometry_1 = next((ch.t1 for ch in geometry_changes.values() if ch.t1), versions["t1"].get("geo"))
-            geometry_2 = next((ch.t2 for ch in geometry_changes.values() if ch.t2), versions["t2"].get("geo"))
+            changed = any(
+                ch.status != ChangeStatusEnum.UNCHANGED for ch in changes.values()
+            )
+            geometry_changes = {
+                k: ch for k, ch in changes.items() if k.startswith("geo")
+            }
+            geometry_changed = any(
+                ch.status != ChangeStatusEnum.UNCHANGED
+                for ch in geometry_changes.values()
+            )
+            geometry_1 = next(
+                (ch.t1 for ch in geometry_changes.values() if ch.t1),
+                versions["t1"].get("geo"),
+            )
+            geometry_2 = next(
+                (ch.t2 for ch in geometry_changes.values() if ch.t2),
+                versions["t2"].get("geo"),
+            )
 
-            props = {k.removeprefix("props."): ch.diff_string for k, ch in changes.items() if k != "geo"}
+            props = {
+                k.removeprefix("props."): ch.diff_string
+                for k, ch in changes.items()
+                if k != "geo"
+            }
             props.update({"changed": changed, "geometry_changed": geometry_changed})
 
-            for wkt in ([geometry_1, geometry_2] if geometry_changed else [geometry_1]):
+            for wkt in [geometry_1, geometry_2] if geometry_changed else [geometry_1]:
                 if wkt:
                     try:
-                        features.append(ShapelyGeoJsonFeature([shapely.from_wkt(wkt)], props))
+                        features.append(
+                            ShapelyGeoJsonFeature([shapely.from_wkt(wkt)], props)
+                        )
                     except Exception as e:
                         logger.warning(e)
 

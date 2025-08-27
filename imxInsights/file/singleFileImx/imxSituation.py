@@ -55,3 +55,18 @@ class ImxSituation(ImxRepo):
 
     def _populate_tree(self, element: Element):
         self._tree.add_imx_element(element, self._imx_file, self.container_id)
+
+    def create_geojson_files(
+        self,
+        directory_path: str | Path,
+        to_wgs: bool = True,
+        nice_display_ref: bool = True,
+    ):
+        super().create_geojson_files(directory_path, to_wgs, nice_display_ref)
+        dir_path = (
+            Path(directory_path) if isinstance(directory_path, str) else directory_path
+        )
+        if self.project_metadata:
+            feature_collection = self.project_metadata.get_geojson(to_wgs)
+            file_name = dir_path / "ProjectMetadataAreas.geojson"
+            feature_collection.to_geojson_file(file_name)

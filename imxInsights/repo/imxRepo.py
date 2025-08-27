@@ -405,10 +405,6 @@ class ImxRepo:
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
 
-        feature_collection = self.project_metadata.get_geojson(to_wgs)
-        file_name = dir_path / "ProjectMetadataAreas.geojson"
-        feature_collection.to_geojson_file(file_name)
-
     @staticmethod
     def _get_full_path(node):
         """Recursively get the path from a node to the top ancestor."""
