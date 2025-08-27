@@ -288,136 +288,58 @@ class ImxContainerCompare:
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
         )
 
-    def get_project_metadata_geojson(
-        self, to_wgs: bool = True
-    ) -> ShapelyGeoJsonFeatureCollection:
-        area_dict: dict[str, dict] = {
-            "UserArea": {"t1": {}, "t2": {}},
-            "WorkArea": {"t1": {}, "t2": {}},
-        }
+    def get_project_metadata_geojson(self, to_wgs: bool = True) -> ShapelyGeoJsonFeatureCollection:
+        areas = {"UserArea": {"t1": {}, "t2": {}}, "WorkArea": {"t1": {}, "t2": {}}}
+        id_map = {self.container_id_1: "t1", self.container_id_2: "t2"}
 
         for container in self._repo.containers:
-            if container.container_id == self.container_id_1:
-                if container.project_metadata:
-                    feature_collection_t1 = container.project_metadata.get_geojson(
-                        to_wgs
-                    )
-                    for item in feature_collection_t1.features:
-                        if item.properties["area"] == "UserArea":
-                            area_dict["UserArea"]["t1"] = {
-                                "props": item.properties,
-                                "geo": item.geometry_list[0].wkt,
-                            }
-                        elif item.properties["area"] == "WorkArea":
-                            area_dict["WorkArea"]["t1"] = {
-                                "props": item.properties,
-                                "geo": item.geometry_list[0].wkt,
-                            }
+            version = id_map.get(container.container_id)
+            if not version or not container.project_metadata:
+                continue
 
-            if container.container_id == self.container_id_2:
-                if container.project_metadata:
-                    feature_collection_t2 = container.project_metadata.get_geojson(
-                        to_wgs
-                    )
-                    for item in feature_collection_t2.features:
-                        if item.properties["area"] == "UserArea":
-                            area_dict["UserArea"]["t2"] = {
-                                "props": item.properties,
-                                "geo": item.geometry_list[0].wkt,
-                            }
-                        elif item.properties["area"] == "WorkArea":
-                            area_dict["WorkArea"]["t2"] = {
-                                "props": item.properties,
-                                "geo": item.geometry_list[0].wkt,
-                            }
+            for feature in container.project_metadata.get_geojson(to_wgs).features:
+                area = feature.properties.get("area")
+                if area in areas and feature.geometry_list:
+                    areas[area][version] = {
+                        "props": feature.properties,
+                        "geo": feature.geometry_list[0].wkt,
+                    }
 
-        features = []
-        for key, value in area_dict.items():
+        features: list[ShapelyGeoJsonFeature] = []
+
+        for area_name, versions in areas.items():
             dd = DeepDiff(
-                value["t1"],
-                value["t2"],
-                ignore_order=True,
-                verbose_level=2,
-                cutoff_distance_for_pairs=1,
-                cutoff_intersection_for_pairs=1,
+                versions["t1"], versions["t2"],
+                ignore_order=True, verbose_level=2,
+                cutoff_distance_for_pairs=1, cutoff_intersection_for_pairs=1,
                 report_repetition=True,
             )
             changes = process_deep_diff(dd)
-            flatten_dict_1 = flatten_dict(value["t1"])
 
-            for key, value in flatten_dict_1.items():
-                if key not in changes:
-                    changes[key] = Change(
-                        status=ChangeStatusEnum.UNCHANGED,
-                        t1=value,
-                        t2=value,
-                        diff_string=f"{value}",
-                        analyse=None,
-                    )
+            # Add unchanged keys from t1
+            for k, v in flatten_dict(versions["t1"]).items():
+                changes.setdefault(
+                    k,
+                    Change(ChangeStatusEnum.UNCHANGED, t1=v, t2=v, diff_string=str(v), analyse=None),
+                )
 
-            temp_dict = {}
-            changed = False
-            geometry_changed = False
-            geometry_1 = None
-            geometry_2 = None
-            for (
-                key2,
-                value2,
-            ) in changes.items():
-                if key2.startswith("geo"):
-                    geometry_1 = value2.t1
-                if value2.status != ChangeStatusEnum.UNCHANGED:
-                    changed = True
-                    if key2.startswith("geo"):
-                        geometry_changed = True
-                        geometry_2 = value2.t2
+            changed = any(ch.status != ChangeStatusEnum.UNCHANGED for ch in changes.values())
+            geometry_changes = {k: ch for k, ch in changes.items() if k.startswith("geo")}
+            geometry_changed = any(ch.status != ChangeStatusEnum.UNCHANGED for ch in geometry_changes.values())
+            geometry_1 = next((ch.t1 for ch in geometry_changes.values() if ch.t1), versions["t1"].get("geo"))
+            geometry_2 = next((ch.t2 for ch in geometry_changes.values() if ch.t2), versions["t2"].get("geo"))
 
-                temp_dict[key2] = value2.diff_string
+            props = {k.removeprefix("props."): ch.diff_string for k, ch in changes.items() if k != "geo"}
+            props.update({"changed": changed, "geometry_changed": geometry_changed})
 
-            temp_dict = {
-                k.removeprefix("props.") if k.startswith("props.") else k: v
-                for k, v in temp_dict.items()
-            }
-            del temp_dict["geo"]
+            for wkt in ([geometry_1, geometry_2] if geometry_changed else [geometry_1]):
+                if wkt:
+                    try:
+                        features.append(ShapelyGeoJsonFeature([shapely.from_wkt(wkt)], props))
+                    except Exception as e:
+                        logger.warning(e)
 
-            if geometry_changed:
-                if geometry_1:
-                    features.append(
-                        ShapelyGeoJsonFeature(
-                            [shapely.from_wkt(geometry_1)],
-                            temp_dict
-                            | {
-                                "changed": changed,
-                                "geometry_changed": geometry_changed,
-                            },
-                        )
-                    )
-                if geometry_2:
-                    features.append(
-                        ShapelyGeoJsonFeature(
-                            [shapely.from_wkt(geometry_2)],
-                            temp_dict
-                            | {
-                                "changed": changed,
-                                "geometry_changed": geometry_changed,
-                            },
-                        )
-                    )
-            else:
-                if geometry_1:
-                    features.append(
-                        ShapelyGeoJsonFeature(
-                            [shapely.from_wkt(geometry_1)],
-                            temp_dict
-                            | {
-                                "changed": changed,
-                                "geometry_changed": geometry_changed,
-                            },
-                        )
-                    )
-
-        feature_collection = ShapelyGeoJsonFeatureCollection(features)
-        return feature_collection
+        return ShapelyGeoJsonFeatureCollection(features)
 
     def create_geojson_files(
         self, directory_path: str | Path, to_wgs: bool = True
@@ -451,7 +373,7 @@ class ImxContainerCompare:
                 geojson_collection.to_geojson_file(file_name)
 
         feature_collection = self.get_project_metadata_geojson(to_wgs=to_wgs)
-        file_name = f"{directory_path}\\PROJECTMETADATA.geojson"
+        file_name = f"{directory_path}\\ProjectMetadataAreas.geojson"
         feature_collection.to_geojson_file(file_name)
 
         logger.success("creating change excel file finished")

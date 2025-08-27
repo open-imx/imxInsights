@@ -393,8 +393,8 @@ class ImxRepo:
             nice_display_ref: add nice display refs
 
         """
+        dir_path = Path(directory_path)
         for path in self.get_all_paths():
-            dir_path = Path(directory_path)
             dir_path.mkdir(parents=True, exist_ok=True)
             geojson_feature_collection = self.get_geojson(
                 [path],
@@ -404,6 +404,10 @@ class ImxRepo:
             geojson_file_path = dir_path / f"{path}.geojson"
             geojson_feature_collection.to_geojson_file(geojson_file_path)
             logger.success(f"GeoJSON file created and saved at {geojson_file_path}.")
+
+        feature_collection = self.project_metadata.get_geojson(to_wgs)
+        file_name = dir_path / "ProjectMetadataAreas.geojson"
+        feature_collection.to_geojson_file(file_name)
 
     @staticmethod
     def _get_full_path(node):
