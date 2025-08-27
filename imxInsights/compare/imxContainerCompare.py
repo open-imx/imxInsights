@@ -373,11 +373,10 @@ class ImxContainerCompare:
             for key, df in diff_dict.items():
                 if df.empty or df.shape[1] == 0:
                     continue
-
-                sheet_name = shorten_sheet_name(key)
-                logger.debug(f"processing {key}")
-
                 try:
+                    sheet_name = shorten_sheet_name(key)
+                    logger.debug(f"processing {key}")
+
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:
