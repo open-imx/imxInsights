@@ -82,7 +82,7 @@ def test_imx_repo_geojson_v124(imx_v124_project_instance: ImxSingleFile):
     with tempfile.TemporaryDirectory() as temp_dir:
         imx.initial_situation.create_geojson_files(temp_dir)
         file_count = len([f for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
-        assert file_count == 73, "Should have x geojson files"
+        assert file_count == 74, "Should have x geojson files"
 
 
 def test_imx_parse_project_v500(imx_v500_project_instance: ImxSingleFile):
@@ -145,7 +145,7 @@ def test_imx_repo_geojson_v1200(imx_v1200_zip_instance: ImxContainer):
     with tempfile.TemporaryDirectory() as temp_dir:
         imx.create_geojson_files(temp_dir)
         file_count = len([f for f in os.listdir(temp_dir) if os.path.isfile(os.path.join(temp_dir, f))])
-        assert file_count == 247, "Should have x geojson files"
+        assert file_count == 248, "Should have x geojson files"
 
 
 def test_imx_parse_v1200_dir(imx_v1200_dir_instance: ImxContainer):
