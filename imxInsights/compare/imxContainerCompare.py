@@ -435,20 +435,20 @@ class ImxContainerCompare:
             directory_path = Path(directory_path)
         directory_path.mkdir(parents=True, exist_ok=True)
 
-        # paths = self._repo.get_all_paths()
-        #
-        # geojson_dict = {}
-        # for path in paths:
-        #     geojson_dict[path] = self.get_geojson([path], to_wgs)
-        #
-        # geojson_dict = dict(sorted(geojson_dict.items()))
-        # geojson_dict = upper_keys_with_index(geojson_dict)
-        #
-        # for path, geojson_collection in geojson_dict.items():
-        #     if len(geojson_collection.features) != 0:
-        #         logger.info(f"create geojson file {path}")
-        #         file_name = f"{directory_path}\\{path}.geojson"
-        #         geojson_collection.to_geojson_file(file_name)
+        paths = self._repo.get_all_paths()
+
+        geojson_dict = {}
+        for path in paths:
+            geojson_dict[path] = self.get_geojson([path], to_wgs)
+
+        geojson_dict = dict(sorted(geojson_dict.items()))
+        geojson_dict = upper_keys_with_index(geojson_dict)
+
+        for path, geojson_collection in geojson_dict.items():
+            if len(geojson_collection.features) != 0:
+                logger.info(f"create geojson file {path}")
+                file_name = f"{directory_path}\\{path}.geojson"
+                geojson_collection.to_geojson_file(file_name)
 
         feature_collection = self.get_project_metadata_geojson(to_wgs=to_wgs)
         file_name = f"{directory_path}\\PROJECTMETADATA.geojson"
