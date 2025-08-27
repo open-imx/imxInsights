@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 from loguru import logger
@@ -25,8 +26,12 @@ class ImxSingleFile:
 
     def __init__(self, imx_file_path: Path | str):
         imx_file_path = Path(imx_file_path)
+        warnings.warn(
+            "Support for SingleImx (IMX version pre 12.0.0) will be dropped in December 2025. ",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         logger.info(f"processing {imx_file_path.name}")
-
         self.file: ImxFile = ImxFile(imx_file_path=imx_file_path)
         self.situation: ImxSituationProtocol | None = None
         self.new_situation: ImxSituationProtocol | None = None
