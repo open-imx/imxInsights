@@ -16,10 +16,11 @@ from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.report_helpers import (
     add_nice_display,
+    add_review_styles_to_excel,
     app_info_df,
     shorten_sheet_name,
     upper_keys_with_index,
-    write_df_to_sheet, add_review_styles_to_excel,
+    write_df_to_sheet,
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,

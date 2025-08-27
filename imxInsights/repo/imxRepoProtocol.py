@@ -88,3 +88,7 @@ class ImxRepoProtocol(Protocol):
     ) -> None:
         """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
         ...
+
+    def to_excel(self, file_path: str | Path):
+        """Writes the comparison results to an Excel file, applying formatting."""
+        ...

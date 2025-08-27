@@ -4,11 +4,16 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+import shapely
+from deepdiff import DeepDiff
 from loguru import logger
 from pandas.io.formats.style import Styler
 
 from imxInsights.compare.changedImxObject import ChangedImxObject
+from imxInsights.compare.changes import Change, get_object_changes, process_deep_diff
+from imxInsights.compare.changeStatusEnum import ChangeStatusEnum
 from imxInsights.repo.imxMultiRepoProtocol import ImxMultiRepoProtocol
+from imxInsights.utils.flatten_unflatten import flatten_dict
 from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.pandas_helpers import (
     df_columns_sort_start_end,
@@ -27,6 +32,7 @@ from imxInsights.utils.report_helpers import (
 )
 from imxInsights.utils.shapely.shapely_geojson import (
     CrsEnum,
+    ShapelyGeoJsonFeature,
     ShapelyGeoJsonFeatureCollection,
 )
 
@@ -197,23 +203,23 @@ class ImxContainerCompare:
         if not df.empty:
             df = clean_diff_df(df)
 
+            # TODO: remove path_to_root
             df = df_columns_sort_start_end(
                 df,
                 [
                     "@puic",
                     "path",
                     "tag",
+                    "status",
+                    "geometry_status",
                     "ImxArea",
                     "parent",
                     "children",
-                    "status",
-                    "geometry_status",
                     "@name",
                 ],
                 ["path_to_root"],
             )
-
-            status_order = ["added", "changed", "unchanged", "type_change", "removed"]
+            status_order = ["added", "changed", "type_change", "removed", "unchanged"]
             df["status"] = pd.Categorical(
                 df["status"], categories=status_order, ordered=True
             )
@@ -282,6 +288,137 @@ class ImxContainerCompare:
             features, crs=CrsEnum.WGS84 if to_wgs else CrsEnum.RD_NEW_NAP
         )
 
+    def get_project_metadata_geojson(
+        self, to_wgs: bool = True
+    ) -> ShapelyGeoJsonFeatureCollection:
+        area_dict: dict[str, dict] = {
+            "UserArea": {"t1": {}, "t2": {}},
+            "WorkArea": {"t1": {}, "t2": {}},
+        }
+
+        for container in self._repo.containers:
+            if container.container_id == self.container_id_1:
+                if container.project_metadata:
+                    feature_collection_t1 = container.project_metadata.get_geojson(
+                        to_wgs
+                    )
+                    for item in feature_collection_t1.features:
+                        if item.properties["area"] == "UserArea":
+                            area_dict["UserArea"]["t1"] = {
+                                "props": item.properties,
+                                "geo": item.geometry_list[0].wkt,
+                            }
+                        elif item.properties["area"] == "WorkArea":
+                            area_dict["WorkArea"]["t1"] = {
+                                "props": item.properties,
+                                "geo": item.geometry_list[0].wkt,
+                            }
+
+            if container.container_id == self.container_id_2:
+                if container.project_metadata:
+                    feature_collection_t2 = container.project_metadata.get_geojson(
+                        to_wgs
+                    )
+                    for item in feature_collection_t2.features:
+                        if item.properties["area"] == "UserArea":
+                            area_dict["UserArea"]["t2"] = {
+                                "props": item.properties,
+                                "geo": item.geometry_list[0].wkt,
+                            }
+                        elif item.properties["area"] == "WorkArea":
+                            area_dict["WorkArea"]["t2"] = {
+                                "props": item.properties,
+                                "geo": item.geometry_list[0].wkt,
+                            }
+
+        features = []
+        for key, value in area_dict.items():
+            dd = DeepDiff(
+                value["t1"],
+                value["t2"],
+                ignore_order=True,
+                verbose_level=2,
+                cutoff_distance_for_pairs=1,
+                cutoff_intersection_for_pairs=1,
+                report_repetition=True,
+            )
+            changes = process_deep_diff(dd)
+            flatten_dict_1 = flatten_dict(value["t1"])
+
+            for key, value in flatten_dict_1.items():
+                if key not in changes:
+                    changes[key] = Change(
+                        status=ChangeStatusEnum.UNCHANGED,
+                        t1=value,
+                        t2=value,
+                        diff_string=f"{value}",
+                        analyse=None,
+                    )
+
+            temp_dict = {}
+            changed = False
+            geometry_changed = False
+            geometry_1 = None
+            geometry_2 = None
+            for (
+                key2,
+                value2,
+            ) in changes.items():
+                if key2.startswith("geo"):
+                    geometry_1 = value2.t1
+                if value2.status != ChangeStatusEnum.UNCHANGED:
+                    changed = True
+                    if key2.startswith("geo"):
+                        geometry_changed = True
+                        geometry_2 = value2.t2
+
+                temp_dict[key2] = value2.diff_string
+
+            temp_dict = {
+                k.removeprefix("props.") if k.startswith("props.") else k: v
+                for k, v in temp_dict.items()
+            }
+            del temp_dict["geo"]
+
+            if geometry_changed:
+                if geometry_1:
+                    features.append(
+                        ShapelyGeoJsonFeature(
+                            [shapely.from_wkt(geometry_1)],
+                            temp_dict
+                            | {
+                                "changed": changed,
+                                "geometry_changed": geometry_changed,
+                            },
+                        )
+                    )
+                if geometry_2:
+                    features.append(
+                        ShapelyGeoJsonFeature(
+                            [shapely.from_wkt(geometry_2)],
+                            temp_dict
+                            | {
+                                "changed": changed,
+                                "geometry_changed": geometry_changed,
+                            },
+                        )
+                    )
+            else:
+                if geometry_1:
+                    features.append(
+                        ShapelyGeoJsonFeature(
+                            [shapely.from_wkt(geometry_1)],
+                            temp_dict
+                            | {
+                                "changed": changed,
+                                "geometry_changed": geometry_changed,
+                            },
+                        )
+                    )
+
+        feature_collection = ShapelyGeoJsonFeatureCollection(features)
+        return feature_collection
+
     def create_geojson_files(
         self, directory_path: str | Path, to_wgs: bool = True
     ) -> None:
@@ -298,20 +435,24 @@ class ImxContainerCompare:
             directory_path = Path(directory_path)
         directory_path.mkdir(parents=True, exist_ok=True)
 
-        paths = self._repo.get_all_paths()
+        # paths = self._repo.get_all_paths()
+        #
+        # geojson_dict = {}
+        # for path in paths:
+        #     geojson_dict[path] = self.get_geojson([path], to_wgs)
+        #
+        # geojson_dict = dict(sorted(geojson_dict.items()))
+        # geojson_dict = upper_keys_with_index(geojson_dict)
+        #
+        # for path, geojson_collection in geojson_dict.items():
+        #     if len(geojson_collection.features) != 0:
+        #         logger.info(f"create geojson file {path}")
+        #         file_name = f"{directory_path}\\{path}.geojson"
+        #         geojson_collection.to_geojson_file(file_name)
 
-        geojson_dict = {}
-        for path in paths:
-            geojson_dict[path] = self.get_geojson([path], to_wgs)
-
-        geojson_dict = dict(sorted(geojson_dict.items()))
-        geojson_dict = upper_keys_with_index(geojson_dict)
-
-        for path, geojson_collection in geojson_dict.items():
-            if len(geojson_collection.features) != 0:
-                logger.info(f"create geojson file {path}")
-                file_name = f"{directory_path}\\{path}.geojson"
-                geojson_collection.to_geojson_file(file_name)
+        feature_collection = self.get_project_metadata_geojson(to_wgs=to_wgs)
+        file_name = f"{directory_path}\\PROJECTMETADATA.geojson"
+        feature_collection.to_geojson_file(file_name)
 
         logger.success("creating change excel file finished")
 
@@ -380,6 +521,7 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:
+                        # TODO: this will fuk up column order
                         df = header_loader.apply_metadata_header(df)
 
                     df = df.fillna("")
@@ -387,8 +529,11 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         work_sheet = write_df_to_sheet(writer, sheet_name, df)
                     elif not header_loader:
+                        del df["path_to_root"]
                         styled_df = self._style_diff_pandas(df)
-                        work_sheet = write_df_to_sheet(writer, sheet_name, styled_df)
+                        work_sheet = write_df_to_sheet(
+                            writer, sheet_name, styled_df, grouped_columns=["G:H"]
+                        )
                     else:
                         work_sheet = header_loader.to_excel_with_metadata(
                             writer,
