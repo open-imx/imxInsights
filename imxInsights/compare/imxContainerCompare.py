@@ -438,7 +438,16 @@ class ImxContainerCompare:
         """
 
         file_name = Path(file_name) if isinstance(file_name, str) else file_name
-        header_loader = header_spec.get_annotator() if header_spec else None
+
+        # we can have more than one version, we should get t2 repo object
+        if header_spec:
+            if not header_spec.spec_csv_path.endswith(
+                f"{self._imx_info[self.container_id_2].imx_version}.csv"
+            ):
+                logger.warning("Spec file does not end whit the imx version of the t2")
+                header_loader = None
+            else:
+                header_loader = header_spec.get_annotator() if header_spec else None
 
         logger.info("create change excel file")
 
