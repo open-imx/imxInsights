@@ -9,6 +9,7 @@ from imxInsights.domain.imxObject import ImxObject
 from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.areaClassifier import AreaClassifier
+from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.utils.shapely.shapely_geojson import ShapelyGeoJsonFeatureCollection
 
 
@@ -89,6 +90,6 @@ class ImxRepoProtocol(Protocol):
         """Create GeoJSON files for the specified object types or paths and save them to the given directory."""
         ...
 
-    def to_excel(self, file_path: str | Path):
+    def to_excel(self, file_path: str | Path, header_spec: HeaderSpec | None = None):
         """Writes the comparison results to an Excel file, applying formatting."""
         ...
