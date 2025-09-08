@@ -425,7 +425,12 @@ class ImxRepo:
     ):
         """Writes the comparison results to an Excel file, applying formatting."""
         file_name = Path(file_path) if isinstance(file_path, str) else file_path
-        header_loader = header_spec.get_annotator() if header_spec else None
+        if not header_spec.spec_csv_path.endswith(self.imx_version):
+            logger.warning("Spec file does not end whit the imx version of the repository")
+            header_loader = None
+        else:
+            header_loader = header_spec.get_annotator() if header_spec else None
+
         logger.info("create change excel file")
 
         pandas_dict = dict(sorted(self.get_pandas_df_dict().items()))
