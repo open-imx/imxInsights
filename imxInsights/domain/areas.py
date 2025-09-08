@@ -128,8 +128,26 @@ class ImxAreas:
 
         # boolean differences for donuts
         if make_donuts:
+            # work without user
             w_cut = w.difference(u) if (w is not None and u is not None) else w
-            c_cut = c.difference(w) if (c is not None and w is not None) else c
+
+            # context without (work ∪ user)
+            if c is not None:
+                mask = None
+                if w is not None and u is not None:
+                    try:
+                        mask = w.union(u)
+                    except Exception:
+                        # Fallback if union hiccups on invalids (should be rare after _fix)
+                        mask = w.buffer(0).union(u.buffer(0))
+                elif w is not None:
+                    mask = w
+                elif u is not None:
+                    mask = u
+
+                c_cut = c.difference(mask) if mask is not None else c
+            else:
+                c_cut = c
         else:
             w_cut, c_cut = w, c
 

@@ -141,9 +141,9 @@ class ObjectTree:
             o.container_id = container_id
             result[o.puic].append(o)
         duplicated = [o for o in objects if len(result[o.puic]) != 1]
-        assert (
-            len(duplicated) == 0
-        ), f"KeyError, multiple results for {[item.puic for item in duplicated]}"
+        assert len(duplicated) == 0, (
+            f"KeyError, multiple results for {[item.puic for item in duplicated]}"
+        )
         return result
 
     def duplicates(self) -> list[str]:
