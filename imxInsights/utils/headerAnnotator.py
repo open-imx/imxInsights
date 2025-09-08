@@ -78,7 +78,7 @@ class HeaderAnnotator:
         self._apply_hyperlink_columns()
         self._drop_ignored_and_duplicates()
 
-    def _apply_hyperlink_columns(self):
+    def _apply_hyperlink_columns(self) -> None:
         """
         Convert any pair of (column, column_link) into Excel HYPERLINK formulas.
 
@@ -86,15 +86,12 @@ class HeaderAnnotator:
             If spec has columns `name` and `name_link`, then replace `name`
             with =HYPERLINK(name_link, name) and drop `name_link`.
         """
-        for col in self.spec_df.columns:
+        # Use row-wise apply to avoid Series + str concatenation (which confuses mypy)
+        for col in list(self.spec_df.columns):
             link_col = f"{col}_link"
             if link_col in self.spec_df.columns:
-                self.spec_df[col] = (
-                    '=HYPERLINK("'
-                    + self.spec_df[link_col]
-                    + '", "'
-                    + self.spec_df[col]
-                    + '")'
+                self.spec_df[col] = self.spec_df.apply(
+                    lambda r: f'=HYPERLINK("{r[link_col]}", "{r[col]}")', axis=1
                 )
                 self.spec_df = self.spec_df.drop([link_col], axis="columns")
 
@@ -227,10 +224,15 @@ class HeaderAnnotator:
         Returns:
             pd.DataFrame: Mapping of DataFrame columns to normalized spec paths.
         """
-        column_path_map_df = pd.DataFrame({"field": df.columns})
-        column_path_map_df["path"] = (
-            object_base_path + column_path_map_df["field"]
-        ).map(self._normalize_path_without_indices)
+        # Build an explicit string Series to keep mypy/pandas stubs happy
+        field_series: pd.Series = pd.Series(list(df.columns), dtype="string")
+        column_path_map_df = pd.DataFrame({"field": field_series})
+
+        # Avoid str + Series; do concatenation inside a lambda per element
+        column_path_map_df["path"] = column_path_map_df["field"].map(
+            lambda s: self._normalize_path_without_indices(f"{object_base_path}{s}")
+        )
+
         return column_path_map_df
 
     def _build_metadata_header(
