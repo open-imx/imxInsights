@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
+from loguru import logger
 from pandas.io.formats.style import Styler
 from xlsxwriter.worksheet import Worksheet  # type: ignore
 
@@ -421,11 +422,22 @@ class HeaderAnnotator:
             df: Input DataFrame. Must contain a 'path_to_root' column.
 
         Returns:
-            DataFrame with metadata rows stacked on top of the original data rows.
+            DataFrame with metadata rows stacked on top of the original data rows,
+            or the unmodified DataFrame if no metadata spec was found.
         """
         original_order = df.columns.tolist()
         object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
         object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
+
+        if object_specs_df.empty:
+            logger.warning(
+                f"HeaderSpec provided but no matching spec found for base path {object_base_path}"
+            )
+            if "path_to_root" in df.columns:
+                df = df.drop(columns=["path_to_root"])
+            df.insert(0, "IndexInfo", "")
+            return df
+
         column_path_map_df = self._build_column_path_map(
             df=df, object_base_path=object_base_path
         )
@@ -436,10 +448,13 @@ class HeaderAnnotator:
         df_with_header = self._merge_metadata_and_data(
             df=df, metadata_header_df=metadata_header_df
         )
-        del df_with_header["path_to_root"]
+        if "path_to_root" in df_with_header.columns:
+            del df_with_header["path_to_root"]
 
         original_order.insert(0, "IndexInfo")
-        original_order.remove("path_to_root")
+        if "path_to_root" in original_order:
+            original_order.remove("path_to_root")
+
         df_with_header = df_with_header[original_order]
         return df_with_header
 
