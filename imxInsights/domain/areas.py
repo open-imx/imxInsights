@@ -110,11 +110,11 @@ class ImxAreas:
         return ShapelyGeoJsonFeature(geoms, properties=properties)
 
     def get_geojson(
-            self,
-            as_wgs: bool = True,
-            base_props: dict | None = None,
-            user_props: dict | None = None,
-            make_donuts: bool = True,
+        self,
+        as_wgs: bool = True,
+        base_props: dict | None = None,
+        user_props: dict | None = None,
+        make_donuts: bool = True,
     ) -> ShapelyGeoJsonFeatureCollection:
         def _compact(d: dict | None) -> dict:
             return {k: v for k, v in (d or {}).items() if v is not None}
