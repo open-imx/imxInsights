@@ -292,7 +292,9 @@ class HeaderAnnotator:
 
         # Combine both results, transpose so fields become columns, and drop all-NaN rows
         metadata_header_df = (
-            pd.concat([merged_specs_df, direct_match_specs_df])
+            pd.concat(
+                [df for df in [merged_specs_df, direct_match_specs_df] if not df.empty]
+            )
             .transpose()
             .dropna(how="all")
         )
