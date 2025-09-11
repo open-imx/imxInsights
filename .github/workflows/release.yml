@@ -113,17 +113,17 @@ jobs:
           hatch build
           hatch publish
 
-      - name: Wait for 3 minutes before dispatching
-        uses: actions/github-script@v7
-        with:
-          script: |
-            console.log("Waiting for 3 minutes...");
-            await new Promise(resolve => setTimeout(resolve, 180000));
-            console.log("Done waiting.");
-
-      - name: Trigger GUI Repo
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.PAT_FOR_GUI_REPO }}
-          repository: open-imx/imxInsightsApps
-          event-type: trigger-auto-release
+#      - name: Wait for 3 minutes before dispatching
+#        uses: actions/github-script@v7
+#        with:
+#          script: |
+#            console.log("Waiting for 3 minutes...");
+#            await new Promise(resolve => setTimeout(resolve, 180000));
+#            console.log("Done waiting.");
+#
+#      - name: Trigger GUI Repo
+#        uses: peter-evans/repository-dispatch@v3
+#        with:
+#          token: ${{ secrets.PAT_FOR_GUI_REPO }}
+#          repository: open-imx/imxInsightsApps
+#          event-type: trigger-auto-release
