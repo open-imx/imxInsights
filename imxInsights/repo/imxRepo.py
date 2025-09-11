@@ -425,6 +425,7 @@ class ImxRepo:
     ):
         """Writes the comparison results to an Excel file, applying formatting."""
         file_name = Path(file_path) if isinstance(file_path, str) else file_path
+        header_loader = None
         if header_spec:
             spec_path_str = str(header_spec.spec_csv_path)
             if not (
@@ -433,7 +434,6 @@ class ImxRepo:
                 logger.warning(
                     "Spec file does not end with the IMX version of the repository"
                 )
-                header_loader = None
             else:
                 header_loader = header_spec.get_annotator()
 
