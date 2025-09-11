@@ -485,7 +485,6 @@ class ImxContainerCompare:
                     if key == "meta-overview":
                         df = df.reset_index(drop=True)
                     elif header_loader:
-                        # TODO: this will fuk up column order
                         df = header_loader.apply_metadata_header(df)
 
                     df = df.fillna("")
