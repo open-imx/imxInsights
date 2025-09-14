@@ -14,6 +14,7 @@ from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.headerAnnotator import HeaderSpec
+from imxInsights.utils.pandas_helpers import df_columns_sort_start_end
 from imxInsights.utils.report_helpers import (
     add_nice_display,
     add_review_styles_to_excel,
@@ -265,6 +266,21 @@ class ImxRepo:
             ]
 
         df = pd.DataFrame.from_records(records)
+
+        df = df_columns_sort_start_end(
+            df,
+            [
+                "@puic",
+                "path",
+                "tag",
+                "ImxArea",
+                "parent",
+                "children",
+                "@name",
+            ],
+            ["path_to_root"],
+        )
+
         if not df.empty and puic_as_index:
             df.set_index("@puic", inplace=False)
             df.fillna("", inplace=True)
@@ -466,13 +482,13 @@ class ImxRepo:
                 [
                     "META_OVERVIEW",
                     "Meta Overview",
-                    '=HYPERLINK("#META_OVERVIEW!A1", "Go")',
+                    '=HYPERLINK("#META_OVERVIEW!A1", "Go to sheet")',
                 ]
             )
             for key, df in pandas_dict.items():
                 sheet_name = shorten_sheet_name(key)
                 index_data.append(
-                    [sheet_name, key, f'=HYPERLINK("#{sheet_name}!A1", "Go the sheet")']
+                    [sheet_name, key, f'=HYPERLINK("#{sheet_name}!A1", "Go to sheet")']
                 )
             index_df = pd.DataFrame(
                 index_data, columns=["Sheet Name", "Full Name", "Link"]
@@ -498,13 +514,14 @@ class ImxRepo:
 
                     if header_loader:
                         df = header_loader.apply_metadata_header(df)
-                        header_loader.to_excel_with_metadata(
+                        worksheet = header_loader.to_excel_with_metadata(
                             writer,
                             sheet_name,
                             df,
                         )
+
                     else:
-                        write_df_to_sheet(
+                        worksheet = write_df_to_sheet(
                             writer,
                             sheet_name,
                             df,
@@ -512,6 +529,9 @@ class ImxRepo:
                             header=True,
                             auto_filter=True,
                         )
+
+                    worksheet.set_column("E:F", options={"level": 1, "hidden": True})
+
                 except Exception as e:
                     logger.exception(f"Error writing sheet '{sheet_name}': {e}")
 
