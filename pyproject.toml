@@ -35,7 +35,7 @@ tag_sign = false
 python = "3.11"
 dependencies = [
     "mypy",
-    "ruff==0.12.12",
+    "ruff==0.13.1",
     "pytest",
     "pytest-cov",
     "pytest-asyncio",
