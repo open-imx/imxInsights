@@ -455,7 +455,12 @@ class ImxContainerCompare:
 
         paths = self._repo.get_all_paths()
         diff_dict = {
-            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=False, ref_display=ref_display)
+            item: self.get_pandas(
+                [item],
+                add_analyse=add_analyse,
+                styled_df=False,
+                ref_display=ref_display,
+            )
             for item in paths
         }
         diff_dict = dict(sorted(diff_dict.items()))

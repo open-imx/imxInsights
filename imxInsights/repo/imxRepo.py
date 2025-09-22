@@ -302,10 +302,14 @@ class ImxRepo:
         out_dict = {}
         if key_based_on_type:
             for imx_type in self.get_types():
-                out_dict[imx_type] = self.get_pandas_df([imx_type], nice_display_ref=nice_display_ref)
+                out_dict[imx_type] = self.get_pandas_df(
+                    [imx_type], nice_display_ref=nice_display_ref
+                )
 
         for imx_path in self.get_all_paths():
-            out_dict[imx_path] = self.get_pandas_df([imx_path], nice_display_ref=nice_display_ref)
+            out_dict[imx_path] = self.get_pandas_df(
+                [imx_path], nice_display_ref=nice_display_ref
+            )
 
         return out_dict
 
@@ -448,12 +452,19 @@ class ImxRepo:
         # 1) Expected .@puic paths from the spec, limited to items marked "In scope" (RVTO or DO)
         # - robust to NaN using 'any(axis=1)'
         # - only keep rows whose path ends with .@puic
-        scope_cols = [c for c in ["uitwisselscope_RVTO", "uitwisselscope_DO"] if c in spec.columns]
-        in_scope_mask = spec[scope_cols].apply(lambda s: s.eq("In scope")).any(axis=1) if scope_cols else pd.Series(
-            False, index=spec.index)
+        scope_cols = [
+            c for c in ["uitwisselscope_RVTO", "uitwisselscope_DO"] if c in spec.columns
+        ]
+        in_scope_mask = (
+            spec[scope_cols].apply(lambda s: s.eq("In scope")).any(axis=1)
+            if scope_cols
+            else pd.Series(False, index=spec.index)
+        )
 
         expected_puic_spec = (
-            spec.loc[in_scope_mask & spec["path"].str.endswith(".@puic", na=False), "path"]
+            spec.loc[
+                in_scope_mask & spec["path"].str.endswith(".@puic", na=False), "path"
+            ]
             .dropna()
             .astype(str)
             .unique()
@@ -463,7 +474,11 @@ class ImxRepo:
         #    We derive them from the first 'path_to_root' of each df (if present), then append '.@puic'
         actual_puic_from_data = set()
         for df in pandas_dict.values():
-            if isinstance(df, pd.DataFrame) and not df.empty and "path_to_root" in df.columns:
+            if (
+                isinstance(df, pd.DataFrame)
+                and not df.empty
+                and "path_to_root" in df.columns
+            ):
                 # use iloc[0] safely
                 root = df["path_to_root"].iloc[0]
                 if pd.notna(root):
@@ -497,11 +512,15 @@ class ImxRepo:
                 header_loader = header_spec.get_annotator()
 
         logger.info("create change excel file")
-        pandas_dict = dict(sorted(self.get_pandas_df_dict(nice_display_ref=nice_display_ref).items()))
+        pandas_dict = dict(
+            sorted(self.get_pandas_df_dict(nice_display_ref=nice_display_ref).items())
+        )
         pandas_dict = upper_keys_with_index(pandas_dict)
         overview_df = self.get_pandas_df_overview(nice_display_ref=nice_display_ref)
         if header_spec:
-            not_present_but_in_scope = self._find_missing_in_scope_puic_paths(header_loader, pandas_dict)
+            not_present_but_in_scope = self._find_missing_in_scope_puic_paths(
+                header_loader, pandas_dict
+            )
 
         file_path = Path(file_path).resolve()
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:

@@ -458,7 +458,9 @@ class HeaderAnnotator:
         if "path_to_root" in original_order:
             original_order.remove("path_to_root")
 
-        extra_cols = [col for col in df_with_header.columns if col not in original_order]
+        extra_cols = [
+            col for col in df_with_header.columns if col not in original_order
+        ]
         new_order = original_order + extra_cols
 
         df_with_header = df_with_header[new_order]
