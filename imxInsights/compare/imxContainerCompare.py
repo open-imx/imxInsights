@@ -424,6 +424,7 @@ class ImxContainerCompare:
         self,
         file_name: str | Path,
         add_analyse: bool = True,
+        ref_display: bool = True,
         add_review_styles: bool = True,
         header_spec: HeaderSpec | None = None,
     ) -> None:
@@ -433,6 +434,7 @@ class ImxContainerCompare:
         Args:
             file_name: Required. The name or path of the Excel file to create.
             add_analyse: Whether to add analysis columns to the Excel output. Defaults to True.
+            ref_display: if True we add ref display column
             add_review_styles: Whether to add review formatting styles to the Excel workbook. Defaults to True.
             header_spec: HeaderSpec object containing header metadata.
         """
@@ -453,7 +455,7 @@ class ImxContainerCompare:
 
         paths = self._repo.get_all_paths()
         diff_dict = {
-            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=False)
+            item: self.get_pandas([item], add_analyse=add_analyse, styled_df=False, ref_display=ref_display)
             for item in paths
         }
         diff_dict = dict(sorted(diff_dict.items()))
