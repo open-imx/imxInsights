@@ -119,13 +119,6 @@ dependencies = [
     "content-types",
 ]
 
-[project.optional-dependencies]
-test = [
-    "pyinstaller==6.15.0",
-    "pyinstaller-hooks-contrib==2025.8",
-    "ttkthemes"
-]
-
 [project.urls]
 
 Documentation = "https://open-imx.github.io/imxInsights/"
