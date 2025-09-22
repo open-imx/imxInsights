@@ -30,6 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        # https://github.com/pypa/hatch/issues/2052
         pipx install hatch
         pipx inject hatch click==8.2.1 --force
         hatch env create

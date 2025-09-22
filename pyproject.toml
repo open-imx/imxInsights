@@ -45,7 +45,6 @@ dependencies = [
     "filelock",
     "distlib",
     "zizmor",
-    "click==8.2.1",
 ]
 
 [[tool.hatch.envs.test.matrix]]
