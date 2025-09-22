@@ -35,7 +35,7 @@ tag_sign = false
 python = "3.11"
 dependencies = [
     "mypy",
-    "ruff== 0.12.12",
+    "ruff==0.12.12",
     "pytest",
     "pytest-cov",
     "pytest-asyncio",
@@ -45,6 +45,7 @@ dependencies = [
     "filelock",
     "distlib",
     "zizmor",
+    "click<8.1.7",
 ]
 
 [[tool.hatch.envs.test.matrix]]
