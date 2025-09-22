@@ -69,11 +69,11 @@ class HeaderAnnotator:
             self.spec_csv_path, on_bad_lines="skip", encoding="utf-8"
         )
 
-        ## TODO: BUG IN SPECS SHOULD BE FIXED
-        #   - extension is named extention in specs so we should replace
-        self.spec_df[self.spec_path_col] = self.spec_df[self.spec_path_col].str.replace(
-            "extention", "extension", regex=False
-        )
+        # ## TODO: BUG IN SPECS SHOULD BE FIXED, this should be fixed now
+        # #   - extension is named extention in specs so we should replace
+        # self.spec_df[self.spec_path_col] = self.spec_df[self.spec_path_col].str.replace(
+        #     "extention", "extension", regex=False
+        # )
 
         # Normalize spec file by applying transformations
         self._apply_hyperlink_columns()
@@ -429,6 +429,7 @@ class HeaderAnnotator:
         """
         original_order = df.columns.tolist()
         object_base_path = self._clean_path(df["path_to_root"].values[0]) + "."
+
         object_specs_df = self._get_specs_for_object(object_base_path=object_base_path)
 
         if object_specs_df.empty:
@@ -457,7 +458,12 @@ class HeaderAnnotator:
         if "path_to_root" in original_order:
             original_order.remove("path_to_root")
 
-        df_with_header = df_with_header[original_order]
+        extra_cols = [
+            col for col in df_with_header.columns if col not in original_order
+        ]
+        new_order = original_order + extra_cols
+
+        df_with_header = df_with_header[new_order]
         return df_with_header
 
     @staticmethod

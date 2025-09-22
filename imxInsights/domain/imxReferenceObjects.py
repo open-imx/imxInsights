@@ -25,5 +25,5 @@ class ImxRef:
     @property
     def display(self) -> str:
         if self.imx_object:
-            return f"{self.lookup}|{self.imx_object.tag if self.imx_object else ''}|{self.imx_object.name if self.imx_object else ''}"
-        return f"{self.lookup}-{self.status.value}"
+            return f"{self.imx_object.tag if self.imx_object else ''}|{self.imx_object.name if self.imx_object else ''}"
+        return f"{self.status.value}"

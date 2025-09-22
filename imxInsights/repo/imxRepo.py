@@ -14,6 +14,7 @@ from imxInsights.exceptions import ImxException
 from imxInsights.repo.imxObjectTree import ObjectTree
 from imxInsights.utils.areaClassifier import AreaClassifier
 from imxInsights.utils.headerAnnotator import HeaderSpec
+from imxInsights.utils.pandas_helpers import df_columns_sort_start_end
 from imxInsights.utils.report_helpers import (
     add_nice_display,
     add_review_styles_to_excel,
@@ -265,19 +266,35 @@ class ImxRepo:
             ]
 
         df = pd.DataFrame.from_records(records)
+
+        df = df_columns_sort_start_end(
+            df,
+            [
+                "@puic",
+                "path",
+                "tag",
+                "ImxArea",
+                "parent",
+                "children",
+                "@name",
+            ],
+            ["path_to_root"],
+        )
+
         if not df.empty and puic_as_index:
             df.set_index("@puic", inplace=False)
             df.fillna("", inplace=True)
         return df
 
     def get_pandas_df_dict(
-        self, key_based_on_type: bool = False
+        self, key_based_on_type: bool = False, nice_display_ref: bool = False
     ) -> dict[str, pd.DataFrame]:
         """
         Get a dictionary of Pandas dataframe of all type bases on keys or path.
 
         Args:
             key_based_on_type: if true key based on type, else on path
+            nice_display_ref: if true we add a display ref column
 
         Returns: dictionary of pandas dataframe
 
@@ -285,10 +302,14 @@ class ImxRepo:
         out_dict = {}
         if key_based_on_type:
             for imx_type in self.get_types():
-                out_dict[imx_type] = self.get_pandas_df([imx_type])
+                out_dict[imx_type] = self.get_pandas_df(
+                    [imx_type], nice_display_ref=nice_display_ref
+                )
 
         for imx_path in self.get_all_paths():
-            out_dict[imx_path] = self.get_pandas_df([imx_path])
+            out_dict[imx_path] = self.get_pandas_df(
+                [imx_path], nice_display_ref=nice_display_ref
+            )
 
         return out_dict
 
@@ -417,10 +438,63 @@ class ImxRepo:
         path.append(node.path)
         return path
 
+    @staticmethod
+    def _find_missing_in_scope_puic_paths(header_loader, pandas_dict) -> pd.DataFrame:
+        """
+        Return a DataFrame with a single column 'path' containing all in-scope .@puic
+        spec paths that are not present in the data.
+        """
+
+        spec = header_loader.spec_df
+        if spec is None or spec.empty:
+            return pd.DataFrame(columns=["path"])
+
+        # 1) Expected .@puic paths from the spec, limited to items marked "In scope" (RVTO or DO)
+        # - robust to NaN using 'any(axis=1)'
+        # - only keep rows whose path ends with .@puic
+        scope_cols = [
+            c for c in ["uitwisselscope_RVTO", "uitwisselscope_DO"] if c in spec.columns
+        ]
+        in_scope_mask = (
+            spec[scope_cols].apply(lambda s: s.eq("In scope")).any(axis=1)
+            if scope_cols
+            else pd.Series(False, index=spec.index)
+        )
+
+        expected_puic_spec = (
+            spec.loc[
+                in_scope_mask & spec["path"].str.endswith(".@puic", na=False), "path"
+            ]
+            .dropna()
+            .astype(str)
+            .unique()
+        )
+
+        # 2) Actual .@puic paths present in the data
+        #    We derive them from the first 'path_to_root' of each df (if present), then append '.@puic'
+        actual_puic_from_data = set()
+        for df in pandas_dict.values():
+            if (
+                isinstance(df, pd.DataFrame)
+                and not df.empty
+                and "path_to_root" in df.columns
+            ):
+                # use iloc[0] safely
+                root = df["path_to_root"].iloc[0]
+                if pd.notna(root):
+                    actual_puic_from_data.add(f"{root}.@puic")
+
+        # 3) Compute missing items
+        expected_set = set(map(str, expected_puic_spec))
+        missing = sorted(expected_set - actual_puic_from_data)
+
+        return pd.DataFrame({"path": missing})
+
     def to_excel(
         self,
         file_path: str | Path,
         add_review_styles: bool = True,
+        nice_display_ref: bool = True,
         header_spec: HeaderSpec | None = None,
     ):
         """Writes the comparison results to an Excel file, applying formatting."""
@@ -438,11 +512,15 @@ class ImxRepo:
                 header_loader = header_spec.get_annotator()
 
         logger.info("create change excel file")
-
-        pandas_dict = dict(sorted(self.get_pandas_df_dict().items()))
+        pandas_dict = dict(
+            sorted(self.get_pandas_df_dict(nice_display_ref=nice_display_ref).items())
+        )
         pandas_dict = upper_keys_with_index(pandas_dict)
-
-        overview_df = self.get_pandas_df_overview()
+        overview_df = self.get_pandas_df_overview(nice_display_ref=nice_display_ref)
+        if header_spec:
+            not_present_but_in_scope = self._find_missing_in_scope_puic_paths(
+                header_loader, pandas_dict
+            )
 
         file_path = Path(file_path).resolve()
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
@@ -466,13 +544,13 @@ class ImxRepo:
                 [
                     "META_OVERVIEW",
                     "Meta Overview",
-                    '=HYPERLINK("#META_OVERVIEW!A1", "Go")',
+                    '=HYPERLINK("#META_OVERVIEW!A1", "Go to sheet")',
                 ]
             )
             for key, df in pandas_dict.items():
                 sheet_name = shorten_sheet_name(key)
                 index_data.append(
-                    [sheet_name, key, f'=HYPERLINK("#{sheet_name}!A1", "Go the sheet")']
+                    [sheet_name, key, f'=HYPERLINK("#{sheet_name}!A1", "Go to sheet")']
                 )
             index_df = pd.DataFrame(
                 index_data, columns=["Sheet Name", "Full Name", "Link"]
@@ -491,6 +569,16 @@ class ImxRepo:
                 auto_filter=True,
             )
 
+            if header_spec:
+                write_df_to_sheet(
+                    writer,
+                    "InScopeMissingObjects",
+                    not_present_but_in_scope,
+                    index=True,
+                    header=True,
+                    auto_filter=True,
+                )
+
             for key, df in pandas_dict.items():
                 try:
                     sheet_name = shorten_sheet_name(key)
@@ -498,13 +586,14 @@ class ImxRepo:
 
                     if header_loader:
                         df = header_loader.apply_metadata_header(df)
-                        header_loader.to_excel_with_metadata(
+                        worksheet = header_loader.to_excel_with_metadata(
                             writer,
                             sheet_name,
                             df,
                         )
+
                     else:
-                        write_df_to_sheet(
+                        worksheet = write_df_to_sheet(
                             writer,
                             sheet_name,
                             df,
@@ -512,6 +601,9 @@ class ImxRepo:
                             header=True,
                             auto_filter=True,
                         )
+
+                    worksheet.set_column("E:F", options={"level": 1, "hidden": True})
+
                 except Exception as e:
                     logger.exception(f"Error writing sheet '{sheet_name}': {e}")
 
