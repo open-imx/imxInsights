@@ -241,4 +241,5 @@ class Imx1500ExtensionMapping(Imx1200ExtensionMapping):
         ObservedLocation: Default is ```["@objectRef"]```.
         KmRibbonLocation: Default is ```["@objectRef"]```.
     """
+
     KmRibbonLocation: list[str] = field(default_factory=lambda: ["@objectRef"])

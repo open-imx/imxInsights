@@ -1,6 +1,6 @@
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
-import xml.etree.ElementTree as ET
 
 from imxInsights.file.containerizedImx.imxDesignCoreFile import ImxDesignCoreFile
 from imxInsights.file.containerizedImx.imxDesignPetalFile import ImxDesignPetalFile
@@ -135,7 +135,9 @@ class ImxContainerFiles:
             "KilometerValues": "kilometer_values",
             "ReferenceSystems": "reference_systems",
         }
-        petal_types = {t for t in imxtype_to_attr if t not in {"SignalingDesign", "Manifest"}}
+        petal_types = {
+            t for t in imxtype_to_attr if t not in {"SignalingDesign", "Manifest"}
+        }
 
         # 4) Load each listed file from the root (respecting subfolders)
         loaded_paths = {manifest_path.resolve()}
