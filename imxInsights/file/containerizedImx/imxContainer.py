@@ -86,6 +86,8 @@ class ImxContainer(ImxRepo):
             "railway_electrification",
             "bgt",
             "observations",
+            "reference_systems",
+            "kilometer_values",
         ]:
             imx_file = getattr(self.files, petal)
             if imx_file is not None:

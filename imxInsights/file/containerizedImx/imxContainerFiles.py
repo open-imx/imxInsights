@@ -26,6 +26,8 @@ class ImxContainerFiles:
         railway_electrification (ImxDesignPetalFile | None): The railway electrification file.
         bgt (ImxDesignPetalFile | None): The BGT file.
         observations (ImxDesignPetalFile | None): The observations file.
+        kilometer_values (ImxDesignPetalFile | None)
+        reference_systems (ImxDesignPetalFile | None)
         additional_files (list[Any]): Additional files.
 
     """
@@ -42,6 +44,8 @@ class ImxContainerFiles:
         self.railway_electrification: ImxDesignPetalFile | None = None
         self.bgt: ImxDesignPetalFile | None = None
         self.observations: ImxDesignPetalFile | None = None
+        self.kilometer_values: ImxDesignPetalFile | None = None
+        self.reference_systems: ImxDesignPetalFile | None = None
         self.additional_files: list[Any] = []
 
     def __iter__(self):
@@ -65,7 +69,7 @@ class ImxContainerFiles:
         cls, container_path: Path, container_id: str
     ) -> "ImxContainerFiles":
         self = cls()
-
+        # TODO: parse manifest get location of file below from manifest!
         tag_to_attr = {
             "{http://www.prorail.nl/IMSpoor}SignalingDesign": "signaling_design",
             "{http://www.prorail.nl/IMSpoor}Manifest": "manifest",
@@ -78,12 +82,14 @@ class ImxContainerFiles:
             "{http://www.prorail.nl/IMSpoor}RailwayElectrification": "railway_electrification",
             "{http://www.prorail.nl/IMSpoor}Bgt": "bgt",
             "{http://www.prorail.nl/IMSpoor}Observations": "observations",
+            "{http://www.prorail.nl/IMSpoor}KilometerValues": "kilometer_values",
+            "{http://www.prorail.nl/IMSpoor}ReferenceSystems": "reference_systems",
         }
 
         for file_path in container_path.glob("*"):
             if file_path.is_file() and file_path.suffix == ".xml":
                 imx_file = ImxFile(file_path, container_id)
-                if imx_file.imx_version not in ["12.0.0", "14.0.0"]:
+                if imx_file.imx_version not in ["12.0.0", "14.0.0", "15.0.0"]:
                     raise ValueError(  # noqa: TRY003
                         f"Imx version {imx_file.imx_version} not supported"
                     )
